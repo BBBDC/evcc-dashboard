@@ -1,15 +1,15 @@
 {
   "meta": {
     "version": "1.0.0",
-    "timestamp": "2026-10-11T10:33:16.886488",
-    "display_time": "11.10.2026 10:33:16",
+    "timestamp": "2026-10-11T10:34:43.405531",
+    "display_time": "11.10.2026 10:34:43",
     "display_date": "11.10.2026"
   },
   "energy": {
-    "pv_power_w": 27156,
-    "pv_power_kw": 27.16,
-    "grid_power_w": -27156,
-    "grid_power_kw": -27.16,
+    "pv_power_w": 26725,
+    "pv_power_kw": 26.73,
+    "grid_power_w": -26725,
+    "grid_power_kw": -26.73,
     "grid_mode": "export",
     "home_power_w": 0,
     "home_power_kw": 0.0,
@@ -18,24 +18,24 @@
     "pv_plants": [
       {
         "title": "Fronius rechts",
-        "power_w": 755,
+        "power_w": 773,
         "energy_kwh": 17.33
       },
       {
         "title": "Solarlog_Anlage",
-        "power_w": 26401,
+        "power_w": 25952,
         "energy_kwh": 2648.14
       }
     ]
   },
   "influx_today": {
-    "energy_kwh": 77.01,
+    "energy_kwh": 78.4,
     "max_power_w": 37853,
-    "avg_power_w": 3300,
+    "avg_power_w": 3328,
     "date": "11.10.2026"
   },
   "forecast": {
-    "today_kwh": 659.2,
+    "today_kwh": 658.02,
     "tomorrow_kwh": 1057.69,
     "dayAfterTomorrow_kwh": 803.27
   },
