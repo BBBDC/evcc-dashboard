@@ -1,15 +1,16 @@
 {
   "meta": {
-    "version": "1.0.0",
-    "timestamp": "2026-10-11T10:34:43.405531",
-    "display_time": "11.10.2026 10:34:43",
-    "display_date": "11.10.2026"
+    "version": "2.0.0",
+    "timestamp": "2026-10-11T10:54:52.932813",
+    "display_time": "11.10.2026 10:54:52",
+    "display_date": "11.10.2026",
+    "location": "Kempten (Allgäu)"
   },
   "energy": {
-    "pv_power_w": 26725,
-    "pv_power_kw": 26.73,
-    "grid_power_w": -26725,
-    "grid_power_kw": -26.73,
+    "pv_power_w": 43415,
+    "pv_power_kw": 43.41,
+    "grid_power_w": -43415,
+    "grid_power_kw": -43.41,
     "grid_mode": "export",
     "home_power_w": 0,
     "home_power_kw": 0.0,
@@ -18,26 +19,93 @@
     "pv_plants": [
       {
         "title": "Fronius rechts",
-        "power_w": 773,
+        "power_w": 1557,
         "energy_kwh": 17.33
       },
       {
         "title": "Solarlog_Anlage",
-        "power_w": 25952,
-        "energy_kwh": 2648.14
+        "power_w": 41858,
+        "energy_kwh": 2648.15
       }
     ]
   },
   "influx_today": {
-    "energy_kwh": 78.4,
-    "max_power_w": 37853,
-    "avg_power_w": 3328,
+    "energy_kwh": 99.7,
+    "max_power_w": 44973,
+    "avg_power_w": 4053,
     "date": "11.10.2026"
   },
-  "forecast": {
-    "today_kwh": 658.02,
-    "tomorrow_kwh": 1057.69,
-    "dayAfterTomorrow_kwh": 803.27
+  "weather_intelligence": {
+    "location": "Kempten (Allgäu)",
+    "dwd": {
+      "condition": "dry",
+      "temp_c": 10.0,
+      "cloud_cover": 100
+    },
+    "open_meteo": {
+      "temp_c": null,
+      "cloud_cover": 95,
+      "sunshine_today_h": 7.1,
+      "sunshine_tomorrow_h": 10.1
+    },
+    "charging_windows": [
+      {
+        "day_label": "Heute",
+        "date": "11.10.2026",
+        "window": "08:30 – 17:45 Uhr",
+        "max_kw": 165.5,
+        "avg_kw": 78.3,
+        "rating": "Optimal (Sehr viel Überschuss)",
+        "rating_code": "optimal",
+        "badge_color": "emerald",
+        "comment": "Bis zu 165 kW Erzeugung – ideales Zeitfenster für Cupra Tavascan / Raval"
+      },
+      {
+        "day_label": "Morgen",
+        "date": "12.10.2026",
+        "window": "08:15 – 18:00 Uhr",
+        "max_kw": 173.8,
+        "avg_kw": 105.1,
+        "rating": "Optimal (Sehr viel Überschuss)",
+        "rating_code": "optimal",
+        "badge_color": "emerald",
+        "comment": "Bis zu 174 kW Erzeugung – ideales Zeitfenster für Cupra Tavascan / Raval"
+      },
+      {
+        "day_label": "Übermorgen",
+        "date": "13.10.2026",
+        "window": "08:15 – 16:30 Uhr",
+        "max_kw": 147.0,
+        "avg_kw": 92.7,
+        "rating": "Optimal (Sehr viel Überschuss)",
+        "rating_code": "optimal",
+        "badge_color": "emerald",
+        "comment": "Bis zu 147 kW Erzeugung – ideales Zeitfenster für Cupra Tavascan / Raval"
+      }
+    ],
+    "days_overview": [
+      {
+        "day_label": "Heute",
+        "date": "11.10.2026",
+        "energy_kwh": 630.8,
+        "max_kw": 165.5,
+        "charging_possible": true
+      },
+      {
+        "day_label": "Morgen",
+        "date": "12.10.2026",
+        "energy_kwh": 1057.7,
+        "max_kw": 173.8,
+        "charging_possible": true
+      },
+      {
+        "day_label": "Übermorgen",
+        "date": "13.10.2026",
+        "energy_kwh": 803.3,
+        "max_kw": 147.0,
+        "charging_possible": true
+      }
+    ]
   },
   "vehicles": [
     {
@@ -74,196 +142,248 @@
     "inverters": [
       {
         "wr_number": 1,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1540,
-        "daysum": 1623,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1509,
+        "daysum": 2404,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.62,
-        "pac_kw": 1.54
+        "daysum_kwh": 2.4,
+        "pac_kw": 1.51,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 2,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1813,
-        "daysum": 1931,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1614,
+        "daysum": 2820,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.93,
-        "pac_kw": 1.81
+        "daysum_kwh": 2.82,
+        "pac_kw": 1.61,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 3,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1547,
-        "daysum": 1623,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1506,
+        "daysum": 2403,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.62,
-        "pac_kw": 1.55
+        "daysum_kwh": 2.4,
+        "pac_kw": 1.51,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 4,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1840,
-        "daysum": 1951,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1637,
+        "daysum": 2855,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.95,
-        "pac_kw": 1.84
+        "daysum_kwh": 2.85,
+        "pac_kw": 1.64,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 5,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1530,
-        "daysum": 1608,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1491,
+        "daysum": 2381,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.61,
-        "pac_kw": 1.53
+        "daysum_kwh": 2.38,
+        "pac_kw": 1.49,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 6,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1554,
-        "daysum": 1632,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1515,
+        "daysum": 2416,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.63,
-        "pac_kw": 1.55
+        "daysum_kwh": 2.42,
+        "pac_kw": 1.51,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 7,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1441,
-        "daysum": 1533,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1411,
+        "daysum": 2263,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.53,
-        "pac_kw": 1.44
+        "daysum_kwh": 2.26,
+        "pac_kw": 1.41,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 8,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 1375,
-        "daysum": 1416,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1218,
+        "daysum": 2089,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 1.42,
-        "pac_kw": 1.38
+        "daysum_kwh": 2.09,
+        "pac_kw": 1.22,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 9,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 2178,
-        "daysum": 2245,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1982,
+        "daysum": 3310,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 2.25,
-        "pac_kw": 2.18
+        "daysum_kwh": 3.31,
+        "pac_kw": 1.98,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 10,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 2078,
-        "daysum": 2132,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 1897,
+        "daysum": 3149,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 2.13,
-        "pac_kw": 2.08
+        "daysum_kwh": 3.15,
+        "pac_kw": 1.9,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 11,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 2420,
-        "daysum": 2495,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 2203,
+        "daysum": 3678,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 2.5,
-        "pac_kw": 2.42
+        "daysum_kwh": 3.68,
+        "pac_kw": 2.2,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 12,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 2448,
-        "daysum": 2516,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 2240,
+        "daysum": 3714,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 2.52,
-        "pac_kw": 2.45
+        "daysum_kwh": 3.71,
+        "pac_kw": 2.24,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 13,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 2460,
-        "daysum": 2536,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 2250,
+        "daysum": 3739,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 2.54,
-        "pac_kw": 2.46
+        "daysum_kwh": 3.74,
+        "pac_kw": 2.25,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 14,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 2398,
-        "daysum": 2468,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 2195,
+        "daysum": 3637,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 2.47,
-        "pac_kw": 2.4
+        "daysum_kwh": 3.64,
+        "pac_kw": 2.19,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 15,
-        "last_update": "2026-10-11T10:10:00",
+        "last_update": "2026-10-11T10:40:00",
         "pac": 0,
         "daysum": 0,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
         "daysum_kwh": 0.0,
-        "pac_kw": 0.0
+        "pac_kw": 0.0,
+        "state_category": "standby",
+        "state_badge": "Standby (0 W)",
+        "status_desc": "Standby / Nacht"
       },
       {
         "wr_number": 16,
-        "last_update": "2026-10-11T10:10:00",
-        "pac": 2270,
-        "daysum": 2343,
+        "last_update": "2026-10-11T10:40:00",
+        "pac": 2084,
+        "daysum": 3449,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 2.34,
-        "pac_kw": 2.27
+        "daysum_kwh": 3.45,
+        "pac_kw": 2.08,
+        "state_category": "active",
+        "state_badge": "Einspeisung",
+        "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 17,
-        "last_update": "2026-10-11T10:10:00",
+        "last_update": "2026-10-11T10:40:00",
         "pac": 0,
         "daysum": 0,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
         "daysum_kwh": 0.0,
-        "pac_kw": 0.0
+        "pac_kw": 0.0,
+        "state_category": "standby",
+        "state_badge": "Standby (0 W)",
+        "status_desc": "Standby / Nacht"
       }
     ],
-    "total_pac": 28892.0,
-    "total_daysum_kwh": 30.05,
-    "active_count": 0,
+    "total_pac": 26752.0,
+    "total_daysum_kwh": 44.31,
+    "active_count": 15,
+    "standby_count": 2,
     "error_count": 0,
-    "last_update": "2026-10-11T10:10:00"
+    "last_update": "2026-10-11T10:40:00"
   }
 }
