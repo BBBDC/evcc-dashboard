@@ -365,65 +365,78 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
             day_after_str: "Übermorgen"
         }
 
+        # Ziel-Ladeleistung des Nutzers (Standard: 7.5 kW = 7–8 kW)
+        TARGET_CHARGE_KW = 7.5
+        TARGET_CHARGE_W = TARGET_CHARGE_KW * 1000.0
+
+        all_charging_points = []
+
         for day_str in [today_str, tomorrow_str, day_after_str]:
             if day_str not in days_map:
                 continue
             points = days_map[day_str]
             label = day_labels.get(day_str, day_str)
 
+            # Serie für interaktiven Schieberegler im Dashboard sammeln
+            for dt, p_w in points:
+                all_charging_points.append({
+                    "t": dt.strftime("%Y-%m-%d %H:%M"),
+                    "day": label,
+                    "hour": dt.strftime("%H:%M"),
+                    "kw": round(p_w / 1000.0, 2)
+                })
+
             # Wallbox Schwellenwerte:
+            # Volle Ladeleistung (7–8 kW Schwellwert)
             # 3-phasiges Laden (ab 6A = 4.1 kW)
             # 1-phasiges Laden (ab 6A = 1.4 kW)
-            # Volle 11 kW Ladeleistung (ab 10.0 kW)
+            full_power_points = [p for p in points if p[1] >= TARGET_CHARGE_W]
             good_points_3p = [p for p in points if p[1] >= 4100]
             good_points_1p = [p for p in points if p[1] >= 1400]
-            full_power_points = [p for p in points if p[1] >= 10000]
 
             max_power_w = max((p[1] for p in points), default=0)
-            avg_power_3p = (sum(p[1] for p in good_points_3p) / len(good_points_3p)) if good_points_3p else 0
             max_kw = max_power_w / 1000.0
+            avg_power_target = (sum(p[1] for p in full_power_points) / len(full_power_points)) if full_power_points else ((sum(p[1] for p in good_points_3p) / len(good_points_3p)) if good_points_3p else 0)
 
-            if good_points_3p:
-                start_time_3p = good_points_3p[0][0].strftime("%H:%M")
-                end_time_3p = good_points_3p[-1][0].strftime("%H:%M")
-                window_str = f"{start_time_3p} – {end_time_3p} Uhr"
-            elif good_points_1p:
-                start_time_1p = good_points_1p[0][0].strftime("%H:%M")
-                end_time_1p = good_points_1p[-1][0].strftime("%H:%M")
-                window_str = f"{start_time_1p} – {end_time_1p} Uhr (1-phasig)"
-            else:
-                window_str = "Kein sonniges Ladefenster"
-
-            # Rating
             if full_power_points:
                 start_full = full_power_points[0][0].strftime("%H:%M")
                 end_full = full_power_points[-1][0].strftime("%H:%M")
-                rating = "Optimal (Volle 11 kW Ladeleistung)"
+                hours_count = round(len(full_power_points) * 15 / 60, 1)
+                window_str = f"{start_full} – {end_full} Uhr"
+                rating = "Optimal (Volle 7–8 kW Leistung)"
                 rating_code = "optimal"
                 badge_color = "emerald"
-                comment = f"Spitze {round(max_kw, 1)} kW • Volle 11 kW Wallbox-Power von {start_full} bis {end_full} Uhr!"
-            elif max_kw >= 6.0:
-                rating = "Sehr gut (3-Phasen Laden 6–10 kW)"
+                comment = f"Spitze {round(max_kw, 1)} kW • Volle Ladeleistung (7–8 kW) durchgehend für ~{hours_count} Std. rein solar gedeckt!"
+            elif good_points_3p:
+                start_3p = good_points_3p[0][0].strftime("%H:%M")
+                end_3p = good_points_3p[-1][0].strftime("%H:%M")
+                window_str = f"{start_3p} – {end_3p} Uhr (Teilladung)"
+                rating = "Gut (3-Phasen Teilladung 4–7 kW)"
                 rating_code = "good"
                 badge_color = "amber"
-                comment = f"Spitze {round(max_kw, 1)} kW • Stabiles 3-phasiges Laden ohne Netzbezug"
-            elif max_kw >= 4.1:
-                rating = "Gut (3-Phasen Laden ab 6A)"
-                rating_code = "good"
-                badge_color = "amber"
-                comment = f"Spitze {round(max_kw, 1)} kW • 3-phasiges Überschussladen möglich"
-            else:
-                rating = "Mäßig (1-phasig empfohlen)"
+                comment = f"Spitze {round(max_kw, 1)} kW • 3-phasiges PV-Laden möglich (bis zu {round(max_kw, 1)} kW)"
+            elif good_points_1p:
+                start_1p = good_points_1p[0][0].strftime("%H:%M")
+                end_1p = good_points_1p[-1][0].strftime("%H:%M")
+                window_str = f"{start_1p} – {end_1p} Uhr (1-phasig)"
+                rating = "Mäßig (1-phasig ab 1.4 kW)"
                 rating_code = "moderate"
                 badge_color = "slate"
                 comment = "Nur für 1-phasiges Erhaltungsladen geeignet"
+            else:
+                window_str = "Kein sonniges Ladefenster"
+                rating = "Kein Solarüberschuss"
+                rating_code = "none"
+                badge_color = "slate"
+                comment = "Wenig bis keine Sonneneinstrahlung"
 
             weather_data["charging_windows"].append({
                 "day_label": label,
                 "date": datetime.strptime(day_str, "%Y-%m-%d").strftime("%d.%m.%Y"),
                 "window": window_str,
+                "target_kw": TARGET_CHARGE_KW,
                 "max_kw": round(max_kw, 1),
-                "avg_kw": round(avg_power_3p / 1000.0, 1) if avg_power_3p else round(max_kw * 0.7, 1),
+                "avg_kw": round(avg_power_target / 1000.0, 1),
                 "rating": rating,
                 "rating_code": rating_code,
                 "badge_color": badge_color,
@@ -437,8 +450,12 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
                 "date": datetime.strptime(day_str, "%Y-%m-%d").strftime("%d.%m.%Y"),
                 "energy_kwh": round(total_day_kwh, 1),
                 "max_kw": round(max_kw, 1),
-                "charging_possible": bool(good_points_3p or good_points_1p)
+                "charging_possible": bool(full_power_points or good_points_3p)
             })
+
+        weather_data["charging_timeseries"] = all_charging_points
+        weather_data["default_target_kw"] = TARGET_CHARGE_KW
+
 
     except Exception as e:
         print(f"Fehler bei Ladefenster-Berechnung: {e}", file=sys.stderr)

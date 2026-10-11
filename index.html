@@ -226,6 +226,37 @@
         </div>
       </div>
 
+      <!-- Interaktiver Ladeleistungs-Einsteller (Standard 7-8 kW) -->
+      <div class="p-4 bg-white rounded-xl border border-cyan-200/90 shadow-2xs mb-5 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold text-xs shrink-0">
+            <i data-lucide="sliders" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
+              <span>Deine maximale Ladeleistung:</span>
+              <span class="px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-900 text-xs font-extrabold font-mono" id="slider-target-val">7.5 kW</span>
+              <span class="text-[11px] font-normal text-slate-500">(7–8 kW Standard)</span>
+            </div>
+            <div class="text-[11px] text-slate-500">Berechnet die genauen Zeitfenster für deine gewünschte Ladeleistung</div>
+          </div>
+        </div>
+
+        <!-- Schnellauswahl Buttons & Slider -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+            <button onclick="setTargetChargeKW(4.1)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="4.1">4,1 kW</button>
+            <button onclick="setTargetChargeKW(6.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="6.0">6,0 kW</button>
+            <button onclick="setTargetChargeKW(7.5)" class="target-btn px-2.5 py-1 rounded font-bold bg-white text-cyan-900 shadow-xs border border-slate-200 transition" data-val="7.5">7,5 kW ★</button>
+            <button onclick="setTargetChargeKW(8.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="8.0">8,0 kW</button>
+            <button onclick="setTargetChargeKW(11.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="11.0">11,0 kW</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <input type="range" id="target-kw-slider" min="3.0" max="11.0" step="0.5" value="7.5" oninput="onSliderChange(this.value)" class="w-24 accent-cyan-600 cursor-pointer">
+          </div>
+        </div>
+      </div>
+
       <!-- Ladeempfehlungs-Karten (Heute, Morgen, Übermorgen) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="charging-windows-container">
         <!-- Dynamisch via JS -->
@@ -235,9 +266,9 @@
       <div class="mt-4 pt-3 border-t border-slate-200/70 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-1.5">
           <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-700 shrink-0"></i>
-          <span><b>Lade-Schwellen:</b> Ab <b>4,1 kW</b> startet 3-phasiges Laden (6A). Ab <b>10 kW</b> steht die volle 11 kW Wallbox-Ladeleistung rein aus Sonnenenergie zur Verfügung.</span>
+          <span><b>Einstellbare Ladeleistung:</b> Die Zeitfenster oben zeigen, wann deine eingestellte Ladeleistung (aktuell <b><span id="info-target-kw">7,5</span> kW</b>) zu 100% ohne Netzbezug solar geladen werden kann.</span>
         </div>
-        <div class="text-slate-500 font-medium">Modell: 18,7 kWp Verbund • Kempten (Allgäu)</div>
+        <div class="text-slate-500 font-medium">Fronius 3er-Verbund (~18,7 kWp)</div>
       </div>
     </div>
 
@@ -571,10 +602,44 @@
       lucide.createIcons();
     }
 
+    let targetChargeKW = parseFloat(localStorage.getItem('max_charging_kw')) || 7.5;
+    let cachedWeather = null;
+
+    function onSliderChange(val) {
+      setTargetChargeKW(parseFloat(val));
+    }
+
+    function setTargetChargeKW(val) {
+      targetChargeKW = parseFloat(val);
+      localStorage.setItem('max_charging_kw', targetChargeKW);
+
+      const slider = document.getElementById('target-kw-slider');
+      if (slider) slider.value = targetChargeKW;
+
+      const valEl = document.getElementById('slider-target-val');
+      if (valEl) valEl.textContent = `${targetChargeKW.toLocaleString('de-DE', { minimumFractionDigits: 1 })} kW`;
+
+      const infoEl = document.getElementById('info-target-kw');
+      if (infoEl) infoEl.textContent = targetChargeKW.toLocaleString('de-DE', { minimumFractionDigits: 1 });
+
+      document.querySelectorAll('.target-btn').forEach(btn => {
+        const btnVal = parseFloat(btn.dataset.val);
+        if (Math.abs(btnVal - targetChargeKW) < 0.1) {
+          btn.className = 'target-btn px-2.5 py-1 rounded font-bold bg-white text-cyan-900 shadow-xs border border-slate-200 transition';
+        } else {
+          btn.className = 'target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition';
+        }
+      });
+
+      if (cachedWeather) {
+        renderChargingCards(cachedWeather, targetChargeKW);
+      }
+    }
+
     function renderWeatherAndCharging(weather) {
+      cachedWeather = weather;
       const dwd = weather.dwd || {};
       const om = weather.open_meteo || {};
-      const windows = weather.charging_windows || [];
 
       // Badges
       const dwdBadge = document.getElementById('dwd-weather-badge');
@@ -591,19 +656,80 @@
       document.getElementById('open-meteo-detail-text').textContent = `${om.cloud_cover ?? '--'}% Bewölkung`;
       document.getElementById('sunshine-tomorrow-text').textContent = `${om.sunshine_tomorrow_h ?? '--'} Std. Sonne`;
 
-      // Windows
+      setTargetChargeKW(targetChargeKW);
+    }
+
+    function renderChargingCards(weather, targetKW) {
       const container = document.getElementById('charging-windows-container');
-      if (windows.length === 0) {
-        container.innerHTML = `<div class="col-span-3 text-center py-6 text-xs text-slate-400">Keine Ladefenster prognostiziert.</div>`;
+      const series = weather.charging_timeseries || [];
+      const daysOverview = weather.days_overview || [];
+
+      if (!series || series.length === 0) {
+        const windows = weather.charging_windows || [];
+        if (windows.length === 0) {
+          container.innerHTML = `<div class="col-span-3 text-center py-6 text-xs text-slate-400">Keine Ladefenster prognostiziert.</div>`;
+          return;
+        }
+        container.innerHTML = windows.map(w => `
+          <div class="p-4 rounded-xl border bg-white border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> ${w.day_label} (${w.date})
+                </span>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">${w.rating_code === 'optimal' ? 'Sehr gut ☀️' : 'Gut'}</span>
+              </div>
+              <div class="text-xl font-extrabold text-slate-900 tracking-tight my-1">${w.window}</div>
+              <div class="text-xs text-slate-600 mt-1">${w.comment}</div>
+            </div>
+            <div class="mt-3 pt-3 border-t border-slate-200/80 flex justify-between text-xs font-medium text-slate-700">
+              <span>Lade-PV Spitze: <b class="text-cyan-800">${w.max_kw} kW</b></span>
+              <span>Ziel: <b>${targetKW.toLocaleString('de-DE')} kW</b></span>
+            </div>
+          </div>
+        `).join('');
+        lucide.createIcons();
         return;
       }
 
-      container.innerHTML = windows.map(w => {
-        let cardBg = "bg-white border-slate-200";
-        let badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-200";
-        let iconName = "sun";
+      const dayLabels = ["Heute", "Morgen", "Übermorgen"];
+      const cardsHtml = dayLabels.map(label => {
+        const dayPoints = series.filter(p => p.day === label);
+        if (dayPoints.length === 0) return '';
 
-        if (w.day_label === "Morgen") {
+        const overview = daysOverview.find(d => d.day_label === label) || {};
+        const maxKw = Math.max(...dayPoints.map(p => p.kw), 0);
+
+        const targetPoints = dayPoints.filter(p => p.kw >= targetKW);
+        const min3pPoints = dayPoints.filter(p => p.kw >= 4.1);
+
+        let windowStr = "Kein sonniges Ladefenster";
+        let rating = "Wenig Sonne";
+        let ratingCode = "none";
+        let badgeColor = "bg-slate-100 text-slate-700 border-slate-200";
+        let comment = `Solarstrom reicht heute nicht für ${targetKW.toLocaleString('de-DE')} kW.`;
+
+        if (targetPoints.length > 0) {
+          const startT = targetPoints[0].hour;
+          const endT = targetPoints[targetPoints.length - 1].hour;
+          const hours = (targetPoints.length * 15 / 60).toFixed(1);
+          windowStr = `${startT} – ${endT} Uhr`;
+          rating = "Optimal (100% Solar)";
+          ratingCode = "optimal";
+          badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-200";
+          comment = `Volle ${targetKW.toLocaleString('de-DE')} kW Ladeleistung für ~${hours} Std. zu 100% rein solar gedeckt!`;
+        } else if (min3pPoints.length > 0) {
+          const startT = min3pPoints[0].hour;
+          const endT = min3pPoints[min3pPoints.length - 1].hour;
+          windowStr = `${startT} – ${endT} Uhr (Teilladung)`;
+          rating = "Teilladung möglich";
+          ratingCode = "good";
+          badgeColor = "bg-amber-100 text-amber-900 border-amber-200";
+          comment = `PV liefert bis zu ${maxKw.toLocaleString('de-DE', { minimumFractionDigits: 1 })} kW (für deine ${targetKW.toLocaleString('de-DE')} kW ist Teilladung oder Netzbezug nötig).`;
+        }
+
+        let cardBg = "bg-white border-slate-200";
+        if (label === "Morgen") {
           cardBg = "bg-amber-50/60 border-amber-200";
         }
 
@@ -612,21 +738,25 @@
             <div>
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <i data-lucide="${iconName}" class="w-4 h-4 text-amber-500"></i> ${w.day_label} (${w.date})
+                  <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> ${label} (${overview.date || ''})
                 </span>
-                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${badgeColor} border">${w.rating_code === 'optimal' ? 'Sehr gut ☀️' : 'Gut'}</span>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${badgeColor} border">${ratingCode === 'optimal' ? 'Sehr gut ☀️' : 'Teilladung'}</span>
               </div>
-              <div class="text-xl font-extrabold text-slate-900 tracking-tight my-1">${w.window}</div>
-              <div class="text-xs text-slate-600 mt-1">${w.comment}</div>
+              <div class="text-xl font-extrabold text-slate-900 tracking-tight my-1">${windowStr}</div>
+              <div class="text-xs text-slate-600 mt-1">${comment}</div>
             </div>
             <div class="mt-3 pt-3 border-t border-slate-200/80 flex justify-between text-xs font-medium text-slate-700">
-              <span>Lade-PV Spitze: <b class="text-cyan-800">${w.max_kw} kW</b></span>
-              <span>Ø Erwartung: <b>${w.avg_kw} kW</b></span>
+              <span>Lade-PV Spitze: <b class="text-cyan-800">${maxKw.toLocaleString('de-DE', { minimumFractionDigits: 1 })} kW</b></span>
+              <span>Ziel: <b>${targetKW.toLocaleString('de-DE')} kW</b></span>
             </div>
           </div>
         `;
       }).join('');
+
+      container.innerHTML = cardsHtml;
+      lucide.createIcons();
     }
+
 
     function renderVehicles(vehicles, chargingStats) {
       const container = document.getElementById('vehicles-container');
