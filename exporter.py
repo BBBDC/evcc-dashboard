@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
-evcc & Solar-Log Telemetry Exporter
-Sammelt Daten aus evcc REST-API, InfluxDB, SQLite Charging DB und SolarLog DB
-und erzeugt data.json für das Web-Dashboard.
+evcc & Solar-Log Telemetry Exporter v2.0
+Sammelt Daten aus:
+- evcc REST-API (Live PV, Grid, Home, Fahrzeuge, Solar-Vorhersage)
+- InfluxDB (Heutiger Tagesertrag, Spitzenleistung, Durchschnitt)
+- SQLite Charging DB (Manuelle Fahrzeug-Ladevorgänge)
+- SolarLog DB (Alle 17 Wechselrichter mit detailliertem Status)
+- Open-Meteo & DWD Bright Sky (Wetter, Sonnenschein & Ladefenster-Empfehlungen)
 """
 
 import sys
@@ -13,9 +17,9 @@ import asyncio
 import aiohttp
 import configparser
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 BASE_DIR = Path("/home/admin/evcc-dashboard")
 BOT_DIR = Path("/home/admin/evcc-bot")
@@ -24,11 +28,17 @@ CONFIG_PATH = BOT_DIR / "config.ini"
 CHARGING_DB_PATH = Path.home() / ".local" / "share" / "evcc_bot" / "charging.db"
 SOLARLOG_DB_PATH = Path.home() / ".local" / "share" / "solarlog_monitor" / "solarlog.db"
 
+# Koordinaten Kempten (Allgäu) aus evcc-Konfiguration
+LAT = 47.7479
+LON = 10.3077
+
+
 def load_config():
     config = configparser.ConfigParser()
     if CONFIG_PATH.exists():
         config.read(CONFIG_PATH)
     return config
+
 
 config = load_config()
 EVCC_URL = config.get("evcc", "url", fallback="http://localhost:7070").rstrip("/")
@@ -130,12 +140,12 @@ def fetch_charging_db() -> Dict[str, Any]:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
-        # Letzte 15 Ladevorgänge
+        # Letzte 20 Ladevorgänge
         cur.execute("""
             SELECT id, vehicle_id, vehicle_title, kwh, charged_at, note
             FROM charging_sessions
             ORDER BY charged_at DESC, id DESC
-            LIMIT 15
+            LIMIT 20
         """)
         result["recent_sessions"] = [dict(r) for r in cur.fetchall()]
 
@@ -176,15 +186,6 @@ def fetch_charging_db() -> Dict[str, Any]:
                 "latest_charge": dict(last_row) if last_row else None
             }
 
-        # Monatliche Summen für Verlaufs-Chart (letzte 6 Monate)
-        cur.execute("""
-            SELECT substr(charged_at, 1, 7) as month_str, round(sum(kwh), 2) as kwh_sum, count(id) as count
-            FROM charging_sessions
-            GROUP BY month_str
-            ORDER BY month_str DESC
-            LIMIT 6
-        """)
-        result["monthly_totals"] = [dict(r) for r in cur.fetchall()]
         conn.close()
     except Exception as e:
         print(f"Warnung Charging DB: {e}", file=sys.stderr)
@@ -198,6 +199,7 @@ def fetch_solarlog_db() -> Dict[str, Any]:
         "total_pac": 0.0,
         "total_daysum_kwh": 0.0,
         "active_count": 0,
+        "standby_count": 0,
         "error_count": 0,
         "last_update": None
     }
@@ -220,32 +222,61 @@ def fetch_solarlog_db() -> Dict[str, Any]:
         total_pac = 0.0
         total_daysum = 0.0
         active_count = 0
+        standby_count = 0
         error_count = 0
         latest_ts = None
 
         for r in rows:
             pac = float(r.get("pac") or 0.0)
             daysum = float(r.get("daysum") or 0.0)
-            status = r.get("status")
-            error = r.get("error")
+            status = r.get("status") or 0
+            error = r.get("error") or 0
             last_up = r.get("last_update")
 
             total_pac += pac
             total_daysum += daysum
-            if status == 2:  # 2 = Einspeisen / Betrieb
-                active_count += 1
-            if error and error != 0:
+
+            # Status-Kategorisierung für Filter & Badges
+            if error and error > 0:
                 error_count += 1
+                state_category = "error"
+                state_badge = f"Fehler {error}"
+            elif pac > 0:
+                active_count += 1
+                state_category = "active"
+                state_badge = "Einspeisung"
+            else:
+                standby_count += 1
+                state_category = "standby"
+                state_badge = "Standby (0 W)"
+
+            # Detaillierter Text
+            status_desc = "Normalbetrieb"
+            if status == 0:
+                status_desc = "Standby / Nacht"
+            elif status == 1:
+                status_desc = "Warten auf Sonne"
+            elif status == 2:
+                status_desc = "Einspeisung"
+            elif status == 3:
+                status_desc = "MPP-Betrieb"
+            elif status == 7:
+                status_desc = "Normalbetrieb"
+
             if last_up and (not latest_ts or last_up > latest_ts):
                 latest_ts = last_up
 
             r["daysum_kwh"] = round(daysum / 1000.0, 2)
             r["pac_kw"] = round(pac / 1000.0, 2)
+            r["state_category"] = state_category
+            r["state_badge"] = state_badge
+            r["status_desc"] = status_desc
 
         result["inverters"] = rows
         result["total_pac"] = round(total_pac, 1)
         result["total_daysum_kwh"] = round(total_daysum / 1000.0, 2)
         result["active_count"] = active_count
+        result["standby_count"] = standby_count
         result["error_count"] = error_count
         result["last_update"] = latest_ts
     except Exception as e:
@@ -254,12 +285,145 @@ def fetch_solarlog_db() -> Dict[str, Any]:
     return result
 
 
+async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Fragt Open-Meteo und DWD Bright Sky ab und berechnet die besten Ladefenster
+    basierend auf der 220 kWp Solarprognose.
+    """
+    weather_data = {
+        "location": "Kempten (Allgäu)",
+        "dwd": {"condition": "unbekannt", "temp_c": None, "cloud_cover": None},
+        "open_meteo": {"temp_c": None, "cloud_cover": None, "sunshine_today_h": None},
+        "charging_windows": [],
+        "days_overview": []
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            # 1. DWD Bright Sky
+            try:
+                dwd_url = f"https://api.brightsky.dev/current_weather?lat={LAT}&lon={LON}"
+                async with session.get(dwd_url, timeout=aiohttp.ClientTimeout(total=4)) as r:
+                    if r.status == 200:
+                        d = await r.json()
+                        w = d.get("weather", {})
+                        weather_data["dwd"] = {
+                            "condition": w.get("condition", "trocken"),
+                            "temp_c": w.get("temperature"),
+                            "cloud_cover": w.get("cloud_cover")
+                        }
+            except Exception as e:
+                print(f"Warnung DWD API: {e}", file=sys.stderr)
+
+            # 2. Open-Meteo Wetter & Globalstrahlung
+            try:
+                om_url = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&hourly=cloudcover,direct_normal_irradiance,temperature_2m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunshine_duration&timezone=Europe%2FBerlin&forecast_days=3"
+                async with session.get(om_url, timeout=aiohttp.ClientTimeout(total=4)) as r:
+                    if r.status == 200:
+                        om = await r.json()
+                        daily = om.get("daily", {})
+                        sunshine_sec = daily.get("sunshine_duration", [0, 0, 0])
+                        weather_data["open_meteo"]["sunshine_today_h"] = round(sunshine_sec[0] / 3600.0, 1) if sunshine_sec else 0
+                        weather_data["open_meteo"]["sunshine_tomorrow_h"] = round(sunshine_sec[1] / 3600.0, 1) if len(sunshine_sec) > 1 else 0
+                        
+                        hourly_cc = om.get("hourly", {}).get("cloudcover", [])
+                        if hourly_cc:
+                            now_hour = datetime.now().hour
+                            weather_data["open_meteo"]["cloud_cover"] = hourly_cc[min(now_hour, len(hourly_cc) - 1)]
+            except Exception as e:
+                print(f"Warnung Open-Meteo API: {e}", file=sys.stderr)
+
+    except Exception as e:
+        print(f"Warnung Wetterabruf allgemein: {e}", file=sys.stderr)
+
+    # 3. Ladefenster-Berechnung aus evcc 15-Minuten-Prognose (220 kWp Anlage)
+    try:
+        solar_fc = evcc_state.get("forecast", {}).get("solar", {})
+        timeseries = solar_fc.get("timeseries", [])
+        
+        days_map = {}
+        for ts, w in timeseries:
+            dt = datetime.fromtimestamp(ts)
+            day_str = dt.strftime("%Y-%m-%d")
+            if day_str not in days_map:
+                days_map[day_str] = []
+            days_map[day_str].append((dt, w))
+
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        tomorrow_str = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+        day_after_str = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
+
+        day_labels = {
+            today_str: "Heute",
+            tomorrow_str: "Morgen",
+            day_after_str: "Übermorgen"
+        }
+
+        for day_str in [today_str, tomorrow_str, day_after_str]:
+            if day_str not in days_map:
+                continue
+            points = days_map[day_str]
+            label = day_labels.get(day_str, day_str)
+
+            # Leistungsfenster mit > 15 kW (perfekt für 11 kW AC Wallbox + Haus)
+            good_points = [p for p in points if p[1] >= 15000]
+            max_power_w = max((p[1] for p in points), default=0)
+            avg_power_w = (sum(p[1] for p in good_points) / len(good_points)) if good_points else 0
+
+            if good_points:
+                start_time = good_points[0][0].strftime("%H:%M")
+                end_time = good_points[-1][0].strftime("%H:%M")
+                
+                # Rating
+                max_kw = max_power_w / 1000.0
+                if max_kw >= 80:
+                    rating = "Optimal (Sehr viel Überschuss)"
+                    rating_code = "optimal"
+                    badge_color = "emerald"
+                elif max_kw >= 30:
+                    rating = "Sehr gut (Volle Ladeleistung)"
+                    rating_code = "good"
+                    badge_color = "amber"
+                else:
+                    rating = "Mäßig (Teilladung)"
+                    rating_code = "moderate"
+                    badge_color = "slate"
+
+                weather_data["charging_windows"].append({
+                    "day_label": label,
+                    "date": datetime.strptime(day_str, "%Y-%m-%d").strftime("%d.%m.%Y"),
+                    "window": f"{start_time} – {end_time} Uhr",
+                    "max_kw": round(max_kw, 1),
+                    "avg_kw": round(avg_power_w / 1000.0, 1),
+                    "rating": rating,
+                    "rating_code": rating_code,
+                    "badge_color": badge_color,
+                    "comment": f"Bis zu {round(max_kw)} kW Erzeugung – ideales Zeitfenster für Cupra Tavascan / Raval"
+                })
+
+            # Tageszusammenfassung
+            energy_kwh = solar_fc.get("today" if label == "Heute" else ("tomorrow" if label == "Morgen" else "dayAfterTomorrow"), {}).get("energy", 0) / 1000.0
+            weather_data["days_overview"].append({
+                "day_label": label,
+                "date": datetime.strptime(day_str, "%Y-%m-%d").strftime("%d.%m.%Y"),
+                "energy_kwh": round(energy_kwh, 1),
+                "max_kw": round(max_power_w / 1000.0, 1),
+                "charging_possible": bool(good_points)
+            })
+
+    except Exception as e:
+        print(f"Fehler bei Ladefenster-Berechnung: {e}", file=sys.stderr)
+
+    return weather_data
+
+
 async def generate_payload() -> Dict[str, Any]:
     now = datetime.now()
     evcc_state = await fetch_evcc_state() or {}
     influx_stats = fetch_influx_stats()
     charging_data = fetch_charging_db()
     solarlog_data = fetch_solarlog_db()
+    weather_and_charging = await fetch_weather_and_charging_recommendations(evcc_state)
 
     # EVCC Aufbereitung
     pv_list = evcc_state.get("pv", [])
@@ -276,7 +440,6 @@ async def generate_payload() -> Dict[str, Any]:
     # Hausverbrauch (homePower)
     home_power = evcc_state.get("homePower")
     if home_power is None:
-        # Formel: PV + Grid (positiv) - Batterie (falls ladend)
         home_power = max(0, total_pv_power + grid_power - (battery_power or 0))
 
     # Fahrzeuge
@@ -312,20 +475,13 @@ async def generate_payload() -> Dict[str, Any]:
                 if lp.get("chargePower") is not None:
                     vinfo["charge_power"] = lp.get("chargePower")
 
-    # Solar Vorhersage
-    forecast_raw = evcc_state.get("forecast", {}).get("solar", {})
-    forecast = {
-        "today_kwh": round(forecast_raw.get("today", {}).get("energy", 0) / 1000.0, 2),
-        "tomorrow_kwh": round(forecast_raw.get("tomorrow", {}).get("energy", 0) / 1000.0, 2),
-        "dayAfterTomorrow_kwh": round(forecast_raw.get("dayAfterTomorrow", {}).get("energy", 0) / 1000.0, 2),
-    }
-
     payload = {
         "meta": {
-            "version": "1.0.0",
+            "version": "2.0.0",
             "timestamp": now.isoformat(),
             "display_time": now.strftime("%d.%m.%Y %H:%M:%S"),
             "display_date": now.strftime("%d.%m.%Y"),
+            "location": "Kempten (Allgäu)"
         },
         "energy": {
             "pv_power_w": round(total_pv_power),
@@ -347,7 +503,7 @@ async def generate_payload() -> Dict[str, Any]:
             ]
         },
         "influx_today": influx_stats,
-        "forecast": forecast,
+        "weather_intelligence": weather_and_charging,
         "vehicles": list(vehicles_dict.values()),
         "charging_stats": charging_data,
         "solarlog": solarlog_data
@@ -374,10 +530,9 @@ def export_and_push() -> bool:
         if status.stdout.strip():
             subprocess.run(["git", "add", "data.json"], cwd=BASE_DIR, check=True)
             
-            # Prüfen ob der letzte Commit bereits ein chore(data) war
             last_msg = subprocess.run(["git", "log", "-1", "--pretty=%B"], cwd=BASE_DIR, capture_output=True, text=True).stdout.strip()
-            
             commit_msg = f"chore(data): auto-update telemetry {datetime.now().strftime('%d.%m %H:%M')}"
+            
             if last_msg.startswith("chore(data):"):
                 subprocess.run(["git", "commit", "--amend", "-m", commit_msg], cwd=BASE_DIR, check=True)
                 subprocess.run(["git", "push", "-f", "origin", "main"], cwd=BASE_DIR, check=True)
@@ -396,7 +551,7 @@ def export_and_push() -> bool:
 
 
 def run_daemon(interval_sec: int = 120):
-    print(f"⚡ Starte EVCC Dashboard Exporter Daemon (Zyklus: alle {interval_sec} Sekunden)...")
+    print(f"⚡ Starte EVCC Dashboard Exporter Daemon v2.0 (Zyklus: alle {interval_sec} Sekunden)...")
     import time
     while True:
         try:
@@ -414,4 +569,3 @@ if __name__ == "__main__":
         run_daemon(interval)
     else:
         export_and_push()
-
