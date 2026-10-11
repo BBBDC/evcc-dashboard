@@ -336,7 +336,11 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
     except Exception as e:
         print(f"Warnung Wetterabruf allgemein: {e}", file=sys.stderr)
 
-    # 3. Ladefenster-Berechnung aus evcc 15-Minuten-Prognose (220 kWp Anlage)
+    # 3. Ladefenster-Berechnung AUSSCHLIESSLICH aus Fronius 3er-Verbund (18.67 kWp)
+    # Formel: WR 1 (Fronius rechts) + WR 2 (100%) + WR 3 (66.7%) = 8/3 ≈ 2.667 * Fronius
+    # Skalierungsfaktor gegenüber der 220 kWp Gesamtanlage: 18.67 / 220.0 ≈ 0.08485
+    RATIO_3WR = (7.0 * (8.0 / 3.0)) / 220.0
+
     try:
         solar_fc = evcc_state.get("forecast", {}).get("solar", {})
         timeseries = solar_fc.get("timeseries", [])
@@ -347,7 +351,9 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
             day_str = dt.strftime("%Y-%m-%d")
             if day_str not in days_map:
                 days_map[day_str] = []
-            days_map[day_str].append((dt, w))
+            # Nur Leistung der 3 Lade-Wechselrichter hochrechnen!
+            scaled_power_w = w * RATIO_3WR
+            days_map[day_str].append((dt, scaled_power_w))
 
         today_str = datetime.now().strftime("%Y-%m-%d")
         tomorrow_str = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -365,56 +371,80 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
             points = days_map[day_str]
             label = day_labels.get(day_str, day_str)
 
-            # Leistungsfenster mit > 15 kW (perfekt für 11 kW AC Wallbox + Haus)
-            good_points = [p for p in points if p[1] >= 15000]
+            # Wallbox Schwellenwerte:
+            # 3-phasiges Laden (ab 6A = 4.1 kW)
+            # 1-phasiges Laden (ab 6A = 1.4 kW)
+            # Volle 11 kW Ladeleistung (ab 10.0 kW)
+            good_points_3p = [p for p in points if p[1] >= 4100]
+            good_points_1p = [p for p in points if p[1] >= 1400]
+            full_power_points = [p for p in points if p[1] >= 10000]
+
             max_power_w = max((p[1] for p in points), default=0)
-            avg_power_w = (sum(p[1] for p in good_points) / len(good_points)) if good_points else 0
+            avg_power_3p = (sum(p[1] for p in good_points_3p) / len(good_points_3p)) if good_points_3p else 0
+            max_kw = max_power_w / 1000.0
 
-            if good_points:
-                start_time = good_points[0][0].strftime("%H:%M")
-                end_time = good_points[-1][0].strftime("%H:%M")
-                
-                # Rating
-                max_kw = max_power_w / 1000.0
-                if max_kw >= 80:
-                    rating = "Optimal (Sehr viel Überschuss)"
-                    rating_code = "optimal"
-                    badge_color = "emerald"
-                elif max_kw >= 30:
-                    rating = "Sehr gut (Volle Ladeleistung)"
-                    rating_code = "good"
-                    badge_color = "amber"
-                else:
-                    rating = "Mäßig (Teilladung)"
-                    rating_code = "moderate"
-                    badge_color = "slate"
+            if good_points_3p:
+                start_time_3p = good_points_3p[0][0].strftime("%H:%M")
+                end_time_3p = good_points_3p[-1][0].strftime("%H:%M")
+                window_str = f"{start_time_3p} – {end_time_3p} Uhr"
+            elif good_points_1p:
+                start_time_1p = good_points_1p[0][0].strftime("%H:%M")
+                end_time_1p = good_points_1p[-1][0].strftime("%H:%M")
+                window_str = f"{start_time_1p} – {end_time_1p} Uhr (1-phasig)"
+            else:
+                window_str = "Kein sonniges Ladefenster"
 
-                weather_data["charging_windows"].append({
-                    "day_label": label,
-                    "date": datetime.strptime(day_str, "%Y-%m-%d").strftime("%d.%m.%Y"),
-                    "window": f"{start_time} – {end_time} Uhr",
-                    "max_kw": round(max_kw, 1),
-                    "avg_kw": round(avg_power_w / 1000.0, 1),
-                    "rating": rating,
-                    "rating_code": rating_code,
-                    "badge_color": badge_color,
-                    "comment": f"Bis zu {round(max_kw)} kW Erzeugung – ideales Zeitfenster für Cupra Tavascan / Raval"
-                })
+            # Rating
+            if full_power_points:
+                start_full = full_power_points[0][0].strftime("%H:%M")
+                end_full = full_power_points[-1][0].strftime("%H:%M")
+                rating = "Optimal (Volle 11 kW Ladeleistung)"
+                rating_code = "optimal"
+                badge_color = "emerald"
+                comment = f"Spitze {round(max_kw, 1)} kW • Volle 11 kW Wallbox-Power von {start_full} bis {end_full} Uhr!"
+            elif max_kw >= 6.0:
+                rating = "Sehr gut (3-Phasen Laden 6–10 kW)"
+                rating_code = "good"
+                badge_color = "amber"
+                comment = f"Spitze {round(max_kw, 1)} kW • Stabiles 3-phasiges Laden ohne Netzbezug"
+            elif max_kw >= 4.1:
+                rating = "Gut (3-Phasen Laden ab 6A)"
+                rating_code = "good"
+                badge_color = "amber"
+                comment = f"Spitze {round(max_kw, 1)} kW • 3-phasiges Überschussladen möglich"
+            else:
+                rating = "Mäßig (1-phasig empfohlen)"
+                rating_code = "moderate"
+                badge_color = "slate"
+                comment = "Nur für 1-phasiges Erhaltungsladen geeignet"
 
-            # Tageszusammenfassung
-            energy_kwh = solar_fc.get("today" if label == "Heute" else ("tomorrow" if label == "Morgen" else "dayAfterTomorrow"), {}).get("energy", 0) / 1000.0
+            weather_data["charging_windows"].append({
+                "day_label": label,
+                "date": datetime.strptime(day_str, "%Y-%m-%d").strftime("%d.%m.%Y"),
+                "window": window_str,
+                "max_kw": round(max_kw, 1),
+                "avg_kw": round(avg_power_3p / 1000.0, 1) if avg_power_3p else round(max_kw * 0.7, 1),
+                "rating": rating,
+                "rating_code": rating_code,
+                "badge_color": badge_color,
+                "comment": comment
+            })
+
+            # Tageszusammenfassung der 3 Lade-Wechselrichter
+            total_day_kwh = (solar_fc.get("today" if label == "Heute" else ("tomorrow" if label == "Morgen" else "dayAfterTomorrow"), {}).get("energy", 0) / 1000.0) * RATIO_3WR
             weather_data["days_overview"].append({
                 "day_label": label,
                 "date": datetime.strptime(day_str, "%Y-%m-%d").strftime("%d.%m.%Y"),
-                "energy_kwh": round(energy_kwh, 1),
-                "max_kw": round(max_power_w / 1000.0, 1),
-                "charging_possible": bool(good_points)
+                "energy_kwh": round(total_day_kwh, 1),
+                "max_kw": round(max_kw, 1),
+                "charging_possible": bool(good_points_3p or good_points_1p)
             })
 
     except Exception as e:
         print(f"Fehler bei Ladefenster-Berechnung: {e}", file=sys.stderr)
 
     return weather_data
+
 
 
 async def generate_payload() -> Dict[str, Any]:
@@ -475,9 +505,43 @@ async def generate_payload() -> Dict[str, Any]:
                 if lp.get("chargePower") is not None:
                     vinfo["charge_power"] = lp.get("chargePower")
 
+    # Fronius 3er-Verbund (exklusiv für Autoladung)
+    fronius_plant = next((p for p in pv_list if "fronius" in p.get("title", "").lower()), None)
+    fronius_w = fronius_plant.get("power", 0) if fronius_plant else 0
+    wr1_w = round(fronius_w)
+    wr2_w = round(fronius_w)
+    wr3_w = round(fronius_w * (2.0 / 3.0))
+    charging_pv_total_w = wr1_w + wr2_w + wr3_w
+    charging_pv_total_kw = round(charging_pv_total_w / 1000.0, 2)
+
+    charging_pv_system = {
+        "title": "Fronius 3er-Verbund (Auto-Lade-PV)",
+        "installed_kwp": 18.67,
+        "total_power_w": charging_pv_total_w,
+        "total_power_kw": charging_pv_total_kw,
+        "wr1": {
+            "title": "Fronius rechts (Messwert)",
+            "power_w": wr1_w,
+            "power_kw": round(wr1_w / 1000.0, 2),
+            "ratio_percent": 100
+        },
+        "wr2": {
+            "title": "Wechselrichter 2 (Partner-WR)",
+            "power_w": wr2_w,
+            "power_kw": round(wr2_w / 1000.0, 2),
+            "ratio_percent": 100
+        },
+        "wr3": {
+            "title": "Wechselrichter 3 (Zusatz-WR)",
+            "power_w": wr3_w,
+            "power_kw": round(wr3_w / 1000.0, 2),
+            "ratio_percent": 66.7
+        }
+    }
+
     payload = {
         "meta": {
-            "version": "2.0.0",
+            "version": "2.1.0",
             "timestamp": now.isoformat(),
             "display_time": now.strftime("%d.%m.%Y %H:%M:%S"),
             "display_date": now.strftime("%d.%m.%Y"),
@@ -502,6 +566,7 @@ async def generate_payload() -> Dict[str, Any]:
                 for p in pv_list
             ]
         },
+        "charging_pv_system": charging_pv_system,
         "influx_today": influx_stats,
         "weather_intelligence": weather_and_charging,
         "vehicles": list(vehicles_dict.values()),

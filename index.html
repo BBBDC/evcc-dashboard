@@ -96,21 +96,39 @@
     <!-- HERO METRICS (4 Kacheln) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
-      <!-- PV-Erzeugung -->
+      <!-- Auto-Lade-PV Live (Fronius 3er-Verbund) -->
+      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-cyan-500 transition-all bg-gradient-to-br from-cyan-50/30 to-white">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-800 flex items-center gap-1.5">
+            <i data-lucide="battery-charging" class="w-4 h-4 text-cyan-600"></i> Auto-Lade-PV Live
+          </span>
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 border border-cyan-200">Fronius 3er (~18,7 kWp)</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <div class="text-3xl font-extrabold text-cyan-900 tracking-tight" id="charging-pv-power-kw">-- kW</div>
+          <div class="text-xs text-slate-500 font-mono" id="charging-pv-power-w">(-- W)</div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between" id="charging-pv-subinfo">
+          <span>Verbund (3 WR):</span>
+          <span class="font-medium text-slate-800 truncate ml-2" id="charging-pv-breakdown">Lädt...</span>
+        </div>
+      </div>
+
+      <!-- Große Solar-Anlage (Solar-Log 220 kWp) -->
       <div class="card-clean rounded-2xl p-5 border-l-4 border-l-amber-500 transition-all">
         <div class="flex justify-between items-start mb-2">
           <span class="text-xs font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
-            <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> PV-Erzeugung Live
+            <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> Große PV-Anlage
           </span>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">220 kWp</span>
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">Reine Einspeisung (220 kWp)</span>
         </div>
         <div class="flex items-baseline gap-2">
           <div class="text-3xl font-extrabold text-slate-900 tracking-tight" id="pv-power-kw">-- kW</div>
           <div class="text-xs text-slate-500 font-mono" id="pv-power-w">(-- W)</div>
         </div>
         <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between" id="pv-subinfo">
-          <span>Aufteilung:</span>
-          <span class="font-medium text-slate-800 truncate ml-2" id="pv-plants-summary">Lädt...</span>
+          <span>Solar-Log:</span>
+          <span class="font-medium text-slate-800 truncate ml-2" id="pv-plants-summary">17 Wechselrichter</span>
         </div>
       </div>
 
@@ -129,24 +147,6 @@
         <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
           <span id="grid-subtext-label">Netzstatus:</span>
           <span class="font-medium text-slate-800" id="grid-direction">Überschuss wird eingespeist</span>
-        </div>
-      </div>
-
-      <!-- Hausverbrauch -->
-      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-purple-500 transition-all">
-        <div class="flex justify-between items-start mb-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-purple-700 flex items-center gap-1.5">
-            <i data-lucide="home" class="w-4 h-4 text-purple-500"></i> Hausverbrauch
-          </span>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200">Eigenbedarf</span>
-        </div>
-        <div class="flex items-baseline gap-2">
-          <div class="text-3xl font-extrabold text-slate-900 tracking-tight" id="home-power-kw">-- kW</div>
-          <div class="text-xs text-slate-500 font-mono" id="home-power-w">(-- W)</div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
-          <span>PV-Abdeckung:</span>
-          <span class="font-semibold text-emerald-700" id="home-pv-coverage">100% durch PV</span>
         </div>
       </div>
 
@@ -169,21 +169,60 @@
 
     </div>
 
-    <!-- INTELLIGENTE LADEFENSTER & WETTERVORHERSAGE -->
-    <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-amber-50/40 via-white to-sky-50/40 border-amber-200/70">
+    <!-- INTELLIGENTE LADEFENSTER & ERTRAGSPROGNOSE (NUR AUS FRONIUS 3ER-VERBUND!) -->
+    <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-cyan-50/50 via-white to-amber-50/40 border-cyan-200">
+      
+      <!-- Hinweis-Box: Trennung Großanlage vs. Auto-Lade-PV -->
+      <div class="p-3.5 bg-sky-50 border border-sky-200 rounded-xl mb-5 text-xs text-sky-950 flex items-start gap-3 shadow-xs">
+        <div class="p-1.5 bg-sky-100 text-sky-700 rounded-lg shrink-0 mt-0.5">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <div class="font-bold text-slate-900 text-xs">Exklusive Ladeempfehlung über Fronius 3er-Verbund (~18,7 kWp)</div>
+          <p class="text-slate-600 mt-0.5">
+            Die Autoladung erfolgt rein über die 3 gekoppelten Wechselrichter (<b>Fronius rechts</b> + <b>100% Partner-WR</b> + <b>66,7% Zusatz-WR</b>). Die 220 kWp Großanlage dient rein der Netzeinspeisung und wird für diese Ladezeiten-Empfehlung <u>nicht</u> herangezogen.
+          </p>
+        </div>
+      </div>
+
+      <!-- Header mit Wetter-Badges -->
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200/80">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
             <i data-lucide="calendar-check" class="w-5 h-5"></i>
           </div>
           <div>
-            <h2 class="text-base font-bold text-slate-900">Intelligente Solar-Ladefenster & Ertragsprognose</h2>
-            <p class="text-xs text-slate-500">Zusammenführung von evcc 220 kWp Modell, Deutscher Wetterdienst (DWD) & Open-Meteo</p>
+            <h2 class="text-base font-bold text-slate-900">Auto-Ladefenster & Solarprognose (Fronius Verbund)</h2>
+            <p class="text-xs text-slate-500">Präzise Ladezeit-Empfehlungen für Cupra Tavascan Max & Cupra Raval Jona</p>
           </div>
         </div>
         <div class="flex items-center gap-2 text-xs" id="weather-badges">
           <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium text-slate-700 shadow-sm" id="dwd-weather-badge">DWD: lädt...</span>
           <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium text-slate-700 shadow-sm" id="sunshine-badge">Sonne: lädt...</span>
+        </div>
+      </div>
+
+      <!-- 3er Verbund Live-Status Kacheln -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5" id="fronius-trio-grid">
+        <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+          <div class="text-[11px] font-semibold text-slate-500">WR 1 (Fronius rechts)</div>
+          <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr1">-- kW</div>
+          <div class="text-[10px] text-emerald-600 font-medium">100% (Messwert evcc)</div>
+        </div>
+        <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+          <div class="text-[11px] font-semibold text-slate-500">WR 2 (Partner-WR)</div>
+          <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr2">-- kW</div>
+          <div class="text-[10px] text-slate-500 font-medium">100% Hochrechnung</div>
+        </div>
+        <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+          <div class="text-[11px] font-semibold text-slate-500">WR 3 (Zusatz-WR)</div>
+          <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr3">-- kW</div>
+          <div class="text-[10px] text-slate-500 font-medium">66,7% Hochrechnung</div>
+        </div>
+        <div class="p-3 bg-cyan-50/70 rounded-xl border border-cyan-200 shadow-2xs">
+          <div class="text-[11px] font-bold text-cyan-800">Gesamt Auto-Lade-PV</div>
+          <div class="text-base font-extrabold text-cyan-950 mt-0.5" id="trio-total">-- kW</div>
+          <div class="text-[10px] text-cyan-700 font-semibold">Aktuelle Wallbox-Power</div>
         </div>
       </div>
 
@@ -193,12 +232,12 @@
         <div class="p-4 bg-white rounded-xl border border-slate-200 animate-pulse text-xs text-slate-400">Berechne optimale Ladefenster...</div>
       </div>
       
-      <div class="mt-4 pt-3 border-t border-slate-200/70 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
+      <div class="mt-4 pt-3 border-t border-slate-200/70 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-1.5">
-          <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600"></i>
-          <span><b>Lade-Tipp für Cupra Tavascan & Raval:</b> Ladefenster sind auf > 15 kW PV-Überschuss optimiert, um 100% solares Laden mit 11 kW Wallbox zu garantieren.</span>
+          <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-700 shrink-0"></i>
+          <span><b>Lade-Schwellen:</b> Ab <b>4,1 kW</b> startet 3-phasiges Laden (6A). Ab <b>10 kW</b> steht die volle 11 kW Wallbox-Ladeleistung rein aus Sonnenenergie zur Verfügung.</span>
         </div>
-        <div class="text-slate-400">Station: Kempten (Allgäu)</div>
+        <div class="text-slate-500 font-medium">Modell: 18,7 kWp Verbund • Kempten (Allgäu)</div>
       </div>
     </div>
 
@@ -253,17 +292,24 @@
 
       </div>
 
-      <!-- PV-Anlagen & Zusatzinfos (1 Spalte) -->
+      <!-- Hausverbrauch & Wetterdetails (1 Spalte) -->
       <div class="space-y-4">
         
+        <!-- Hausverbrauch & PV-Kopplung -->
         <div class="card-clean rounded-2xl p-5">
           <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
-            <i data-lucide="layers" class="w-5 h-5 text-amber-500"></i>
-            PV-Anlagen Aufteilung
+            <i data-lucide="home" class="w-5 h-5 text-purple-600"></i>
+            Hausverbrauch & Deckung
           </h2>
-          <div class="space-y-2.5" id="plants-list">
-            <!-- Dynamisch via JS -->
-            <div class="text-xs text-slate-400 text-center py-4">Lade Anlagendetails...</div>
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-purple-50/50 border border-purple-200">
+              <span class="text-xs text-slate-600">Aktueller Hausverbrauch:</span>
+              <span class="text-sm font-bold text-purple-900" id="home-power-kw-detail">-- kW</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="text-xs text-slate-600">Deckungsgrad durch PV:</span>
+              <span class="text-sm font-bold text-emerald-700" id="home-pv-coverage">100% durch PV</span>
+            </div>
           </div>
         </div>
 
@@ -297,11 +343,14 @@
     <div class="card-clean rounded-2xl p-6 shadow-sm">
       <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-200">
         <div>
-          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
-            <i data-lucide="cpu" class="w-5 h-5 text-amber-600"></i>
-            Solar-Log Wechselrichter Übersicht (Alle 17 Wechselrichter)
-          </h2>
-          <p class="text-xs text-slate-500 mt-0.5">Detaillierte Status- und Ertragsanzeige untereinander mit Schnellfilter</p>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
+              <i data-lucide="cpu" class="w-5 h-5 text-amber-600"></i>
+              Solar-Log Großanlage (Alle 17 Wechselrichter)
+            </h2>
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">Reine Netzeinspeisung</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Detaillierte Status- und Ertragsanzeige der 220 kWp Großanlage untereinander mit Schnellfilter</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-3 text-xs">
@@ -432,18 +481,28 @@
         document.getElementById('display-location').textContent = data.meta.location;
       }
 
-      // 2. PV-Power
+      // 2. Fronius 3er-Verbund (Auto-Lade-PV)
+      const chargingPV = data.charging_pv_system || {};
+      const chPowW = chargingPV.total_power_w ?? 0;
+      document.getElementById('charging-pv-power-kw').textContent = `${(chPowW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`;
+      document.getElementById('charging-pv-power-w').textContent = `(${chPowW.toLocaleString('de-DE')} W)`;
+
+      const wr1_kw = chargingPV.wr1 ? (chargingPV.wr1.power_w / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2 }) : '--';
+      const wr2_kw = chargingPV.wr2 ? (chargingPV.wr2.power_w / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2 }) : '--';
+      const wr3_kw = chargingPV.wr3 ? (chargingPV.wr3.power_w / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2 }) : '--';
+      document.getElementById('charging-pv-breakdown').textContent = `WR1: ${wr1_kw} kW • WR2: ${wr2_kw} kW • WR3: ${wr3_kw} kW`;
+
+      document.getElementById('trio-wr1').textContent = `${wr1_kw} kW`;
+      document.getElementById('trio-wr2').textContent = `${wr2_kw} kW`;
+      document.getElementById('trio-wr3').textContent = `${wr3_kw} kW`;
+      document.getElementById('trio-total').textContent = `${(chPowW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2 })} kW`;
+
+      // 3. Große PV-Anlage (Solar-Log 220 kWp)
       const pvPowerW = data.energy?.pv_power_w ?? 0;
       document.getElementById('pv-power-kw').textContent = `${(pvPowerW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`;
       document.getElementById('pv-power-w').textContent = `(${pvPowerW.toLocaleString('de-DE')} W)`;
 
-      const plants = data.energy?.pv_plants || [];
-      if (plants.length > 0) {
-        const pSummary = plants.map(p => `${p.title}: ${fmtKW(p.power_w)} kW`).join(' • ');
-        document.getElementById('pv-plants-summary').textContent = pSummary;
-      }
-
-      // 3. Grid
+      // 4. Grid
       const gridW = data.energy?.grid_power_w ?? 0;
       const isExport = gridW <= 0;
       const absGridKW = Math.abs(gridW) / 1000;
@@ -473,49 +532,31 @@
         gridIconEl.setAttribute('data-lucide', 'arrow-down-left');
       }
 
-      // 4. Hausverbrauch
+      // 5. Hausverbrauch
       const homeW = data.energy?.home_power_w ?? 0;
-      document.getElementById('home-power-kw').textContent = `${(homeW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`;
-      document.getElementById('home-power-w').textContent = `(${homeW.toLocaleString('de-DE')} W)`;
+      document.getElementById('home-power-kw-detail').textContent = `${(homeW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW (${homeW.toLocaleString('de-DE')} W)`;
 
       if (isExport && pvPowerW > homeW) {
-        document.getElementById('home-pv-coverage').textContent = '100% durch PV';
-        document.getElementById('home-pv-coverage').className = 'font-semibold text-emerald-700';
+        document.getElementById('home-pv-coverage').textContent = '100% durch PV gedeckt';
+        document.getElementById('home-pv-coverage').className = 'text-sm font-bold text-emerald-700';
       } else if (pvPowerW > 0) {
         const cov = Math.min(100, Math.round((pvPowerW / Math.max(1, homeW)) * 100));
         document.getElementById('home-pv-coverage').textContent = `${cov}% durch PV`;
-        document.getElementById('home-pv-coverage').className = 'font-semibold text-amber-700';
+        document.getElementById('home-pv-coverage').className = 'text-sm font-bold text-amber-700';
       } else {
         document.getElementById('home-pv-coverage').textContent = 'Netzbezug';
-        document.getElementById('home-pv-coverage').className = 'font-semibold text-slate-500';
+        document.getElementById('home-pv-coverage').className = 'text-sm font-bold text-slate-500';
       }
 
-      // 5. Influx
+      // 6. Influx
       const influx = data.influx_today || {};
       document.getElementById('today-energy-kwh').textContent = `${fmtNumber(influx.energy_kwh)} kWh`;
       document.getElementById('today-max-power').textContent = `${fmtNumber(influx.max_power_w, 0)} W`;
       document.getElementById('today-avg-power').textContent = `${fmtNumber(influx.avg_power_w, 0)} W`;
       document.getElementById('influx-date').textContent = influx.date || 'Heute';
 
-      // 6. Wetter & Ladefenster
+      // 7. Wetter & Ladefenster
       renderWeatherAndCharging(data.weather_intelligence || {});
-
-      // 7. PV-Anlagen Liste
-      const plantsContainer = document.getElementById('plants-list');
-      if (plants.length > 0) {
-        plantsContainer.innerHTML = plants.map(p => `
-          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
-            <div>
-              <div class="text-xs font-bold text-slate-800">${p.title}</div>
-              <div class="text-[11px] text-slate-500">${p.energy_kwh ? p.energy_kwh.toLocaleString('de-DE') + ' kWh Gesamt' : 'Wechselrichter'}</div>
-            </div>
-            <div class="text-right">
-              <div class="text-sm font-bold text-amber-700">${(p.power_w / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW</div>
-              <div class="text-[11px] text-slate-500 font-mono">${p.power_w.toLocaleString('de-DE')} W</div>
-            </div>
-          </div>
-        `).join('');
-      }
 
       // 8. Fahrzeuge
       renderVehicles(data.vehicles || [], data.charging_stats || {});
@@ -563,7 +604,7 @@
         let iconName = "sun";
 
         if (w.day_label === "Morgen") {
-          cardBg = "bg-amber-50/50 border-amber-200";
+          cardBg = "bg-amber-50/60 border-amber-200";
         }
 
         return `
@@ -579,7 +620,7 @@
               <div class="text-xs text-slate-600 mt-1">${w.comment}</div>
             </div>
             <div class="mt-3 pt-3 border-t border-slate-200/80 flex justify-between text-xs font-medium text-slate-700">
-              <span>Spitzenleistung: <b class="text-amber-700">${w.max_kw} kW</b></span>
+              <span>Lade-PV Spitze: <b class="text-cyan-800">${w.max_kw} kW</b></span>
               <span>Ø Erwartung: <b>${w.avg_kw} kW</b></span>
             </div>
           </div>
@@ -719,11 +760,9 @@
       const tbody = document.getElementById('inverter-table-body');
 
       let filtered = allInverters.filter(inv => {
-        // Tab Filter
         if (currentInverterFilter !== 'all') {
           if (inv.state_category !== currentInverterFilter) return false;
         }
-        // Text Search
         if (search) {
           const matchWr = `wr ${inv.wr_number}`.includes(search) || `${inv.wr_number}` === search;
           const matchStatus = (inv.status_desc || '').toLowerCase().includes(search);
@@ -738,7 +777,6 @@
         return;
       }
 
-      // Max PAC for visual meter bar
       const maxPac = Math.max(...allInverters.map(i => i.pac || 0), 2500);
 
       tbody.innerHTML = filtered.map(wr => {
