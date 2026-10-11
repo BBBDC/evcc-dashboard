@@ -355,7 +355,7 @@ async def generate_payload() -> Dict[str, Any]:
     return payload
 
 
-def export_and_push(single_run=True):
+def export_and_push() -> bool:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     payload = loop.run_until_complete(generate_payload())
@@ -365,21 +365,53 @@ def export_and_push(single_run=True):
     with open(json_file, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
 
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] ✅ data.json geschrieben.")
+    now_str = datetime.now().strftime("%d.%m %H:%M:%S")
+    print(f"[{now_str}] ✅ data.json geschrieben.")
 
-    # Git Commit & Push
+    # Git Commit & Push mit Historien-Schutz (--amend wenn möglich)
     try:
         status = subprocess.run(["git", "status", "--porcelain", "data.json"], cwd=BASE_DIR, capture_output=True, text=True)
         if status.stdout.strip():
             subprocess.run(["git", "add", "data.json"], cwd=BASE_DIR, check=True)
-            subprocess.run(["git", "commit", "-m", f"chore(data): auto-update telemetry {datetime.now().strftime('%d.%m %H:%M')}"], cwd=BASE_DIR, check=True)
-            subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Push zu GitHub erfolgreich.")
+            
+            # Prüfen ob der letzte Commit bereits ein chore(data) war
+            last_msg = subprocess.run(["git", "log", "-1", "--pretty=%B"], cwd=BASE_DIR, capture_output=True, text=True).stdout.strip()
+            
+            commit_msg = f"chore(data): auto-update telemetry {datetime.now().strftime('%d.%m %H:%M')}"
+            if last_msg.startswith("chore(data):"):
+                subprocess.run(["git", "commit", "--amend", "-m", commit_msg], cwd=BASE_DIR, check=True)
+                subprocess.run(["git", "push", "-f", "origin", "main"], cwd=BASE_DIR, check=True)
+            else:
+                subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, check=True)
+                subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
+
+            print(f"[{now_str}] 🚀 Telemetrie erfolgreich zu GitHub übertragen.")
+            return True
         else:
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Keine Änderungen in data.json.")
+            print(f"[{now_str}] Keine Änderungen in data.json festgestellt.")
+            return False
     except Exception as e:
-        print(f"Fehler bei Git Push: {e}", file=sys.stderr)
+        print(f"[{now_str}] ⚠️ Fehler bei Git Push: {e}", file=sys.stderr)
+        return False
+
+
+def run_daemon(interval_sec: int = 120):
+    print(f"⚡ Starte EVCC Dashboard Exporter Daemon (Zyklus: alle {interval_sec} Sekunden)...")
+    import time
+    while True:
+        try:
+            export_and_push()
+        except Exception as e:
+            print(f"Unerwarteter Exporter-Fehler: {e}", file=sys.stderr)
+        time.sleep(interval_sec)
 
 
 if __name__ == "__main__":
-    export_and_push()
+    if len(sys.argv) > 1 and sys.argv[1] in ("--daemon", "-d", "daemon"):
+        interval = 120
+        if len(sys.argv) > 2 and sys.argv[2].isdigit():
+            interval = int(sys.argv[2])
+        run_daemon(interval)
+    else:
+        export_and_push()
+
