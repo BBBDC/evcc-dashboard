@@ -1,0 +1,269 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "timestamp": "2026-10-11T10:33:16.886488",
+    "display_time": "11.10.2026 10:33:16",
+    "display_date": "11.10.2026"
+  },
+  "energy": {
+    "pv_power_w": 27156,
+    "pv_power_kw": 27.16,
+    "grid_power_w": -27156,
+    "grid_power_kw": -27.16,
+    "grid_mode": "export",
+    "home_power_w": 0,
+    "home_power_kw": 0.0,
+    "battery_soc": null,
+    "battery_power_w": null,
+    "pv_plants": [
+      {
+        "title": "Fronius rechts",
+        "power_w": 755,
+        "energy_kwh": 17.33
+      },
+      {
+        "title": "Solarlog_Anlage",
+        "power_w": 26401,
+        "energy_kwh": 2648.14
+      }
+    ]
+  },
+  "influx_today": {
+    "energy_kwh": 77.01,
+    "max_power_w": 37853,
+    "avg_power_w": 3300,
+    "date": "11.10.2026"
+  },
+  "forecast": {
+    "today_kwh": 659.2,
+    "tomorrow_kwh": 1057.69,
+    "dayAfterTomorrow_kwh": 803.27
+  },
+  "vehicles": [
+    {
+      "id": "db:2",
+      "title": "Cupra Tavascan Max",
+      "capacity": 77,
+      "mode": "smart",
+      "minSoc": 90,
+      "soc": null,
+      "odometer": null,
+      "connected": false,
+      "charging": false,
+      "charge_power": 0
+    },
+    {
+      "id": "db:5",
+      "title": "Cupra Raval Jona",
+      "capacity": 52,
+      "mode": null,
+      "minSoc": null,
+      "soc": null,
+      "odometer": null,
+      "connected": false,
+      "charging": false,
+      "charge_power": 0
+    }
+  ],
+  "charging_stats": {
+    "vehicles": {},
+    "recent_sessions": [],
+    "monthly_totals": []
+  },
+  "solarlog": {
+    "inverters": [
+      {
+        "wr_number": 1,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1540,
+        "daysum": 1623,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.62,
+        "pac_kw": 1.54
+      },
+      {
+        "wr_number": 2,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1813,
+        "daysum": 1931,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.93,
+        "pac_kw": 1.81
+      },
+      {
+        "wr_number": 3,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1547,
+        "daysum": 1623,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.62,
+        "pac_kw": 1.55
+      },
+      {
+        "wr_number": 4,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1840,
+        "daysum": 1951,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.95,
+        "pac_kw": 1.84
+      },
+      {
+        "wr_number": 5,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1530,
+        "daysum": 1608,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.61,
+        "pac_kw": 1.53
+      },
+      {
+        "wr_number": 6,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1554,
+        "daysum": 1632,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.63,
+        "pac_kw": 1.55
+      },
+      {
+        "wr_number": 7,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1441,
+        "daysum": 1533,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.53,
+        "pac_kw": 1.44
+      },
+      {
+        "wr_number": 8,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 1375,
+        "daysum": 1416,
+        "status": 7,
+        "error": 0,
+        "status_text": "Status 7, Error 0",
+        "daysum_kwh": 1.42,
+        "pac_kw": 1.38
+      },
+      {
+        "wr_number": 9,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 2178,
+        "daysum": 2245,
+        "status": 3,
+        "error": 0,
+        "status_text": "Status 3, Error 0",
+        "daysum_kwh": 2.25,
+        "pac_kw": 2.18
+      },
+      {
+        "wr_number": 10,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 2078,
+        "daysum": 2132,
+        "status": 3,
+        "error": 0,
+        "status_text": "Status 3, Error 0",
+        "daysum_kwh": 2.13,
+        "pac_kw": 2.08
+      },
+      {
+        "wr_number": 11,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 2420,
+        "daysum": 2495,
+        "status": 3,
+        "error": 0,
+        "status_text": "Status 3, Error 0",
+        "daysum_kwh": 2.5,
+        "pac_kw": 2.42
+      },
+      {
+        "wr_number": 12,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 2448,
+        "daysum": 2516,
+        "status": 3,
+        "error": 0,
+        "status_text": "Status 3, Error 0",
+        "daysum_kwh": 2.52,
+        "pac_kw": 2.45
+      },
+      {
+        "wr_number": 13,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 2460,
+        "daysum": 2536,
+        "status": 3,
+        "error": 0,
+        "status_text": "Status 3, Error 0",
+        "daysum_kwh": 2.54,
+        "pac_kw": 2.46
+      },
+      {
+        "wr_number": 14,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 2398,
+        "daysum": 2468,
+        "status": 3,
+        "error": 0,
+        "status_text": "Status 3, Error 0",
+        "daysum_kwh": 2.47,
+        "pac_kw": 2.4
+      },
+      {
+        "wr_number": 15,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 0,
+        "daysum": 0,
+        "status": 0,
+        "error": 0,
+        "status_text": "Status 0, Error 0",
+        "daysum_kwh": 0.0,
+        "pac_kw": 0.0
+      },
+      {
+        "wr_number": 16,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 2270,
+        "daysum": 2343,
+        "status": 3,
+        "error": 0,
+        "status_text": "Status 3, Error 0",
+        "daysum_kwh": 2.34,
+        "pac_kw": 2.27
+      },
+      {
+        "wr_number": 17,
+        "last_update": "2026-10-11T10:10:00",
+        "pac": 0,
+        "daysum": 0,
+        "status": 0,
+        "error": 0,
+        "status_text": "Status 0, Error 0",
+        "daysum_kwh": 0.0,
+        "pac_kw": 0.0
+      }
+    ],
+    "total_pac": 28892.0,
+    "total_daysum_kwh": 30.05,
+    "active_count": 0,
+    "error_count": 0,
+    "last_update": "2026-10-11T10:10:00"
+  }
+}

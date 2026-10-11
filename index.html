@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVCC & Solar-Log Zentrale</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              solar: '#f59e0b',
+              solarGlow: '#fbbf24',
+              gridExport: '#10b981',
+              gridImport: '#ef4444',
+              car: '#06b6d4',
+              home: '#8b5cf6',
+              bgDark: '#0f172a',
+              cardDark: '#1e293b',
+              cardBorder: '#334155'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+    .pulse-dot {
+      animation: pulse-slow 2s infinite ease-in-out;
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+    .glass-card:hover {
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased pb-16 selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 shadow-lg shadow-amber-500/20">
+          <i data-lucide="zap" class="w-6 h-6 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            EVCC & Solar-Log Zentrale
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hidden sm:inline-block">Live</span>
+          </h1>
+          <p class="text-xs text-slate-400 flex items-center gap-1.5">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 pulse-dot" id="live-indicator"></span>
+            <span id="display-time">Lädt Live-Daten...</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls & Refresh Info -->
+      <div class="flex items-center space-x-3 ml-auto">
+        <div class="text-right text-xs text-slate-400 hidden sm:block">
+          <div>Automatischer Abgleich:</div>
+          <div class="font-medium text-slate-300" id="countdown-text">in 45s</div>
+        </div>
+
+        <button id="refresh-btn" onclick="loadTelemetryData(true)" class="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-700 transition duration-150 text-xs font-semibold shadow-sm active:scale-95">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
+          <span>Aktualisieren</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+
+    <!-- HERO KPI CARDS (4 Spalten) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- PV-Erzeugung -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold tracking-wider uppercase text-amber-400 flex items-center gap-1.5">
+            <i data-lucide="sun" class="w-4 h-4"></i> PV-Erzeugung
+          </span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20" id="pv-status-badge">Aktiv</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <div class="text-3xl font-extrabold text-white tracking-tight" id="pv-power-kw">-- kW</div>
+          <div class="text-xs text-slate-400" id="pv-power-w">(-- W)</div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-between" id="pv-subinfo">
+          <span>Anlagen:</span>
+          <span class="font-medium text-slate-300" id="pv-plants-summary">Lädt...</span>
+        </div>
+      </div>
+
+      <!-- Netz (Grid) -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold tracking-wider uppercase text-emerald-400 flex items-center gap-1.5" id="grid-header-label">
+            <i data-lucide="arrow-up-right" class="w-4 h-4" id="grid-icon"></i> Netz
+          </span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20" id="grid-mode-badge">Einspeisung</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <div class="text-3xl font-extrabold text-emerald-400 tracking-tight" id="grid-power-kw">-- kW</div>
+          <div class="text-xs text-slate-400" id="grid-power-w">(-- W)</div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-between">
+          <span id="grid-subtext-label">Richtung:</span>
+          <span class="font-medium text-slate-300" id="grid-direction">Überschuss wird eingespeist</span>
+        </div>
+      </div>
+
+      <!-- Hausverbrauch -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold tracking-wider uppercase text-purple-400 flex items-center gap-1.5">
+            <i data-lucide="home" class="w-4 h-4"></i> Hausverbrauch
+          </span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-300 border border-purple-500/20">Direkt</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <div class="text-3xl font-extrabold text-white tracking-tight" id="home-power-kw">-- kW</div>
+          <div class="text-xs text-slate-400" id="home-power-w">(-- W)</div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-between">
+          <span>Deckung:</span>
+          <span class="font-medium text-emerald-400" id="home-pv-coverage">100% durch PV</span>
+        </div>
+      </div>
+
+      <!-- Tagesertrag (InfluxDB) -->
+      <div class="glass-card rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold tracking-wider uppercase text-cyan-400 flex items-center gap-1.5">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Ertrag Heute
+          </span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20" id="influx-date">Heute</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <div class="text-3xl font-extrabold text-cyan-300 tracking-tight" id="today-energy-kwh">-- kWh</div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-between">
+          <span>Spitze: <b class="text-slate-200" id="today-max-power">-- W</b></span>
+          <span>Ø: <b class="text-slate-200" id="today-avg-power">-- W</b></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MIDDLE SECTION: FAHRZEUGE & SOLAR-VORHERSAGE -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Fahrzeuge (2 Spalten auf Desktop) -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="car" class="w-5 h-5 text-cyan-400"></i>
+            Fahrzeuge & Ladezentrale
+          </h2>
+          <span class="text-xs text-slate-400">Cupra Raval Jona & Cupra Tavascan Max</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="vehicles-container">
+          <!-- Dynamisch befüllt via JS -->
+          <div class="glass-card rounded-2xl p-5 animate-pulse text-center py-10 text-slate-500">
+            Fahrzeugdaten laden...
+          </div>
+        </div>
+
+        <!-- Manuelle Ladehistorie Zusammenfassung -->
+        <div class="glass-card rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="history" class="w-4 h-4 text-emerald-400"></i>
+              Letzte Ladevorgänge (Manuell & Bot)
+            </h3>
+            <span class="text-xs text-slate-400" id="charging-sessions-count">0 Einträge</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="text-slate-400 uppercase bg-slate-900/50 border-b border-slate-800">
+                <tr>
+                  <th class="py-2.5 px-3">Datum / Uhrzeit</th>
+                  <th class="py-2.5 px-3">Fahrzeug</th>
+                  <th class="py-2.5 px-3 text-right">Geladen (kWh)</th>
+                  <th class="py-2.5 px-3">Notiz</th>
+                </tr>
+              </thead>
+              <tbody id="charging-table-body" class="divide-y divide-slate-800/60">
+                <tr>
+                  <td colspan="4" class="py-4 text-center text-slate-500">Noch keine Ladevorgänge in der Datenbank erfasst.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Solar-Vorhersage & PV-Anlagen (1 Spalte) -->
+      <div class="space-y-4">
+        
+        <!-- Vorhersage -->
+        <div class="glass-card rounded-2xl p-5">
+          <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
+            <i data-lucide="cloud-sun" class="w-5 h-5 text-amber-400"></i>
+            Solar-Vorhersage
+          </h2>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-xs">HEUTE</div>
+                <div class="text-xs text-slate-300">Prognose Tag</div>
+              </div>
+              <div class="text-sm font-bold text-white" id="forecast-today">-- kWh</div>
+            </div>
+
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs">MORGEN</div>
+                <div class="text-xs text-slate-300">Prognose Tag</div>
+              </div>
+              <div class="text-sm font-bold text-white" id="forecast-tomorrow">-- kWh</div>
+            </div>
+
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">+2T</div>
+                <div class="text-xs text-slate-300">Übermorgen</div>
+              </div>
+              <div class="text-sm font-bold text-white" id="forecast-day-after">-- kWh</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-3 text-right">Quelle: Open-Meteo via evcc</div>
+        </div>
+
+        <!-- PV-Anlagen Details -->
+        <div class="glass-card rounded-2xl p-5">
+          <h2 class="text-base font-bold text-white flex items-center gap-2 mb-4">
+            <i data-lucide="layers" class="w-5 h-5 text-yellow-400"></i>
+            PV-Anlagen Aufteilung
+          </h2>
+          <div class="space-y-3" id="plants-list">
+            <!-- Dynamisch via JS -->
+            <div class="text-xs text-slate-500 text-center py-4">Lade Anlagendetails...</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BOTTOM SECTION: SOLAR-LOG WECHSELRICHTER MATRIX (17 WR) -->
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="cpu" class="w-5 h-5 text-amber-500"></i>
+            Solar-Log Wechselrichter Übersicht (17 Einheiten)
+          </h2>
+          <p class="text-xs text-slate-400">Live-Messwerte, Erträge und Status je Wechselrichter</p>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium" id="solarlog-active-count">17 Aktiv</span>
+          <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-medium" id="solarlog-total-power">Gesamt: -- kW</span>
+          <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium" id="solarlog-total-daysum">Tagesertrag: -- kWh</span>
+        </div>
+      </div>
+
+      <!-- Inverter Grid / Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="solarlog-grid">
+        <!-- Dynamisch befüllt via JS -->
+        <div class="col-span-full text-center py-8 text-xs text-slate-500">Wechselrichterdaten laden...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-slate-500">
+    <p>EVCC & Solar-Log Web Dashboard • Gehostet auf GitHub Pages • Automatische Telemetrie-Synchronisation</p>
+  </footer>
+
+  <!-- APPLICATION LOGIC SCRIPT -->
+  <script>
+    let countdownSeconds = 45;
+    let countdownInterval = null;
+
+    // Formatters
+    const fmtKW = (val) => (val !== null && val !== undefined) ? (val / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
+    const fmtNumber = (val, decimals = 2) => (val !== null && val !== undefined) ? Number(val).toLocaleString('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : '--';
+
+    async function loadTelemetryData(isManual = false) {
+      const refreshBtn = document.getElementById('refresh-btn');
+      const refreshIcon = document.getElementById('refresh-icon');
+
+      if (isManual) {
+        refreshIcon.classList.add('animate-spin');
+        refreshBtn.disabled = true;
+      }
+
+      const timestamp = new Date().getTime();
+      let data = null;
+
+      // 1. Primär: Relativer Abruf data.json
+      try {
+        const resp = await fetch(`data.json?t=${timestamp}`, { cache: 'no-store' });
+        if (resp.ok) {
+          data = await resp.json();
+        }
+      } catch (e) {
+        console.warn("Relativer Abruf data.json fehlgeschlagen, versuche Raw GitHub...", e);
+      }
+
+      // 2. Fallback: Raw GitHub Content (falls Pages Cache noch verzögert ist)
+      if (!data) {
+        try {
+          const rawUrl = `https://raw.githubusercontent.com/BBBDC/evcc-dashboard/main/data.json?t=${timestamp}`;
+          const resp = await fetch(rawUrl, { cache: 'no-store' });
+          if (resp.ok) {
+            data = await resp.json();
+          }
+        } catch (e) {
+          console.error("Auch Fallback fehlgeschlagen:", e);
+        }
+      }
+
+      if (data) {
+        renderDashboard(data);
+      } else {
+        document.getElementById('display-time').textContent = 'Fehler beim Laden der Daten';
+      }
+
+      if (isManual) {
+        setTimeout(() => {
+          refreshIcon.classList.remove('animate-spin');
+          refreshBtn.disabled = false;
+        }, 500);
+      }
+
+      // Countdown zurücksetzen
+      countdownSeconds = 45;
+    }
+
+    function renderDashboard(data) {
+      // 1. Meta / Zeit
+      const displayTime = data.meta?.display_time || 'Unbekannt';
+      document.getElementById('display-time').textContent = `Stand: ${displayTime}`;
+
+      // 2. PV-Power
+      const pvPowerW = data.energy?.pv_power_w ?? 0;
+      document.getElementById('pv-power-kw').textContent = `${(pvPowerW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`;
+      document.getElementById('pv-power-w').textContent = `(${pvPowerW.toLocaleString('de-DE')} W)`;
+
+      // Plants Summary
+      const plants = data.energy?.pv_plants || [];
+      if (plants.length > 0) {
+        const pSummary = plants.map(p => `${p.title}: ${fmtKW(p.power_w)} kW`).join(' • ');
+        document.getElementById('pv-plants-summary').textContent = pSummary;
+      }
+
+      // 3. Grid (Netz)
+      const gridW = data.energy?.grid_power_w ?? 0;
+      const isExport = gridW <= 0;
+      const absGridKW = Math.abs(gridW) / 1000;
+      
+      const gridKwEl = document.getElementById('grid-power-kw');
+      const gridModeEl = document.getElementById('grid-mode-badge');
+      const gridDirectionEl = document.getElementById('grid-direction');
+      const gridIconEl = document.getElementById('grid-icon');
+
+      gridKwEl.textContent = `${absGridKW.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`;
+      document.getElementById('grid-power-w').textContent = `(${Math.abs(gridW).toLocaleString('de-DE')} W)`;
+
+      if (isExport) {
+        gridKwEl.className = 'text-3xl font-extrabold text-emerald-400 tracking-tight';
+        gridModeEl.textContent = 'Einspeisung';
+        gridModeEl.className = 'text-xs font-medium px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20';
+        gridDirectionEl.textContent = 'Überschuss wird eingespeist';
+        gridIconEl.setAttribute('data-lucide', 'arrow-up-right');
+      } else {
+        gridKwEl.className = 'text-3xl font-extrabold text-amber-400 tracking-tight';
+        gridModeEl.textContent = 'Netzbezug';
+        gridModeEl.className = 'text-xs font-medium px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20';
+        gridDirectionEl.textContent = 'Strom wird aus dem Netz bezogen';
+        gridIconEl.setAttribute('data-lucide', 'arrow-down-left');
+      }
+
+      // 4. Hausverbrauch
+      const homeW = data.energy?.home_power_w ?? 0;
+      document.getElementById('home-power-kw').textContent = `${(homeW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`;
+      document.getElementById('home-power-w').textContent = `(${homeW.toLocaleString('de-DE')} W)`;
+
+      if (isExport && pvPowerW > homeW) {
+        document.getElementById('home-pv-coverage').textContent = '100% durch PV';
+        document.getElementById('home-pv-coverage').className = 'font-medium text-emerald-400';
+      } else if (pvPowerW > 0) {
+        const cov = Math.min(100, Math.round((pvPowerW / Math.max(1, homeW)) * 100));
+        document.getElementById('home-pv-coverage').textContent = `${cov}% durch PV`;
+        document.getElementById('home-pv-coverage').className = 'font-medium text-amber-400';
+      } else {
+        document.getElementById('home-pv-coverage').textContent = 'Netzbezug';
+        document.getElementById('home-pv-coverage').className = 'font-medium text-slate-400';
+      }
+
+      // 5. Influx Today
+      const influx = data.influx_today || {};
+      document.getElementById('today-energy-kwh').textContent = `${fmtNumber(influx.energy_kwh)} kWh`;
+      document.getElementById('today-max-power').textContent = `${fmtNumber(influx.max_power_w, 0)} W`;
+      document.getElementById('today-avg-power').textContent = `${fmtNumber(influx.avg_power_w, 0)} W`;
+      document.getElementById('influx-date').textContent = influx.date || 'Heute';
+
+      // 6. Forecast
+      const fc = data.forecast || {};
+      document.getElementById('forecast-today').textContent = `${fmtNumber(fc.today_kwh)} kWh`;
+      document.getElementById('forecast-tomorrow').textContent = `${fmtNumber(fc.tomorrow_kwh)} kWh`;
+      document.getElementById('forecast-day-after').textContent = `${fmtNumber(fc.dayAfterTomorrow_kwh)} kWh`;
+
+      // 7. PV-Anlagen Liste
+      const plantsContainer = document.getElementById('plants-list');
+      if (plants.length > 0) {
+        plantsContainer.innerHTML = plants.map(p => `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div>
+              <div class="text-xs font-bold text-slate-200">${p.title}</div>
+              <div class="text-[11px] text-slate-400">${p.energy_kwh ? p.energy_kwh.toLocaleString('de-DE') + ' kWh Gesamt' : 'Wechselrichter'}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-bold text-amber-400">${(p.power_w / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW</div>
+              <div class="text-[11px] text-slate-400">${p.power_w.toLocaleString('de-DE')} W</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 8. Fahrzeuge Rendern
+      renderVehicles(data.vehicles || [], data.charging_stats || {});
+
+      // 9. Ladehistorie Tabelle
+      renderChargingTable(data.charging_stats?.recent_sessions || []);
+
+      // 10. Solar-Log Inverter Matrix
+      renderSolarLog(data.solarlog || {});
+
+      // Icons neu rendern
+      lucide.createIcons();
+    }
+
+    function renderVehicles(vehicles, chargingStats) {
+      const container = document.getElementById('vehicles-container');
+      if (!vehicles || vehicles.length === 0) {
+        container.innerHTML = `<div class="col-span-2 text-center text-xs text-slate-500 py-6">Keine Fahrzeuge konfiguriert.</div>`;
+        return;
+      }
+
+      container.innerHTML = vehicles.map(v => {
+        const stat = chargingStats.vehicles?.[v.title] || {};
+        const isCharging = v.charging;
+        const isConnected = v.connected;
+        const soc = v.soc !== null ? `${v.soc}%` : 'N/A';
+        const capacity = v.capacity ? `${v.capacity} kWh Akku` : '';
+        const mode = v.mode || 'Standard';
+
+        let statusBadge = `<span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 text-xs font-medium">Bereit</span>`;
+        if (isCharging) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 text-xs font-medium border border-cyan-500/30 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400 pulse-dot"></span> Lädt (${fmtKW(v.charge_power)} kW)</span>`;
+        } else if (isConnected) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-medium border border-emerald-500/30">Verbunden</span>`;
+        }
+
+        const monthKwh = stat.month_kwh !== undefined ? `${stat.month_kwh.toLocaleString('de-DE', { minimumFractionDigits: 2 })} kWh` : '0,00 kWh';
+        const totalKwh = stat.total_kwh !== undefined ? `${stat.total_kwh.toLocaleString('de-DE', { minimumFractionDigits: 2 })} kWh` : '0,00 kWh';
+        const lastCharge = stat.latest_charge ? `${stat.latest_charge.kwh} kWh (${stat.latest_charge.charged_at})` : 'Keine erfasst';
+
+        return `
+          <div class="glass-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20">
+                    <i data-lucide="car" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-sm text-white">${v.title}</h3>
+                    <div class="text-[11px] text-slate-400">${capacity} • Modus: ${mode}</div>
+                  </div>
+                </div>
+                ${statusBadge}
+              </div>
+
+              <!-- Akkustand / SoC Anzeige -->
+              <div class="my-4 p-3 rounded-xl bg-slate-900/50 border border-slate-800/80">
+                <div class="flex justify-between items-center text-xs mb-1.5">
+                  <span class="text-slate-400">Aktueller SoC:</span>
+                  <span class="font-bold text-white">${soc}</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                  <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full" style="width: ${v.soc !== null ? v.soc : 0}%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Manuelle Erfassung Statistiken -->
+            <div class="pt-3 border-t border-slate-800 text-xs space-y-1.5 text-slate-400">
+              <div class="flex justify-between">
+                <span>Diesen Monat:</span>
+                <span class="font-semibold text-slate-200">${monthKwh}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Gesamt geladen:</span>
+                <span class="font-semibold text-slate-200">${totalKwh}</span>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-400">
+                <span>Letzter Eintrag:</span>
+                <span class="truncate ml-2 text-slate-300">${lastCharge}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderChargingTable(sessions) {
+      const tbody = document.getElementById('charging-table-body');
+      const countEl = document.getElementById('charging-sessions-count');
+
+      countEl.textContent = `${sessions.length} Einträge`;
+
+      if (!sessions || sessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">Noch keine manuellen Ladevorgänge erfasst.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sessions.map(s => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="py-2.5 px-3 font-mono text-slate-300">${s.charged_at}</td>
+          <td class="py-2.5 px-3 font-semibold text-white">${s.vehicle_title}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-bold text-cyan-400">${Number(s.kwh).toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
+          <td class="py-2.5 px-3 text-slate-400">${s.note || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSolarLog(solarlog) {
+      const inverters = solarlog.inverters || [];
+      const totalPac = solarlog.total_pac ?? 0;
+      const totalDaysum = solarlog.total_daysum_kwh ?? 0;
+      const activeCount = solarlog.active_count ?? 0;
+
+      document.getElementById('solarlog-total-power').textContent = `Leistung: ${(totalPac / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2 })} kW`;
+      document.getElementById('solarlog-total-daysum').textContent = `Tagesertrag: ${totalDaysum.toLocaleString('de-DE', { minimumFractionDigits: 2 })} kWh`;
+      document.getElementById('solarlog-active-count').textContent = `${activeCount} / ${inverters.length} Aktiv`;
+
+      const grid = document.getElementById('solarlog-grid');
+      if (inverters.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-6 text-xs text-slate-500">Keine Wechselrichterdaten vorhanden.</div>`;
+        return;
+      }
+
+      grid.innerHTML = inverters.map(wr => {
+        const pacKW = (wr.pac / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const daysumKWH = wr.daysum_kwh.toLocaleString('de-DE', { minimumFractionDigits: 2 });
+        const hasError = wr.error && wr.error !== 0;
+
+        return `
+          <div class="rounded-xl p-3 bg-slate-900/70 border ${hasError ? 'border-red-500/40 bg-red-950/10' : 'border-slate-800/80'} hover:border-slate-700 transition">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] font-bold text-slate-300">WR ${wr.wr_number}</span>
+              <span class="w-2 h-2 rounded-full ${hasError ? 'bg-red-400' : 'bg-emerald-400'}"></span>
+            </div>
+            <div class="text-sm font-extrabold text-amber-400 mb-0.5">${pacKW} kW</div>
+            <div class="text-[11px] text-slate-400 flex justify-between">
+              <span>Tag:</span>
+              <span class="font-medium text-slate-200">${daysumKWH} kWh</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Countdown Timer
+    function startCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        countdownSeconds--;
+        const el = document.getElementById('countdown-text');
+        if (el) el.textContent = `in ${countdownSeconds}s`;
+
+        if (countdownSeconds <= 0) {
+          loadTelemetryData();
+        }
+      }, 1000);
+    }
+
+    // Start beim Laden
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      loadTelemetryData();
+      startCountdown();
+    });
+  </script>
+</body>
+</html>
