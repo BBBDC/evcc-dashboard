@@ -1,16 +1,16 @@
 {
   "meta": {
     "version": "2.0.0",
-    "timestamp": "2026-10-11T10:54:52.932813",
-    "display_time": "11.10.2026 10:54:52",
+    "timestamp": "2026-10-11T11:07:08.817825",
+    "display_time": "11.10.2026 11:07:08",
     "display_date": "11.10.2026",
     "location": "Kempten (Allgäu)"
   },
   "energy": {
-    "pv_power_w": 43415,
-    "pv_power_kw": 43.41,
-    "grid_power_w": -43415,
-    "grid_power_kw": -43.41,
+    "pv_power_w": 39940,
+    "pv_power_kw": 39.94,
+    "grid_power_w": -39940,
+    "grid_power_kw": -39.94,
     "grid_mode": "export",
     "home_power_w": 0,
     "home_power_kw": 0.0,
@@ -19,34 +19,33 @@
     "pv_plants": [
       {
         "title": "Fronius rechts",
-        "power_w": 1557,
+        "power_w": 1222,
         "energy_kwh": 17.33
       },
       {
         "title": "Solarlog_Anlage",
-        "power_w": 41858,
-        "energy_kwh": 2648.15
+        "power_w": 38718,
+        "energy_kwh": 2648.16
       }
     ]
   },
   "influx_today": {
-    "energy_kwh": 99.7,
-    "max_power_w": 44973,
-    "avg_power_w": 4053,
+    "energy_kwh": 115.59,
+    "max_power_w": 49583,
+    "avg_power_w": 4588,
     "date": "11.10.2026"
   },
   "weather_intelligence": {
     "location": "Kempten (Allgäu)",
     "dwd": {
       "condition": "dry",
-      "temp_c": 10.0,
+      "temp_c": 10.4,
       "cloud_cover": 100
     },
     "open_meteo": {
       "temp_c": null,
-      "cloud_cover": 95,
-      "sunshine_today_h": 7.1,
-      "sunshine_tomorrow_h": 10.1
+      "cloud_cover": null,
+      "sunshine_today_h": null
     },
     "charging_windows": [
       {
@@ -87,7 +86,7 @@
       {
         "day_label": "Heute",
         "date": "11.10.2026",
-        "energy_kwh": 630.8,
+        "energy_kwh": 614.6,
         "max_kw": 165.5,
         "charging_possible": true
       },
