@@ -928,8 +928,17 @@
         }
 
         const monthKwh = stat.month_kwh !== undefined ? `${stat.month_kwh.toLocaleString('de-DE', { minimumFractionDigits: 2 })} kWh` : '0,00 kWh';
+        const monthCost = stat.month_cost !== undefined && stat.month_cost > 0 ? ` (${stat.month_cost.toLocaleString('de-DE', { minimumFractionDigits: 2 })} €)` : '';
         const totalKwh = stat.total_kwh !== undefined ? `${stat.total_kwh.toLocaleString('de-DE', { minimumFractionDigits: 2 })} kWh` : '0,00 kWh';
-        const lastCharge = stat.latest_charge ? `${stat.latest_charge.kwh} kWh (${stat.latest_charge.charged_at})` : 'Keine erfasst';
+        const totalCost = stat.total_cost !== undefined && stat.total_cost > 0 ? ` (${stat.total_cost.toLocaleString('de-DE', { minimumFractionDigits: 2 })} €)` : '';
+        const pricePerKwh = stat.price_per_kwh !== undefined ? `${stat.price_per_kwh.toLocaleString('de-DE', { minimumFractionDigits: 2 })} €/kWh` : '0,30 €/kWh';
+        
+        let lastCharge = 'Keine erfasst';
+        if (stat.latest_charge) {
+          const lKwh = `${stat.latest_charge.kwh} kWh`;
+          const lCost = stat.latest_charge.total_cost ? ` (${Number(stat.latest_charge.total_cost).toLocaleString('de-DE', { minimumFractionDigits: 2 })} €)` : '';
+          lastCharge = `${lKwh}${lCost} (${stat.latest_charge.charged_at})`;
+        }
 
         return `
           <div class="card-clean rounded-2xl p-5 flex flex-col justify-between">
@@ -963,11 +972,15 @@
             <div class="pt-3 border-t border-slate-100 text-xs space-y-1.5 text-slate-600">
               <div class="flex justify-between">
                 <span>Diesen Monat:</span>
-                <span class="font-semibold text-slate-900">${monthKwh}</span>
+                <span class="font-semibold text-slate-900">${monthKwh} <span class="text-emerald-700">${monthCost}</span></span>
               </div>
               <div class="flex justify-between">
                 <span>Gesamt geladen:</span>
-                <span class="font-semibold text-slate-900">${totalKwh}</span>
+                <span class="font-semibold text-slate-900">${totalKwh} <span class="text-emerald-700">${totalCost}</span></span>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-500">
+                <span>Strompreis:</span>
+                <span class="font-semibold text-cyan-800">${pricePerKwh}</span>
               </div>
               <div class="flex justify-between text-[11px] text-slate-500">
                 <span>Letzter Eintrag:</span>
@@ -990,15 +1003,24 @@
         return;
       }
 
-      tbody.innerHTML = sessions.map(s => `
+      tbody.innerHTML = sessions.map(s => {
+        const kwhStr = `${Number(s.kwh).toLocaleString('de-DE', { minimumFractionDigits: 2 })} kWh`;
+        const costStr = s.total_cost !== undefined && s.total_cost !== null ? `${Number(s.total_cost).toLocaleString('de-DE', { minimumFractionDigits: 2 })} €` : '';
+        const priceStr = s.price_per_kwh !== undefined && s.price_per_kwh !== null ? `${Number(s.price_per_kwh).toLocaleString('de-DE', { minimumFractionDigits: 2 })} €/kWh` : '';
+        const infoStr = [priceStr, s.note].filter(Boolean).join(' • ') || '-';
+        return `
         <tr class="hover:bg-slate-50 transition">
           <td class="py-2.5 px-3 font-mono text-slate-600">${s.charged_at}</td>
           <td class="py-2.5 px-3 font-semibold text-slate-900">${s.vehicle_title}</td>
-          <td class="py-2.5 px-3 text-right font-mono font-bold text-sky-700">${Number(s.kwh).toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
-          <td class="py-2.5 px-3 text-slate-500">${s.note || '-'}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-bold text-sky-700">
+            ${kwhStr}
+            ${costStr ? `<div class="text-[11px] text-emerald-700 font-semibold font-mono">${costStr}</div>` : ''}
+          </td>
+          <td class="py-2.5 px-3 text-slate-500 text-xs">${infoStr}</td>
         </tr>
-      `).join('');
+      `}).join('');
     }
+
 
     // SolarLog Tabelle & Filter
     function renderSolarLogTable(solarlog) {

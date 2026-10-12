@@ -140,9 +140,29 @@ def fetch_charging_db() -> Dict[str, Any]:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
+        # Prüfe vorhandene Spalten in charging_sessions
+        cur.execute("PRAGMA table_info(charging_sessions)")
+        cols = [r["name"] for r in cur.fetchall()]
+        has_cost = "total_cost" in cols
+        has_price = "price_per_kwh" in cols
+
+        # Prüfe Tabelle vehicle_settings
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='vehicle_settings'")
+        has_settings = cur.fetchone() is not None
+
+        vehicle_prices = {}
+        if has_settings:
+            cur.execute("SELECT vehicle_id, vehicle_title, price_per_kwh FROM vehicle_settings")
+            for r in cur.fetchall():
+                vehicle_prices[r["vehicle_title"]] = float(r["price_per_kwh"])
+                vehicle_prices[r["vehicle_id"]] = float(r["price_per_kwh"])
+
         # Letzte 20 Ladevorgänge
-        cur.execute("""
-            SELECT id, vehicle_id, vehicle_title, kwh, charged_at, note
+        price_col = "COALESCE(price_per_kwh, 0.30) as price_per_kwh," if has_price else "0.30 as price_per_kwh,"
+        cost_col = "COALESCE(total_cost, round(kwh * 0.30, 2)) as total_cost," if has_cost else "round(kwh * 0.30, 2) as total_cost,"
+
+        cur.execute(f"""
+            SELECT id, vehicle_id, vehicle_title, kwh, {price_col} {cost_col} charged_at, note
             FROM charging_sessions
             ORDER BY charged_at DESC, id DESC
             LIMIT 20
@@ -155,22 +175,30 @@ def fetch_charging_db() -> Dict[str, Any]:
         cur_year = now.strftime("%Y")
 
         cur.execute("SELECT DISTINCT vehicle_title FROM charging_sessions")
-        titles = [r[0] for r in cur.fetchall()]
+        titles = set(r[0] for r in cur.fetchall())
+        for t in vehicle_prices.keys():
+            if not t.startswith("db:"):
+                titles.add(t)
 
         for title in titles:
-            cur.execute("""
+            cost_expr = "COALESCE(total_cost, kwh * COALESCE(price_per_kwh, 0.30))" if has_cost else "(kwh * 0.30)"
+
+            cur.execute(f"""
                 SELECT 
                     COUNT(id) as total_count,
                     COALESCE(SUM(kwh), 0.0) as total_kwh,
+                    COALESCE(SUM({cost_expr}), 0.0) as total_cost,
                     COALESCE(SUM(CASE WHEN charged_at LIKE ? THEN kwh ELSE 0.0 END), 0.0) as month_kwh,
-                    COALESCE(SUM(CASE WHEN charged_at LIKE ? THEN kwh ELSE 0.0 END), 0.0) as year_kwh
+                    COALESCE(SUM(CASE WHEN charged_at LIKE ? THEN {cost_expr} ELSE 0.0 END), 0.0) as month_cost,
+                    COALESCE(SUM(CASE WHEN charged_at LIKE ? THEN kwh ELSE 0.0 END), 0.0) as year_kwh,
+                    COALESCE(SUM(CASE WHEN charged_at LIKE ? THEN {cost_expr} ELSE 0.0 END), 0.0) as year_cost
                 FROM charging_sessions
                 WHERE vehicle_title = ?
-            """, (f"{cur_month}%", f"{cur_year}%", title))
+            """, (f"{cur_month}%", f"{cur_month}%", f"{cur_year}%", f"{cur_year}%", title))
             row = cur.fetchone()
 
-            cur.execute("""
-                SELECT charged_at, kwh, note
+            cur.execute(f"""
+                SELECT charged_at, kwh, {price_col} {cost_col} note
                 FROM charging_sessions
                 WHERE vehicle_title = ?
                 ORDER BY charged_at DESC, id DESC
@@ -178,11 +206,17 @@ def fetch_charging_db() -> Dict[str, Any]:
             """, (title,))
             last_row = cur.fetchone()
 
+            v_price = vehicle_prices.get(title, 0.30)
+
             result["vehicles"][title] = {
+                "price_per_kwh": v_price,
                 "total_count": row["total_count"] if row else 0,
                 "total_kwh": round(row["total_kwh"], 2) if row else 0.0,
+                "total_cost": round(row["total_cost"], 2) if row else 0.0,
                 "month_kwh": round(row["month_kwh"], 2) if row else 0.0,
+                "month_cost": round(row["month_cost"], 2) if row else 0.0,
                 "year_kwh": round(row["year_kwh"], 2) if row else 0.0,
+                "year_cost": round(row["year_cost"], 2) if row else 0.0,
                 "latest_charge": dict(last_row) if last_row else None
             }
 
@@ -191,6 +225,7 @@ def fetch_charging_db() -> Dict[str, Any]:
         print(f"Warnung Charging DB: {e}", file=sys.stderr)
 
     return result
+
 
 
 def fetch_solarlog_db() -> Dict[str, Any]:
