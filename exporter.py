@@ -531,11 +531,33 @@ async def generate_payload() -> Dict[str, Any]:
     charging_pv_total_w = wr1_w + wr2_w + wr3_w
     charging_pv_total_kw = round(charging_pv_total_w / 1000.0, 2)
 
+    threshold_kw = 9.0
+    threshold_w = 9000
+    target_charge_kw = 6.0
+    buffer_kw = 3.0
+    is_charging_ready = charging_pv_total_w >= threshold_w
+    diff_to_threshold_w = charging_pv_total_w - threshold_w
+    diff_to_threshold_kw = round(diff_to_threshold_w / 1000.0, 2)
+    progress_pct = min(100.0, round((charging_pv_total_w / threshold_w) * 100.0, 1))
+
+    charging_readiness = {
+        "threshold_kw": threshold_kw,
+        "threshold_w": threshold_w,
+        "target_charge_kw": target_charge_kw,
+        "buffer_kw": buffer_kw,
+        "current_kw": charging_pv_total_kw,
+        "current_w": charging_pv_total_w,
+        "is_ready": is_charging_ready,
+        "diff_kw": diff_to_threshold_kw,
+        "progress_percent": progress_pct
+    }
+
     charging_pv_system = {
         "title": "Fronius 3er-Verbund (Auto-Lade-PV)",
         "installed_kwp": 18.67,
         "total_power_w": charging_pv_total_w,
         "total_power_kw": charging_pv_total_kw,
+        "charging_readiness": charging_readiness,
         "wr1": {
             "title": "Fronius rechts (Messwert)",
             "power_w": wr1_w,
@@ -558,7 +580,7 @@ async def generate_payload() -> Dict[str, Any]:
 
     payload = {
         "meta": {
-            "version": "2.1.0",
+            "version": "2.2.0",
             "timestamp": now.isoformat(),
             "display_time": now.strftime("%d.%m.%Y %H:%M:%S"),
             "display_date": now.strftime("%d.%m.%Y"),
@@ -584,6 +606,7 @@ async def generate_payload() -> Dict[str, Any]:
             ]
         },
         "charging_pv_system": charging_pv_system,
+        "charging_readiness": charging_readiness,
         "influx_today": influx_stats,
         "weather_intelligence": weather_and_charging,
         "vehicles": list(vehicles_dict.values()),
@@ -616,7 +639,7 @@ def export_and_push() -> bool:
             commit_msg = f"chore(data): auto-update telemetry {datetime.now().strftime('%d.%m %H:%M')}"
             
             if last_msg.startswith("chore(data):"):
-                subprocess.run(["git", "commit", "--amend", "-m", commit_msg], cwd=BASE_DIR, check=True)
+                subprocess.run(["git", "commit", "--amend", "--date=now", "-m", commit_msg], cwd=BASE_DIR, check=True)
                 subprocess.run(["git", "push", "-f", "origin", "main"], cwd=BASE_DIR, check=True)
             else:
                 subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, check=True)
