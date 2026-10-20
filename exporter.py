@@ -499,6 +499,23 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
 
 
 
+def fetch_auth_data() -> Dict[str, Any]:
+    try:
+        if str(BOT_DIR) not in sys.path:
+            sys.path.insert(0, str(BOT_DIR))
+        from bot.auth import get_exportable_auth_payload
+        return get_exportable_auth_payload()
+    except Exception as e:
+        print(f"Warnung Auth-Payload: {e}", file=sys.stderr)
+        return {
+            "bot_username": "evcc_bayrhof_bot",
+            "group_chat_id": -5111787183,
+            "group_title": "EVCC Bayrhof Steuerung",
+            "authorized_ids": ["15231751"],
+            "authorized_usernames": ["bdc_gumb_drop"]
+        }
+
+
 async def generate_payload() -> Dict[str, Any]:
     now = datetime.now()
     evcc_state = await fetch_evcc_state() or {}
@@ -646,7 +663,8 @@ async def generate_payload() -> Dict[str, Any]:
         "weather_intelligence": weather_and_charging,
         "vehicles": list(vehicles_dict.values()),
         "charging_stats": charging_data,
-        "solarlog": solarlog_data
+        "solarlog": solarlog_data,
+        "auth": fetch_auth_data()
     }
     return payload
 

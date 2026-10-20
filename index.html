@@ -42,6 +42,20 @@
       }
     }
   </script>
+  <script>
+    // Global Telegram Callback Bridge
+    window.onTelegramAuth = function(user) {
+      console.log('Telegram Auth Callback empfangen:', user);
+      if (typeof handleTelegramLogin === 'function') {
+        handleTelegramLogin(user);
+      } else {
+        try {
+          localStorage.setItem('evcc_auth_user', JSON.stringify(user));
+        } catch(e) {}
+        window.location.reload();
+      }
+    };
+  </script>
   <style>
     html, body {
       overscroll-behavior-y: contain;
@@ -65,6 +79,63 @@
   </style>
 </head>
 <body class="bg-slate-100/70 text-slate-800 min-h-screen font-sans antialiased pb-20 selection:bg-amber-100 selection:text-amber-900">
+
+  <!-- TELEGRAM AUTHENTICATION GATE OVERLAY -->
+  <div id="telegram-auth-gate" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 transition-all duration-300">
+    <div class="w-full max-w-md rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-2xl text-center space-y-5 relative overflow-hidden">
+      <!-- Glow background accents -->
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Icon -->
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center mx-auto text-3xl shadow-lg shadow-amber-500/30">
+        ⚡
+      </div>
+
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 tracking-tight">EVCC Bayrhof Steuerung</h2>
+        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+          Privater Zugang für Mitglieder der Telegram-Gruppe <strong>EVCC Bayrhof Steuerung</strong>. Bitte melde dich über Telegram an, um das Dashboard freizuschalten.
+        </p>
+      </div>
+
+      <!-- Telegram Official Login Widget -->
+      <div id="tg-widget-mount" class="py-2 flex flex-col items-center justify-center min-h-[50px]">
+        <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                data-telegram-login="evcc_bayrhof_bot" 
+                data-size="large" 
+                data-radius="12" 
+                data-onauth="onTelegramAuth(user)" 
+                data-auth-url="https://bbbdc.github.io/evcc-dashboard/index.html"
+                data-request-access="write"></script>
+      </div>
+
+      <!-- Error / Notice Box -->
+      <div id="tg-auth-error" class="hidden text-left"></div>
+
+      <!-- Fallback / Alternative Login -->
+      <div class="pt-1">
+        <button type="button" onclick="toggleFallbackLogin()" class="text-[11px] text-slate-500 hover:text-amber-600 transition cursor-pointer underline">
+          Alternative: Über Nutzernamen anmelden
+        </button>
+        <div id="fallback-login-container" class="hidden mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-left">
+          <label class="block text-[11px] text-slate-600 font-medium">Telegram Benutzername:</label>
+          <div class="flex gap-2">
+            <input type="text" id="fallback-username-input" placeholder="z. B. Bdc_Gumb_Drop" class="flex-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-xs text-slate-800 focus:outline-none focus:border-amber-500" onkeydown="if(event.key==='Enter') submitFallbackLogin()">
+            <button type="button" onclick="submitFallbackLogin()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition cursor-pointer shadow-sm">
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+        <p>Zugriff nur für autorisierte Gruppenmitglieder.</p>
+        <p>Noch nicht freigeschaltet? Öffne <a href="https://t.me/evcc_bayrhof_bot" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold underline">@evcc_bayrhof_bot</a> und sende <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700 font-mono">/start</code>.</p>
+      </div>
+    </div>
+  </div>
 
   <!-- PULL TO REFRESH INDICATOR (iOS Standalone & Mobile) -->
   <div id="ptr-indicator" class="fixed inset-x-0 z-[100] flex justify-center pointer-events-none transition-transform duration-200 ease-out" style="top: max(env(safe-area-inset-top, 0px), 12px); transform: translateY(-160%);">
@@ -112,6 +183,24 @@
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
           <span>Aktualisieren</span>
         </button>
+
+        <!-- User Auth Badge & Logout -->
+        <div id="auth-user-badge" class="hidden flex items-center gap-2.5 pl-3 border-l border-slate-200">
+          <div class="relative w-8 h-8 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+            <img id="auth-user-photo" src="" alt="" class="w-full h-full object-cover hidden">
+            <span id="auth-user-avatar-fallback" class="text-xs font-bold text-amber-800">👤</span>
+          </div>
+          <div class="hidden md:flex flex-col text-left">
+            <div class="flex items-center gap-1.5">
+              <span id="auth-user-name" class="text-xs font-bold text-slate-800 leading-tight">@User</span>
+              <span id="auth-user-role-badge" class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">MITGLIED</span>
+            </div>
+            <span class="text-[10px] text-slate-400">Bayrhof Gruppe</span>
+          </div>
+          <button onclick="logoutTelegram()" title="Abmelden" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -542,6 +631,211 @@
 
   <!-- SCRIPT -->
   <script>
+    // ==========================================
+    // TELEGRAM AUTHENTICATION & ACCESS CONTROL
+    // ==========================================
+    let currentAuthUser = null;
+    let currentAuthData = {
+      bot_username: "evcc_bayrhof_bot",
+      group_chat_id: -5111787183,
+      group_title: "EVCC Bayrhof Steuerung",
+      authorized_ids: ["15231751"],
+      authorized_usernames: ["bdc_gumb_drop"]
+    };
+
+    function getAuthenticatedUser() {
+      if (currentAuthUser) return currentAuthUser;
+      try {
+        const raw = localStorage.getItem('evcc_auth_user');
+        if (raw) currentAuthUser = JSON.parse(raw);
+      } catch (e) {}
+      return currentAuthUser;
+    }
+
+    function checkUserAuthorization(user) {
+      if (!user) return { authorized: false, role: null };
+      
+      const adminIds = ['15231751'];
+      const adminUnames = ['bdc_gumb_drop'];
+      
+      const uid = String(user.id || '').trim();
+      const uname = (user.username || '').replace(/^@/, '').toLowerCase().trim();
+
+      // Master Admin immer berechtigt
+      if (adminIds.includes(uid) || (uname && adminUnames.includes(uname))) {
+        return { authorized: true, role: 'admin' };
+      }
+
+      // Prüfe authData aus data.json
+      const auth = currentAuthData || {};
+      const validIds = (auth.authorized_ids || []).map(x => String(x).trim());
+      const validUnames = (auth.authorized_usernames || []).map(x => String(x).replace(/^@/, '').toLowerCase().trim());
+
+      if (uid && validIds.includes(uid)) {
+        return { authorized: true, role: 'member' };
+      }
+      if (uname && validUnames.includes(uname)) {
+        return { authorized: true, role: 'member' };
+      }
+
+      return { authorized: false, role: null };
+    }
+
+    window.handleTelegramLogin = function(user) {
+      if (!user) return;
+      const authResult = checkUserAuthorization(user);
+      user.role = authResult.role;
+
+      if (!authResult.authorized) {
+        const errBox = document.getElementById('tg-auth-error');
+        if (errBox) {
+          errBox.className = 'p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-2 mt-3 text-left';
+          const displayId = user.id ? ` (ID: ${user.id})` : '';
+          const displayName = user.username ? `@${user.username.replace(/^@/, '')}` : (user.first_name || 'Unbekannt');
+          errBox.innerHTML = `
+            <div class="font-bold text-rose-700 flex items-center gap-1.5">
+              <span>⛔</span> Zugriff noch nicht freigeschaltet
+            </div>
+            <p>Dein Telegram-Account <strong>${displayName}</strong>${displayId} ist noch nicht freigeschaltet.</p>
+            <p class="text-[11px] text-slate-600 leading-relaxed">Bitte öffne <a href="https://t.me/evcc_bayrhof_bot" target="_blank" class="text-amber-600 font-bold underline">@evcc_bayrhof_bot</a> in Telegram und sende <code>/start</code>. Als Mitglied der Gruppe <em>EVCC Bayrhof Steuerung</em> wird deine Anfrage an den Administrator gesendet.</p>
+            <button onclick="logoutTelegram()" class="mt-2 w-full py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs transition cursor-pointer">
+              Mit anderem Account anmelden
+            </button>
+          `;
+          errBox.classList.remove('hidden');
+        }
+        return;
+      }
+
+      currentAuthUser = user;
+      try {
+        localStorage.setItem('evcc_auth_user', JSON.stringify(user));
+      } catch (e) {}
+
+      applyAuthenticatedState(user);
+    };
+
+    window.onTelegramAuth = window.handleTelegramLogin;
+
+    function applyAuthenticatedState(user) {
+      const gate = document.getElementById('telegram-auth-gate');
+      if (gate) gate.classList.add('hidden');
+
+      const badge = document.getElementById('auth-user-badge');
+      if (badge) {
+        badge.classList.remove('hidden');
+        const nameEl = document.getElementById('auth-user-name');
+        const roleEl = document.getElementById('auth-user-role-badge');
+        const photoEl = document.getElementById('auth-user-photo');
+        const fallbackEl = document.getElementById('auth-user-avatar-fallback');
+
+        if (nameEl) nameEl.innerText = user.username ? '@' + user.username.replace(/^@/, '') : (user.first_name || 'Mitglied');
+        if (roleEl) {
+          if (user.role === 'admin') {
+            roleEl.innerText = 'ADMIN';
+            roleEl.className = 'px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500 text-white';
+          } else {
+            roleEl.innerText = 'MITGLIED';
+            roleEl.className = 'px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300';
+          }
+        }
+        if (user.photo_url && photoEl) {
+          photoEl.src = user.photo_url;
+          photoEl.classList.remove('hidden');
+          if (fallbackEl) fallbackEl.classList.add('hidden');
+        } else {
+          if (photoEl) photoEl.classList.add('hidden');
+          if (fallbackEl) fallbackEl.classList.remove('hidden');
+        }
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function logoutTelegram() {
+      try {
+        localStorage.removeItem('evcc_auth_user');
+      } catch (e) {}
+      currentAuthUser = null;
+      const badge = document.getElementById('auth-user-badge');
+      if (badge) badge.classList.add('hidden');
+      const errBox = document.getElementById('tg-auth-error');
+      if (errBox) errBox.classList.add('hidden');
+      const gate = document.getElementById('telegram-auth-gate');
+      if (gate) gate.classList.remove('hidden');
+    }
+
+    function toggleFallbackLogin() {
+      const c = document.getElementById('fallback-login-container');
+      if (c) c.classList.toggle('hidden');
+    }
+
+    function submitFallbackLogin() {
+      const inp = document.getElementById('fallback-username-input');
+      if (!inp) return;
+      const raw = inp.value.trim().replace(/^@/, '');
+      if (!raw) return;
+
+      const dummyUser = {
+        id: 'user_' + raw.toLowerCase(),
+        username: raw,
+        first_name: raw
+      };
+
+      const authResult = checkUserAuthorization(dummyUser);
+      if (!authResult.authorized) {
+        const errBox = document.getElementById('tg-auth-error');
+        if (errBox) {
+          errBox.className = 'p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1 mt-2 text-left';
+          errBox.innerHTML = `Der Nutzername <strong>@${raw}</strong> ist noch nicht autorisiert. Bitte öffne <a href="https://t.me/evcc_bayrhof_bot" target="_blank" class="text-amber-600 underline font-bold">@evcc_bayrhof_bot</a> in Telegram.`;
+          errBox.classList.remove('hidden');
+        }
+        return;
+      }
+
+      dummyUser.role = authResult.role;
+      window.handleTelegramLogin(dummyUser);
+    }
+
+    function initAuthOnLoad() {
+      // 1. URL Query-Parameter prüfen (Telegram Login Widget Redirect)
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('id') || urlParams.get('username')) {
+          const qUser = {
+            id: urlParams.get('id') || ('user_' + (urlParams.get('username') || '').toLowerCase()),
+            first_name: urlParams.get('first_name') || urlParams.get('username') || 'Mitglied',
+            last_name: urlParams.get('last_name') || '',
+            username: (urlParams.get('username') || '').replace(/^@/, ''),
+            photo_url: urlParams.get('photo_url') || '',
+            auth_date: urlParams.get('auth_date') || '',
+            hash: urlParams.get('hash') || ''
+          };
+          window.handleTelegramLogin(qUser);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return;
+        }
+      } catch (e) {}
+
+      // 2. Gespeicherten Nutzer aus localStorage laden
+      const savedUser = getAuthenticatedUser();
+      if (savedUser) {
+        const authResult = checkUserAuthorization(savedUser);
+        if (authResult.authorized) {
+          savedUser.role = authResult.role;
+          applyAuthenticatedState(savedUser);
+          return;
+        } else {
+          // Berechtigung möglicherweise nicht mehr gegeben
+          logoutTelegram();
+          return;
+        }
+      }
+
+      // Kein Nutzer angemeldet -> Gate anzeigen
+      const gate = document.getElementById('telegram-auth-gate');
+      if (gate) gate.classList.remove('hidden');
+    }
+
     let currentInverterFilter = 'all';
     let allInverters = [];
     let countdownSeconds = 45;
@@ -580,7 +874,11 @@
       }
 
       if (data) {
+        if (data.auth) {
+          currentAuthData = data.auth;
+        }
         renderDashboard(data);
+        initAuthOnLoad();
       } else {
         document.getElementById('display-time').textContent = 'Fehler beim Laden der Daten';
       }
@@ -1185,6 +1483,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
+      initAuthOnLoad();
       loadTelemetryData();
       startCountdown();
     });
