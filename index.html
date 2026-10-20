@@ -78,7 +78,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-100/70 text-slate-800 min-h-screen font-sans antialiased pb-20 selection:bg-amber-100 selection:text-amber-900">
+<body class="bg-slate-100/70 text-slate-800 min-h-screen font-sans antialiased pb-28 sm:pb-20 selection:bg-amber-100 selection:text-amber-900">
 
   <!-- TELEGRAM AUTHENTICATION GATE OVERLAY -->
   <div id="telegram-auth-gate" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 transition-all duration-300">
@@ -203,421 +203,512 @@
         </div>
       </div>
 
+      <!-- Desktop Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-2 w-full pt-2.5 border-t border-slate-100">
+        <button id="nav-tab-overview" onclick="switchDashboardTab('overview')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-amber-500 text-white shadow-sm cursor-pointer">
+          <i data-lucide="zap" class="w-4 h-4"></i>
+          <span>Live & Laden</span>
+        </button>
+        <button id="nav-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer relative">
+          <i data-lucide="sun" class="w-4 h-4"></i>
+          <span>Solar-Log (17 WR)</span>
+          <span id="tab-badge-solarlog-errors" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white ml-0.5">0</span>
+        </button>
+        <button id="nav-tab-forecast" onclick="switchDashboardTab('forecast')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i data-lucide="calendar-check" class="w-4 h-4"></i>
+          <span>Ladefenster & Prognose</span>
+        </button>
+        <button id="nav-tab-history" onclick="switchDashboardTab('history')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i data-lucide="history" class="w-4 h-4"></i>
+          <span>Ladehistorie</span>
+        </button>
+      </nav>
     </div>
   </header>
 
   <!-- MAIN WRAPPER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-    <!-- HERO METRICS (4 Kacheln) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- ========================================== -->
+    <!-- TAB 1: ⚡ LIVE & LADEN                      -->
+    <!-- ========================================== -->
+    <div id="tab-content-overview" class="tab-pane space-y-6">
       
-      <!-- Auto-Lade-PV Live (Fronius 3er-Verbund) -->
-      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-cyan-500 transition-all bg-gradient-to-br from-cyan-50/30 to-white">
-        <div class="flex justify-between items-start mb-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-cyan-800 flex items-center gap-1.5">
-            <i data-lucide="battery-charging" class="w-4 h-4 text-cyan-600"></i> Auto-Lade-PV Live
-          </span>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 border border-cyan-200">Fronius 3er (~18,7 kWp)</span>
-        </div>
-        <div class="flex items-baseline gap-2">
-          <div class="text-3xl font-extrabold text-cyan-900 tracking-tight" id="charging-pv-power-kw">-- kW</div>
-          <div class="text-xs text-slate-500 font-mono" id="charging-pv-power-w">(-- W)</div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between" id="charging-pv-subinfo">
-          <span>Verbund (3 WR):</span>
-          <span class="font-medium text-slate-800 truncate ml-2" id="charging-pv-breakdown">Lädt...</span>
-        </div>
-        <!-- 6 kW Lade-Bereitschaft (≥ 9 kW Schwelle) -->
-        <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-1.5" id="hero-readiness-box">
-          <div class="flex items-center justify-between text-[11px]">
-            <span class="text-slate-500 font-medium flex items-center gap-1">
-              <i data-lucide="zap" class="w-3 h-3 text-cyan-600"></i> 6 kW Laden (≥ 9 kW):
+      <!-- HERO METRICS (4 Kacheln) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Auto-Lade-PV Live (Fronius 3er-Verbund) -->
+        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-cyan-500 transition-all bg-gradient-to-br from-cyan-50/30 to-white">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-800 flex items-center gap-1.5">
+              <i data-lucide="battery-charging" class="w-4 h-4 text-cyan-600"></i> Auto-Lade-PV Live
             </span>
-            <span id="hero-readiness-badge" class="px-2 py-0.5 rounded-md font-bold text-[10px] bg-slate-100 text-slate-600 border border-slate-200">Prüfe...</span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 border border-cyan-200">Fronius 3er (~18,7 kWp)</span>
           </div>
-          <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-            <div id="hero-readiness-bar" class="h-1.5 rounded-full bg-cyan-500 transition-all duration-500" style="width: 0%"></div>
+          <div class="flex items-baseline gap-2">
+            <div class="text-3xl font-extrabold text-cyan-900 tracking-tight" id="charging-pv-power-kw">-- kW</div>
+            <div class="text-xs text-slate-500 font-mono" id="charging-pv-power-w">(-- W)</div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between" id="charging-pv-subinfo">
+            <span>Verbund (3 WR):</span>
+            <span class="font-medium text-slate-800 truncate ml-2" id="charging-pv-breakdown">Lädt...</span>
+          </div>
+          <!-- 6 kW Lade-Bereitschaft (≥ 9 kW Schwelle) -->
+          <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-1.5" id="hero-readiness-box">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-500 font-medium flex items-center gap-1">
+                <i data-lucide="zap" class="w-3 h-3 text-cyan-600"></i> 6 kW Laden (≥ 9 kW):
+              </span>
+              <span id="hero-readiness-badge" class="px-2 py-0.5 rounded-md font-bold text-[10px] bg-slate-100 text-slate-600 border border-slate-200">Prüfe...</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+              <div id="hero-readiness-bar" class="h-1.5 rounded-full bg-cyan-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
           </div>
         </div>
+
+        <!-- Große Solar-Anlage (Solar-Log 220 kWp) -->
+        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-amber-500 transition-all">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+              <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> Große PV-Anlage
+            </span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">Reine Einspeisung (220 kWp)</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <div class="text-3xl font-extrabold text-slate-900 tracking-tight" id="pv-power-kw">-- kW</div>
+            <div class="text-xs text-slate-500 font-mono" id="pv-power-w">(-- W)</div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between" id="pv-subinfo">
+            <span>Solar-Log:</span>
+            <span class="font-medium text-slate-800 truncate ml-2" id="pv-plants-summary">17 Wechselrichter</span>
+          </div>
+        </div>
+
+        <!-- Netz (Grid) -->
+        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-emerald-500 transition-all" id="grid-card">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5" id="grid-header-label">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-600" id="grid-icon"></i> Netzeinspeisung
+            </span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200" id="grid-mode-badge">Einspeisung</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <div class="text-3xl font-extrabold text-emerald-700 tracking-tight" id="grid-power-kw">-- kW</div>
+            <div class="text-xs text-slate-500 font-mono" id="grid-power-w">(-- W)</div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
+            <span id="grid-subtext-label">Netzstatus:</span>
+            <span class="font-medium text-slate-800" id="grid-direction">Überschuss wird eingespeist</span>
+          </div>
+        </div>
+
+        <!-- Tagesertrag (InfluxDB) -->
+        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-sky-500 transition-all">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-sky-800 flex items-center gap-1.5">
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-sky-600"></i> Ertrag Heute
+            </span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200" id="influx-date">Heute</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <div class="text-3xl font-extrabold text-sky-800 tracking-tight" id="today-energy-kwh">-- kWh</div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
+            <span>Spitze: <b class="text-slate-800" id="today-max-power">-- W</b></span>
+            <span>Ø: <b class="text-slate-800" id="today-avg-power">-- W</b></span>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Große Solar-Anlage (Solar-Log 220 kWp) -->
-      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-amber-500 transition-all">
-        <div class="flex justify-between items-start mb-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
-            <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> Große PV-Anlage
-          </span>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">Reine Einspeisung (220 kWp)</span>
-        </div>
-        <div class="flex items-baseline gap-2">
-          <div class="text-3xl font-extrabold text-slate-900 tracking-tight" id="pv-power-kw">-- kW</div>
-          <div class="text-xs text-slate-500 font-mono" id="pv-power-w">(-- W)</div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between" id="pv-subinfo">
-          <span>Solar-Log:</span>
-          <span class="font-medium text-slate-800 truncate ml-2" id="pv-plants-summary">17 Wechselrichter</span>
-        </div>
-      </div>
+      <!-- FAHRZEUGE & HAUSVERBRAUCH -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- Netz (Grid) -->
-      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-emerald-500 transition-all" id="grid-card">
-        <div class="flex justify-between items-start mb-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5" id="grid-header-label">
-            <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-600" id="grid-icon"></i> Netzeinspeisung
-          </span>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200" id="grid-mode-badge">Einspeisung</span>
-        </div>
-        <div class="flex items-baseline gap-2">
-          <div class="text-3xl font-extrabold text-emerald-700 tracking-tight" id="grid-power-kw">-- kW</div>
-          <div class="text-xs text-slate-500 font-mono" id="grid-power-w">(-- W)</div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
-          <span id="grid-subtext-label">Netzstatus:</span>
-          <span class="font-medium text-slate-800" id="grid-direction">Überschuss wird eingespeist</span>
-        </div>
-      </div>
+        <!-- Fahrzeuge (2 Spalten) -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="car" class="w-5 h-5 text-sky-600"></i>
+              Fahrzeuge & Live-Ladeleistung
+            </h2>
+            <span class="text-xs text-slate-500">Cupra Raval Jona & Cupra Tavascan Max</span>
+          </div>
 
-      <!-- Tagesertrag (InfluxDB) -->
-      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-sky-500 transition-all">
-        <div class="flex justify-between items-start mb-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-sky-800 flex items-center gap-1.5">
-            <i data-lucide="bar-chart-2" class="w-4 h-4 text-sky-600"></i> Ertrag Heute
-          </span>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200" id="influx-date">Heute</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="vehicles-container">
+            <!-- Dynamisch via JS -->
+            <div class="card-clean rounded-2xl p-5 animate-pulse text-center py-10 text-slate-400">
+              Fahrzeugdaten laden...
+            </div>
+          </div>
         </div>
-        <div class="flex items-baseline gap-2">
-          <div class="text-3xl font-extrabold text-sky-800 tracking-tight" id="today-energy-kwh">-- kWh</div>
+
+        <!-- Hausverbrauch & Schnellzugriff (1 Spalte) -->
+        <div class="space-y-4">
+          
+          <!-- Hausverbrauch & PV-Kopplung -->
+          <div class="card-clean rounded-2xl p-5">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
+              <i data-lucide="home" class="w-5 h-5 text-purple-600"></i>
+              Hausverbrauch & Deckung
+            </h2>
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between p-3 rounded-xl bg-purple-50/50 border border-purple-200">
+                <span class="text-xs text-slate-600">Aktueller Hausverbrauch:</span>
+                <span class="text-sm font-bold text-purple-900" id="home-power-kw-detail">-- kW</span>
+              </div>
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <span class="text-xs text-slate-600">Deckungsgrad durch PV:</span>
+                <span class="text-sm font-bold text-emerald-700" id="home-pv-coverage">100% durch PV</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Schnell-Aktion Ladefenster & Prognose -->
+          <div class="card-clean rounded-2xl p-5 bg-gradient-to-br from-amber-50/60 to-white border border-amber-200/80">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                  <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 class="text-xs font-bold text-slate-900">3-Tage-Ladefenster</h3>
+                  <p class="text-[11px] text-slate-500">Sonnige Phasen optimal nutzen</p>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              Fronius 3er-Verbund Ertragsprognose & stündliche Ladefenster-Berechnung für heute und die kommenden Tage.
+            </p>
+            <button onclick="switchDashboardTab('forecast')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+              <span>Ladefenster & Prognose öffnen</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
         </div>
-        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
-          <span>Spitze: <b class="text-slate-800" id="today-max-power">-- W</b></span>
-          <span>Ø: <b class="text-slate-800" id="today-avg-power">-- W</b></span>
-        </div>
+
       </div>
 
     </div>
 
-    <!-- INTELLIGENTE LADEFENSTER & ERTRAGSPROGNOSE (NUR AUS FRONIUS 3ER-VERBUND!) -->
-    <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-cyan-50/50 via-white to-amber-50/40 border-cyan-200">
+    <!-- ========================================== -->
+    <!-- TAB 2: ☀️ SOLAR-LOG GROSSANLAGE (17 WR)    -->
+    <!-- ========================================== -->
+    <div id="tab-content-solarlog" class="tab-pane hidden space-y-6">
       
-      <!-- Hinweis-Box: Trennung Großanlage vs. Auto-Lade-PV -->
-      <div class="p-3.5 bg-sky-50 border border-sky-200 rounded-xl mb-5 text-xs text-sky-950 flex items-start gap-3 shadow-xs">
-        <div class="p-1.5 bg-sky-100 text-sky-700 rounded-lg shrink-0 mt-0.5">
-          <i data-lucide="shield-check" class="w-4 h-4"></i>
+      <!-- SOLAR-LOG WECHSELRICHTER TABELLE (UNTEREINANDER & FILTERBAR) -->
+      <div class="card-clean rounded-2xl p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
+                <i data-lucide="cpu" class="w-5 h-5 text-amber-600"></i>
+                Solar-Log Großanlage (Alle 17 Wechselrichter)
+              </h2>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">Reine Netzeinspeisung</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Detaillierte Status- und Ertragsanzeige der 220 kWp Großanlage untereinander mit Schnellfilter</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 text-xs">
+            <span class="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200" id="solarlog-active-count">15 / 17 Einspeisend</span>
+            <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-800 font-semibold border border-slate-200" id="solarlog-total-power">Gesamt: -- kW</span>
+            <span class="px-3 py-1 rounded-lg bg-amber-100 text-amber-900 font-semibold border border-amber-200" id="solarlog-total-daysum">Tagesertrag: -- kWh</span>
+          </div>
         </div>
-        <div>
-          <div class="font-bold text-slate-900 text-xs">Exklusive Ladeempfehlung über Fronius 3er-Verbund (~18,7 kWp)</div>
-          <p class="text-slate-600 mt-0.5">
-            Die Autoladung erfolgt rein über die 3 gekoppelten Wechselrichter (<b>Fronius rechts</b> + <b>100% Partner-WR</b> + <b>66,7% Zusatz-WR</b>). Die 220 kWp Großanlage dient rein der Netzeinspeisung und wird für diese Ladezeiten-Empfehlung <u>nicht</u> herangezogen.
-          </p>
+
+        <!-- Filterleiste & Suche -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          
+          <!-- Filter Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200" id="filter-buttons">
+            <button onclick="setInverterFilter('all')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-sm transition" data-filter="all">
+              Alle (17)
+            </button>
+            <button onclick="setInverterFilter('active')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-filter="active">
+              🟢 Einspeisend (<span id="count-active">15</span>)
+            </button>
+            <button onclick="setInverterFilter('standby')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-filter="standby">
+              🟡 Standby / 0 W (<span id="count-standby">2</span>)
+            </button>
+            <button onclick="setInverterFilter('error')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-filter="error">
+              🔴 Störung (<span id="count-error">0</span>)
+            </button>
+          </div>
+
+          <!-- Schnellsuche -->
+          <div class="relative">
+            <input type="text" id="wr-search" oninput="applyInverterFilters()" placeholder="WR oder Status filtern..." class="w-56 pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+          </div>
+
         </div>
+
+        <!-- Tabellenansicht Untereinander -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs">
+          <table class="w-full text-left text-xs text-slate-700">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Wechselrichter</th>
+                <th class="py-3 px-4">Status & Zustand</th>
+                <th class="py-3 px-4 text-right">Aktuelle Leistung (Pac)</th>
+                <th class="py-3 px-4 text-right">Tagesertrag (DaySum)</th>
+                <th class="py-3 px-4">Rohwerte</th>
+                <th class="py-3 px-4 text-right">Letztes Update</th>
+              </tr>
+            </thead>
+            <tbody id="inverter-table-body" class="divide-y divide-slate-100 bg-white">
+              <!-- Dynamisch via JS befüllt -->
+              <tr>
+                <td colspan="6" class="py-6 text-center text-slate-400">Lade Wechselrichter...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
-      <!-- Header mit Wetter-Badges -->
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200/80">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-            <i data-lucide="calendar-check" class="w-5 h-5"></i>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: 🔮 LADEFENSTER & PROGNOSE           -->
+    <!-- ========================================== -->
+    <div id="tab-content-forecast" class="tab-pane hidden space-y-6">
+      
+      <!-- INTELLIGENTE LADEFENSTER & ERTRAGSPROGNOSE (NUR AUS FRONIUS 3ER-VERBUND!) -->
+      <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-cyan-50/50 via-white to-amber-50/40 border-cyan-200">
+        
+        <!-- Hinweis-Box: Trennung Großanlage vs. Auto-Lade-PV -->
+        <div class="p-3.5 bg-sky-50 border border-sky-200 rounded-xl mb-5 text-xs text-sky-950 flex items-start gap-3 shadow-xs">
+          <div class="p-1.5 bg-sky-100 text-sky-700 rounded-lg shrink-0 mt-0.5">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
           </div>
           <div>
-            <h2 class="text-base font-bold text-slate-900">Auto-Ladefenster & Solarprognose (Fronius Verbund)</h2>
-            <p class="text-xs text-slate-500">Präzise Ladezeit-Empfehlungen für Cupra Tavascan Max & Cupra Raval Jona</p>
+            <div class="font-bold text-slate-900 text-xs">Exklusive Ladeempfehlung über Fronius 3er-Verbund (~18,7 kWp)</div>
+            <p class="text-slate-600 mt-0.5">
+              Die Autoladung erfolgt rein über die 3 gekoppelten Wechselrichter (<b>Fronius rechts</b> + <b>100% Partner-WR</b> + <b>66,7% Zusatz-WR</b>). Die 220 kWp Großanlage dient rein der Netzeinspeisung und wird für diese Ladezeiten-Empfehlung <u>nicht</u> herangezogen.
+            </p>
           </div>
         </div>
-        <div class="flex items-center gap-2 text-xs" id="weather-badges">
-          <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium text-slate-700 shadow-sm" id="dwd-weather-badge">DWD: lädt...</span>
-          <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium text-slate-700 shadow-sm" id="sunshine-badge">Sonne: lädt...</span>
-        </div>
-      </div>
 
-      <!-- 3er Verbund Live-Status Kacheln -->
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5" id="fronius-trio-grid">
-        <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-          <div class="text-[11px] font-semibold text-slate-500">WR 1 (Fronius rechts)</div>
-          <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr1">-- kW</div>
-          <div class="text-[10px] text-emerald-600 font-medium">100% (Messwert evcc)</div>
-        </div>
-        <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-          <div class="text-[11px] font-semibold text-slate-500">WR 2 (Partner-WR)</div>
-          <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr2">-- kW</div>
-          <div class="text-[10px] text-slate-500 font-medium">100% Hochrechnung</div>
-        </div>
-        <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-          <div class="text-[11px] font-semibold text-slate-500">WR 3 (Zusatz-WR)</div>
-          <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr3">-- kW</div>
-          <div class="text-[10px] text-slate-500 font-medium">66,7% Hochrechnung</div>
-        </div>
-        <div class="p-3 bg-cyan-50/70 rounded-xl border border-cyan-200 shadow-2xs">
-          <div class="text-[11px] font-bold text-cyan-800">Gesamt Auto-Lade-PV</div>
-          <div class="text-base font-extrabold text-cyan-950 mt-0.5" id="trio-total">-- kW</div>
-          <div class="text-[10px] text-cyan-700 font-semibold">Aktuelle Wallbox-Power</div>
-        </div>
-      </div>
-
-      <!-- MANUELLES 6 kW LADE-KRITERIUM (≥ 9 kW Schwelle mit 5 Min Telegram-Debounce) -->
-      <div id="solar-threshold-card" class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs mb-5 transition-all">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-2.5">
+        <!-- Header mit Wetter-Badges -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200/80">
           <div class="flex items-center gap-2.5">
-            <div id="solar-threshold-icon-box" class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0">
-              <i data-lucide="zap" class="w-4 h-4"></i>
+            <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+              <i data-lucide="calendar-check" class="w-5 h-5"></i>
             </div>
             <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-slate-900">Manuelles 6 kW Ladekriterium:</span>
-                <span id="solar-threshold-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                  Prüfe Schwelle...
-                </span>
+              <h2 class="text-base font-bold text-slate-900">Auto-Ladefenster & Solarprognose (Fronius Verbund)</h2>
+              <p class="text-xs text-slate-500">Präzise Ladezeit-Empfehlungen für Cupra Tavascan Max & Cupra Raval Jona</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-xs" id="weather-badges">
+            <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium text-slate-700 shadow-sm" id="dwd-weather-badge">DWD: lädt...</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium text-slate-700 shadow-sm" id="sunshine-badge">Sonne: lädt...</span>
+          </div>
+        </div>
+
+        <!-- 3er Verbund Live-Status Kacheln -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5" id="fronius-trio-grid">
+          <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+            <div class="text-[11px] font-semibold text-slate-500">WR 1 (Fronius rechts)</div>
+            <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr1">-- kW</div>
+            <div class="text-[10px] text-emerald-600 font-medium">100% (Messwert evcc)</div>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+            <div class="text-[11px] font-semibold text-slate-500">WR 2 (Partner-WR)</div>
+            <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr2">-- kW</div>
+            <div class="text-[10px] text-slate-500 font-medium">100% Hochrechnung</div>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+            <div class="text-[11px] font-semibold text-slate-500">WR 3 (Zusatz-WR)</div>
+            <div class="text-base font-extrabold text-slate-900 mt-0.5" id="trio-wr3">-- kW</div>
+            <div class="text-[10px] text-slate-500 font-medium">66,7% Hochrechnung</div>
+          </div>
+          <div class="p-3 bg-cyan-50/70 rounded-xl border border-cyan-200 shadow-2xs">
+            <div class="text-[11px] font-bold text-cyan-800">Gesamt Auto-Lade-PV</div>
+            <div class="text-base font-extrabold text-cyan-950 mt-0.5" id="trio-total">-- kW</div>
+            <div class="text-[10px] text-cyan-700 font-semibold">Aktuelle Wallbox-Power</div>
+          </div>
+        </div>
+
+        <!-- MANUELLES 6 kW LADE-KRITERIUM (≥ 9 kW Schwelle mit 5 Min Telegram-Debounce) -->
+        <div id="solar-threshold-card" class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs mb-5 transition-all">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-2.5">
+            <div class="flex items-center gap-2.5">
+              <div id="solar-threshold-icon-box" class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0">
+                <i data-lucide="zap" class="w-4 h-4"></i>
               </div>
-              <div class="text-[11px] text-slate-500 mt-0.5">
-                Bedarf: Mindestens <b>9,0 kW</b> vom Dach (6 kW Ladeleistung + ~3 kW Hauspuffer)
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-slate-900">Manuelles 6 kW Ladekriterium:</span>
+                  <span id="solar-threshold-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                    Prüfe Schwelle...
+                  </span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">
+                  Bedarf: Mindestens <b>9,0 kW</b> vom Dach (6 kW Ladeleistung + ~3 kW Hauspuffer)
+                </div>
               </div>
+            </div>
+
+            <!-- Telegram Debounce Info Badge -->
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200/80 text-[11px] font-medium">
+              <i data-lucide="bell" class="w-3.5 h-3.5 text-sky-600 shrink-0"></i>
+              <span>Telegram-Alert: nach <b>5 Min. stabil</b> über/unter 9 kW</span>
             </div>
           </div>
 
-          <!-- Telegram Debounce Info Badge -->
-          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200/80 text-[11px] font-medium">
-            <i data-lucide="bell" class="w-3.5 h-3.5 text-sky-600 shrink-0"></i>
-            <span>Telegram-Alert: nach <b>5 Min. stabil</b> über/unter 9 kW</span>
-          </div>
-        </div>
-
-        <!-- Detail-Balken & Werte -->
-        <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 space-y-2">
-          <div class="flex justify-between items-center text-xs">
-            <span class="text-slate-600">Aktuelle Fronius Lade-PV: <b class="text-slate-900 font-mono" id="threshold-current-kw">-- kW</b></span>
-            <span class="text-slate-500 font-medium" id="threshold-diff-text">Schwelle: <b>9,0 kW</b></span>
-          </div>
-          
-          <div class="relative w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-            <div id="threshold-progress-bar" class="h-3 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-500" style="width: 0%"></div>
-          </div>
-
-          <div class="flex justify-between text-[11px] text-slate-400 font-mono">
-            <span>0 kW</span>
-            <span>6 kW (Wallbox)</span>
-            <span class="font-bold text-slate-600">9 kW (Schwelle mit Hauspuffer)</span>
-            <span>18,7 kWp</span>
-          </div>
-        </div>
-
-        <div class="mt-2 text-[11px] text-slate-500 flex items-center justify-between" id="threshold-status-explanation">
-          <span>Sobald die Erzeugung über 9 kW liegt, reicht der reine Solarstrom für 6 kW Ladevorgang ohne Netzbezug.</span>
-          <span class="font-semibold text-slate-700" id="threshold-decision-text">Warte auf Solarleistung</span>
-        </div>
-      </div>
-
-      <!-- Interaktiver Ladeleistungs-Einsteller (Standard 7-8 kW) -->
-      <div class="p-4 bg-white rounded-xl border border-cyan-200/90 shadow-2xs mb-5 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold text-xs shrink-0">
-            <i data-lucide="sliders" class="w-4 h-4"></i>
-          </div>
-          <div>
-            <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
-              <span>Deine maximale Ladeleistung:</span>
-              <span class="px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-900 text-xs font-extrabold font-mono" id="slider-target-val">7.5 kW</span>
-              <span class="text-[11px] font-normal text-slate-500">(7–8 kW Standard)</span>
+          <!-- Detail-Balken & Werte -->
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-600">Aktuelle Fronius Lade-PV: <b class="text-slate-900 font-mono" id="threshold-current-kw">-- kW</b></span>
+              <span class="text-slate-500 font-medium" id="threshold-diff-text">Schwelle: <b>9,0 kW</b></span>
             </div>
-            <div class="text-[11px] text-slate-500">Berechnet die genauen Zeitfenster für deine gewünschte Ladeleistung</div>
+            
+            <div class="relative w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+              <div id="threshold-progress-bar" class="h-3 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+              <span>0 kW</span>
+              <span>6 kW (Wallbox)</span>
+              <span class="font-bold text-slate-600">9 kW (Schwelle mit Hauspuffer)</span>
+              <span>18,7 kWp</span>
+            </div>
+          </div>
+
+          <div class="mt-2 text-[11px] text-slate-500 flex items-center justify-between" id="threshold-status-explanation">
+            <span>Sobald die Erzeugung über 9 kW liegt, reicht der reine Solarstrom für 6 kW Ladevorgang ohne Netzbezug.</span>
+            <span class="font-semibold text-slate-700" id="threshold-decision-text">Warte auf Solarleistung</span>
           </div>
         </div>
 
-        <!-- Schnellauswahl Buttons & Slider -->
-        <div class="flex flex-wrap items-center gap-2.5">
-          <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
-            <button onclick="setTargetChargeKW(4.1)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="4.1">4,1 kW</button>
-            <button onclick="setTargetChargeKW(6.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="6.0">6,0 kW (Manuell)</button>
-            <button onclick="setTargetChargeKW(7.5)" class="target-btn px-2.5 py-1 rounded font-bold bg-white text-cyan-900 shadow-xs border border-slate-200 transition" data-val="7.5">7,5 kW ★</button>
-            <button onclick="setTargetChargeKW(9.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="9.0">9,0 kW</button>
-            <button onclick="setTargetChargeKW(11.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="11.0">11,0 kW</button>
+        <!-- Interaktiver Ladeleistungs-Einsteller (Standard 7-8 kW) -->
+        <div class="p-4 bg-white rounded-xl border border-cyan-200/90 shadow-2xs mb-5 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-800 flex items-center justify-center font-bold text-xs shrink-0">
+              <i data-lucide="sliders" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
+                <span>Deine maximale Ladeleistung:</span>
+                <span class="px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-900 text-xs font-extrabold font-mono" id="slider-target-val">7.5 kW</span>
+                <span class="text-[11px] font-normal text-slate-500">(7–8 kW Standard)</span>
+              </div>
+              <div class="text-[11px] text-slate-500">Berechnet die genauen Zeitfenster für deine gewünschte Ladeleistung</div>
+            </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <input type="range" id="target-kw-slider" min="3.0" max="11.0" step="0.5" value="7.5" oninput="onSliderChange(this.value)" class="w-24 accent-cyan-600 cursor-pointer">
+
+          <!-- Schnellauswahl Buttons & Slider -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+              <button onclick="setTargetChargeKW(4.1)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="4.1">4,1 kW</button>
+              <button onclick="setTargetChargeKW(6.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="6.0">6,0 kW (Manuell)</button>
+              <button onclick="setTargetChargeKW(7.5)" class="target-btn px-2.5 py-1 rounded font-bold bg-white text-cyan-900 shadow-xs border border-slate-200 transition" data-val="7.5">7,5 kW ★</button>
+              <button onclick="setTargetChargeKW(9.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="9.0">9,0 kW</button>
+              <button onclick="setTargetChargeKW(11.0)" class="target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition" data-val="11.0">11,0 kW</button>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="range" id="target-kw-slider" min="3.0" max="11.0" step="0.5" value="7.5" oninput="onSliderChange(this.value)" class="w-24 accent-cyan-600 cursor-pointer">
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Ladeempfehlungs-Karten (Heute, Morgen, Übermorgen) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="charging-windows-container">
-        <!-- Dynamisch via JS -->
-        <div class="p-4 bg-white rounded-xl border border-slate-200 animate-pulse text-xs text-slate-400">Berechne optimale Ladefenster...</div>
-      </div>
-      
-      <div class="mt-4 pt-3 border-t border-slate-200/70 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-1.5">
-          <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-700 shrink-0"></i>
-          <span><b>Einstellbare Ladeleistung:</b> Die Zeitfenster oben zeigen, wann deine eingestellte Ladeleistung (aktuell <b><span id="info-target-kw">7,5</span> kW</b>) zu 100% ohne Netzbezug solar geladen werden kann.</span>
-        </div>
-        <div class="text-slate-500 font-medium">Fronius 3er-Verbund (~18,7 kWp)</div>
-      </div>
-    </div>
-
-    <!-- FAHRZEUGE & LADEHISTORIE -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <!-- Fahrzeuge (2 Spalten) -->
-      <div class="lg:col-span-2 space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-            <i data-lucide="car" class="w-5 h-5 text-sky-600"></i>
-            Fahrzeuge & Ladeerfassung
-          </h2>
-          <span class="text-xs text-slate-500">Cupra Raval Jona & Cupra Tavascan Max</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="vehicles-container">
+        <!-- Ladeempfehlungs-Karten (Heute, Morgen, Übermorgen) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="charging-windows-container">
           <!-- Dynamisch via JS -->
-          <div class="card-clean rounded-2xl p-5 animate-pulse text-center py-10 text-slate-400">
-            Fahrzeugdaten laden...
-          </div>
+          <div class="p-4 bg-white rounded-xl border border-slate-200 animate-pulse text-xs text-slate-400">Berechne optimale Ladefenster...</div>
         </div>
-
-        <!-- Letzte Ladevorgänge Tabelle -->
-        <div class="card-clean rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
-            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-              <i data-lucide="history" class="w-4 h-4 text-emerald-600"></i>
-              Letzte Ladevorgänge (Telegram-Bot & Manuell)
-            </h3>
-            <span class="text-xs text-slate-500 font-medium" id="charging-sessions-count">0 Einträge</span>
+        
+        <div class="mt-4 pt-3 border-t border-slate-200/70 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-700 shrink-0"></i>
+            <span><b>Einstellbare Ladeleistung:</b> Die Zeitfenster oben zeigen, wann deine eingestellte Ladeleistung (aktuell <b><span id="info-target-kw">7,5</span> kW</b>) zu 100% ohne Netzbezug solar geladen werden kann.</span>
           </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-700">
-              <thead class="text-slate-500 uppercase bg-slate-50 border-b border-slate-200 text-[11px]">
-                <tr>
-                  <th class="py-2.5 px-3">Datum / Uhrzeit</th>
-                  <th class="py-2.5 px-3">Fahrzeug</th>
-                  <th class="py-2.5 px-3 text-right">Geladen (kWh)</th>
-                  <th class="py-2.5 px-3">Notiz</th>
-                </tr>
-              </thead>
-              <tbody id="charging-table-body" class="divide-y divide-slate-100">
-                <tr>
-                  <td colspan="4" class="py-4 text-center text-slate-400">Noch keine Ladevorgänge in der Datenbank.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <div class="text-slate-500 font-medium">Fronius 3er-Verbund (~18,7 kWp)</div>
         </div>
-
       </div>
 
-      <!-- Hausverbrauch & Wetterdetails (1 Spalte) -->
-      <div class="space-y-4">
-        
-        <!-- Hausverbrauch & PV-Kopplung -->
-        <div class="card-clean rounded-2xl p-5">
-          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
-            <i data-lucide="home" class="w-5 h-5 text-purple-600"></i>
-            Hausverbrauch & Deckung
-          </h2>
-          <div class="space-y-2.5">
-            <div class="flex items-center justify-between p-3 rounded-xl bg-purple-50/50 border border-purple-200">
-              <span class="text-xs text-slate-600">Aktueller Hausverbrauch:</span>
-              <span class="text-sm font-bold text-purple-900" id="home-power-kw-detail">-- kW</span>
-            </div>
-            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
-              <span class="text-xs text-slate-600">Deckungsgrad durch PV:</span>
-              <span class="text-sm font-bold text-emerald-700" id="home-pv-coverage">100% durch PV</span>
-            </div>
+      <!-- Wetterdienst-Messwerte -->
+      <div class="card-clean rounded-2xl p-5">
+        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
+          <i data-lucide="cloud-sun" class="w-5 h-5 text-sky-600"></i>
+          Wetterdienst-Messwerte & Sonnenprognose
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <span class="font-medium text-slate-500 text-[11px]">Deutscher Wetterdienst (DWD):</span>
+            <span class="font-bold text-slate-900 text-sm mt-1" id="dwd-detail-text">--</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <span class="font-medium text-slate-500 text-[11px]">Open-Meteo Bewölkung:</span>
+            <span class="font-bold text-slate-900 text-sm mt-1" id="open-meteo-detail-text">--</span>
+          </div>
+          <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex flex-col justify-between">
+            <span class="font-medium text-amber-800 text-[11px]">Sonnenschein Morgen (Prognose):</span>
+            <span class="font-bold text-amber-900 text-sm mt-1" id="sunshine-tomorrow-text">-- Std.</span>
           </div>
         </div>
-
-        <!-- Wetter Provider Vergleich -->
-        <div class="card-clean rounded-2xl p-5">
-          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
-            <i data-lucide="cloud-sun" class="w-5 h-5 text-sky-600"></i>
-            Wetterdienst-Messwerte
-          </h2>
-          <div class="space-y-2.5 text-xs text-slate-600">
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span class="font-medium text-slate-700">Deutscher Wetterdienst (DWD):</span>
-              <span class="font-bold text-slate-900" id="dwd-detail-text">--</span>
-            </div>
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span class="font-medium text-slate-700">Open-Meteo Bewölkung:</span>
-              <span class="font-bold text-slate-900" id="open-meteo-detail-text">--</span>
-            </div>
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span class="font-medium text-slate-700">Sonnenschein Morgen (Prognose):</span>
-              <span class="font-bold text-amber-600" id="sunshine-tomorrow-text">-- Std.</span>
-            </div>
-          </div>
-        </div>
-
       </div>
 
     </div>
 
-    <!-- SOLAR-LOG WECHSELRICHTER TABELLE (UNTEREINANDER & FILTERBAR) -->
-    <div class="card-clean rounded-2xl p-6 shadow-sm">
-      <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-200">
-        <div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
-              <i data-lucide="cpu" class="w-5 h-5 text-amber-600"></i>
-              Solar-Log Großanlage (Alle 17 Wechselrichter)
+    <!-- ========================================== -->
+    <!-- TAB 4: 📋 LADEHISTORIE & PROTOKOLL         -->
+    <!-- ========================================== -->
+    <div id="tab-content-history" class="tab-pane hidden space-y-6">
+      
+      <!-- Übersichtskarten Ladevorgänge -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-emerald-500">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Erfasste Vorgänge</div>
+          <div class="text-2xl font-extrabold text-slate-900 mt-1" id="history-total-count">0</div>
+          <div class="text-[11px] text-slate-400 mt-1">Über Bot & manuell</div>
+        </div>
+        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-sky-500">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Erfassung via Bot</div>
+          <div class="text-xs font-semibold text-slate-700 mt-1">@evcc_bayrhof_bot</div>
+          <div class="text-[11px] text-slate-400 mt-1">Befehl <code>/laden</code> in Telegram</div>
+        </div>
+        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-amber-500">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Fahrzeuge</div>
+          <div class="text-xs font-semibold text-slate-700 mt-1">Cupra Tavascan & Raval</div>
+          <div class="text-[11px] text-slate-400 mt-1">Automatische Zuordnung</div>
+        </div>
+      </div>
+
+      <!-- Letzte Ladevorgänge Tabelle -->
+      <div class="card-clean rounded-2xl p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="history" class="w-5 h-5 text-emerald-600"></i>
+              Ladehistorie & Protokoll
             </h2>
-            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">Reine Netzeinspeisung</span>
+            <p class="text-xs text-slate-500 mt-0.5">Vollständiges Protokoll aller manuell und per Bot erfassten Ladesitzungen</p>
           </div>
-          <p class="text-xs text-slate-500 mt-0.5">Detaillierte Status- und Ertragsanzeige der 220 kWp Großanlage untereinander mit Schnellfilter</p>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200" id="charging-sessions-count">0 Einträge</span>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 text-xs">
-          <span class="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200" id="solarlog-active-count">15 / 17 Einspeisend</span>
-          <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-800 font-semibold border border-slate-200" id="solarlog-total-power">Gesamt: -- kW</span>
-          <span class="px-3 py-1 rounded-lg bg-amber-100 text-amber-900 font-semibold border border-amber-200" id="solarlog-total-daysum">Tagesertrag: -- kWh</span>
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs text-slate-700">
+            <thead class="text-slate-600 uppercase bg-slate-50 border-b border-slate-200 text-[11px] font-semibold">
+              <tr>
+                <th class="py-3 px-4">Datum / Uhrzeit</th>
+                <th class="py-3 px-4">Fahrzeug</th>
+                <th class="py-3 px-4 text-right">Geladen (kWh)</th>
+                <th class="py-3 px-4">Notiz / Abrechnung</th>
+              </tr>
+            </thead>
+            <tbody id="charging-table-body" class="divide-y divide-slate-100 bg-white">
+              <tr>
+                <td colspan="4" class="py-6 text-center text-slate-400">Noch keine Ladevorgänge in der Datenbank.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <!-- Filterleiste & Suche -->
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        
-        <!-- Filter Tabs -->
-        <div class="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200" id="filter-buttons">
-          <button onclick="setInverterFilter('all')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-sm transition" data-filter="all">
-            Alle (17)
-          </button>
-          <button onclick="setInverterFilter('active')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-filter="active">
-            🟢 Einspeisend (<span id="count-active">15</span>)
-          </button>
-          <button onclick="setInverterFilter('standby')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-filter="standby">
-            🟡 Standby / 0 W (<span id="count-standby">2</span>)
-          </button>
-          <button onclick="setInverterFilter('error')" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-filter="error">
-            🔴 Störung (<span id="count-error">0</span>)
-          </button>
-        </div>
-
-        <!-- Schnellsuche -->
-        <div class="relative">
-          <input type="text" id="wr-search" oninput="applyInverterFilters()" placeholder="WR oder Status filtern..." class="w-56 pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
-          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
-        </div>
-
-      </div>
-
-      <!-- Tabellenansicht Untereinander -->
-      <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs">
-        <table class="w-full text-left text-xs text-slate-700">
-          <thead class="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
-            <tr>
-              <th class="py-3 px-4">Wechselrichter</th>
-              <th class="py-3 px-4">Status & Zustand</th>
-              <th class="py-3 px-4 text-right">Aktuelle Leistung (Pac)</th>
-              <th class="py-3 px-4 text-right">Tagesertrag (DaySum)</th>
-              <th class="py-3 px-4">Rohwerte</th>
-              <th class="py-3 px-4 text-right">Letztes Update</th>
-            </tr>
-          </thead>
-          <tbody id="inverter-table-body" class="divide-y divide-slate-100 bg-white">
-            <!-- Dynamisch via JS befüllt -->
-            <tr>
-              <td colspan="6" class="py-6 text-center text-slate-400">Lade Wechselrichter...</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
     </div>
@@ -628,6 +719,35 @@
   <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-slate-500">
     <p>EVCC & Solar-Log Web Dashboard • Gehostet auf GitHub Pages • Automatische Telemetrie alle 2 Minuten</p>
   </footer>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-2 py-1.5 pb-[max(env(safe-area-inset-bottom,0px),8px)] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] flex items-center justify-around">
+    <button id="mob-tab-overview" onclick="switchDashboardTab('overview')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-amber-600 font-bold active:scale-95 bg-amber-50 cursor-pointer">
+      <i data-lucide="zap" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-0.5 font-semibold">Laden</span>
+    </button>
+    <button id="mob-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer relative">
+      <i data-lucide="sun" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-0.5 font-semibold">Solar-Log</span>
+      <span id="mob-badge-solarlog-errors" class="hidden absolute top-1 right-5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+    </button>
+    <button id="mob-tab-forecast" onclick="switchDashboardTab('forecast')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer">
+      <i data-lucide="calendar-check" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-0.5 font-semibold">Prognose</span>
+    </button>
+    <button id="mob-tab-history" onclick="switchDashboardTab('history')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer">
+      <i data-lucide="history" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-0.5 font-semibold">Historie</span>
+    </button>
+  </nav>
+
+  <!-- TOAST NOTIFICATION BANNER -->
+  <div id="toast-banner" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="px-4 py-3 rounded-xl bg-slate-900/95 border border-slate-700 text-white text-xs font-semibold shadow-2xl flex items-center gap-2.5 backdrop-blur-md">
+      <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+      <span id="toast-message">Dashboard erfolgreich aktualisiert!</span>
+    </div>
+  </div>
 
   <!-- SCRIPT -->
   <script>
@@ -836,6 +956,65 @@
       if (gate) gate.classList.remove('hidden');
     }
 
+    // ==========================================
+    // TAB NAVIGATION & UI HELPERS
+    // ==========================================
+    function switchDashboardTab(tabId) {
+      const validTabs = ['overview', 'solarlog', 'forecast', 'history'];
+      if (!validTabs.includes(tabId)) tabId = 'overview';
+
+      validTabs.forEach(t => {
+        const pane = document.getElementById('tab-content-' + t);
+        if (pane) {
+          if (t === tabId) {
+            pane.classList.remove('hidden');
+          } else {
+            pane.classList.add('hidden');
+          }
+        }
+
+        // Desktop Tab Buttons
+        const dBtn = document.getElementById('nav-tab-' + t);
+        if (dBtn) {
+          if (t === tabId) {
+            dBtn.className = 'dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-amber-500 text-white shadow-sm cursor-pointer';
+          } else {
+            dBtn.className = 'dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer';
+          }
+        }
+
+        // Mobile Bottom Tab Buttons
+        const mBtn = document.getElementById('mob-tab-' + t);
+        if (mBtn) {
+          if (t === tabId) {
+            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-amber-600 font-bold active:scale-95 bg-amber-50 cursor-pointer';
+          } else {
+            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer relative';
+          }
+        }
+      });
+
+      try {
+        sessionStorage.setItem('evcc_active_tab', tabId);
+      } catch (e) {}
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function showToast(message) {
+      const banner = document.getElementById('toast-banner');
+      const msgEl = document.getElementById('toast-message');
+      if (!banner || !msgEl) return;
+      msgEl.textContent = message || 'Dashboard erfolgreich aktualisiert!';
+      banner.classList.remove('translate-y-24', 'opacity-0');
+      banner.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        banner.classList.add('translate-y-24', 'opacity-0');
+        banner.classList.remove('translate-y-0', 'opacity-100');
+      }, 2400);
+    }
+
     let currentInverterFilter = 'all';
     let allInverters = [];
     let countdownSeconds = 45;
@@ -884,6 +1063,7 @@
       }
 
       if (isManual) {
+        showToast('Dashboard erfolgreich aktualisiert!');
         setTimeout(() => {
           refreshIcon.classList.remove('animate-spin');
           refreshBtn.disabled = false;
@@ -1309,11 +1489,14 @@
     function renderChargingTable(sessions) {
       const tbody = document.getElementById('charging-table-body');
       const countEl = document.getElementById('charging-sessions-count');
+      const totalCountEl = document.getElementById('history-total-count');
 
-      countEl.textContent = `${sessions.length} Einträge`;
+      const count = sessions ? sessions.length : 0;
+      if (countEl) countEl.textContent = `${count} Einträge`;
+      if (totalCountEl) totalCountEl.textContent = count;
 
       if (!sessions || sessions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">Noch keine manuellen Ladevorgänge erfasst.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Noch keine manuellen Ladevorgänge in der Datenbank erfasst.</td></tr>`;
         return;
       }
 
@@ -1352,6 +1535,22 @@
       document.getElementById('count-active').textContent = activeCount;
       document.getElementById('count-standby').textContent = standbyCount;
       document.getElementById('count-error').textContent = errorCount;
+
+      // Smart Badges on Navigation Tabs
+      const tabBadge = document.getElementById('tab-badge-solarlog-errors');
+      const mobBadge = document.getElementById('mob-badge-solarlog-errors');
+      if (errorCount > 0) {
+        if (tabBadge) {
+          tabBadge.textContent = errorCount;
+          tabBadge.classList.remove('hidden');
+        }
+        if (mobBadge) {
+          mobBadge.classList.remove('hidden');
+        }
+      } else {
+        if (tabBadge) tabBadge.classList.add('hidden');
+        if (mobBadge) mobBadge.classList.add('hidden');
+      }
 
       applyInverterFilters();
     }
@@ -1484,6 +1683,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       initAuthOnLoad();
+      const savedTab = sessionStorage.getItem('evcc_active_tab') || 'overview';
+      switchDashboardTab(savedTab);
       loadTelemetryData();
       startCountdown();
     });
