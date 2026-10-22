@@ -509,7 +509,7 @@ def fetch_auth_data() -> Dict[str, Any]:
         print(f"Warnung Auth-Payload: {e}", file=sys.stderr)
         return {
             "bot_username": "evcc_bayrhof_bot",
-            "group_chat_id": -5111787183,
+            "group_chat_id": -1003964768309,
             "group_title": "EVCC Bayrhof Steuerung",
             "authorized_ids": ["15231751"],
             "authorized_usernames": ["bdc_gumb_drop"]
