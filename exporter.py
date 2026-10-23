@@ -17,6 +17,8 @@ import asyncio
 import aiohttp
 import configparser
 import subprocess
+import math
+from zoneinfo import ZoneInfo
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Dict, Any, Optional, List
@@ -28,9 +30,87 @@ CONFIG_PATH = BOT_DIR / "config.ini"
 CHARGING_DB_PATH = Path.home() / ".local" / "share" / "evcc_bot" / "charging.db"
 SOLARLOG_DB_PATH = Path.home() / ".local" / "share" / "solarlog_monitor" / "solarlog.db"
 
-# Koordinaten Kempten (Allgäu) aus evcc-Konfiguration
+# Zeitzone & Koordinaten Kempten (Allgäu)
+LOCAL_TZ = ZoneInfo("Europe/Berlin")
 LAT = 47.7479
 LON = 10.3077
+
+# Dynamische Zyklus-Intervalle (Sekunden)
+DAY_INTERVAL_SEC = 120    # 2 Minuten tagsüber bei Sonnenschein oder Ladevorgang
+NIGHT_INTERVAL_SEC = 900  # 15 Minuten nachts im Ruhemodus (schont GitHub API & Pages)
+
+
+def get_sun_times(dt: Optional[datetime] = None) -> tuple[Optional[datetime], Optional[datetime]]:
+    """
+    Berechnet Sonnenaufgang und Sonnenuntergang für Kempten (Allgäu)
+    via NOAA-Algorithmus (offline, mathematisch exakt auf Tagesbasis).
+    Rückgabe: (sunrise_dt, sunset_dt) in Europe/Berlin.
+    """
+    if dt is None:
+        dt = datetime.now(LOCAL_TZ)
+    d = dt.date()
+    n = (datetime(d.year, d.month, d.day) - datetime(2000, 1, 1, 12, 0)).days + 0.0008
+    j_star = n - LON / 360.0
+    M = (357.5291 + 0.98560028 * j_star) % 360.0
+    C = 1.9148 * math.sin(math.radians(M)) + 0.02 * math.sin(math.radians(2 * M)) + 0.0003 * math.sin(math.radians(3 * M))
+    lambda_val = (M + C + 180.0 + 102.9372) % 360.0
+    j_transit = 2451545.0 + j_star + 0.0053 * math.sin(math.radians(M)) - 0.0069 * math.sin(math.radians(2 * lambda_val))
+    sin_delta = math.sin(math.radians(lambda_val)) * math.sin(math.radians(23.44))
+    cos_delta = math.cos(math.asin(sin_delta))
+    cos_omega_0 = (math.sin(math.radians(-0.833)) - math.sin(math.radians(LAT)) * sin_delta) / (math.cos(math.radians(LAT)) * cos_delta)
+    if cos_omega_0 > 1.0 or cos_omega_0 < -1.0:
+        return None, None
+    omega_0 = math.degrees(math.acos(cos_omega_0))
+    j_rise = j_transit - omega_0 / 360.0
+    j_set = j_transit + omega_0 / 360.0
+
+    def jd_to_dt(jd):
+        ts = (jd - 2440587.5) * 86400.0
+        return datetime.fromtimestamp(ts, tz=timezone.utc).astimezone(LOCAL_TZ)
+
+    return jd_to_dt(j_rise), jd_to_dt(j_set)
+
+
+def get_dynamic_interval(payload: Dict[str, Any], day_sec: int = DAY_INTERVAL_SEC, night_sec: int = NIGHT_INTERVAL_SEC) -> int:
+    """
+    Ermittelt dynamisch das nächste Abrufintervall:
+    - Tag (Sonnenaufgang - 15m bis Sonnenuntergang + 30m): Tag-Intervall (z.B. 120s)
+    - PV-Leistung > 50 W: Tag-Intervall (z.B. 120s)
+    - Aktiver Fahrzeug-Ladevorgang (auch nachts): Tag-Intervall (z.B. 120s)
+    - Nacht (ohne Sonne & ohne Laden): Nacht-Intervall (z.B. 900s / 15 Min)
+    """
+    now = datetime.now(LOCAL_TZ)
+    sunrise, sunset = get_sun_times(now)
+
+    pv_power = payload.get("energy", {}).get("pv_power_w", 0) or 0
+    vehicles = payload.get("vehicles", [])
+    is_charging = any(
+        v.get("charging") is True or (v.get("charge_power", 0) or 0) > 0
+        for v in vehicles
+    )
+
+    is_day = False
+    if sunrise and sunset:
+        is_day = (sunrise - timedelta(minutes=15)) <= now <= (sunset + timedelta(minutes=30))
+
+    now_str = now.strftime("%H:%M:%S")
+    sunrise_str = sunrise.strftime("%H:%M") if sunrise else "--:--"
+    sunset_str = sunset.strftime("%H:%M") if sunset else "--:--"
+
+    if pv_power > 50:
+        print(f"[{now_str}] ☀️ PV-Leistung aktiv ({pv_power} W) -> Tag-Intervall ({day_sec}s).")
+        return day_sec
+
+    if is_charging:
+        print(f"[{now_str}] 🔌 Fahrzeug lädt aktiv -> Schnell-Intervall ({day_sec}s).")
+        return day_sec
+
+    if is_day:
+        print(f"[{now_str}] ☀️ Tagfenster aktiv ({sunrise_str} – {sunset_str} Uhr) -> Tag-Intervall ({day_sec}s).")
+        return day_sec
+
+    print(f"[{now_str}] 🌙 Nachtmodus aktiv (Sonne ging um {sunset_str} Uhr unter, Aufgang morgen {sunrise_str} Uhr) -> Nacht-Intervall ({night_sec}s / {round(night_sec/60)} Min).")
+    return night_sec
 
 
 def load_config():
@@ -350,9 +430,9 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
             except Exception as e:
                 print(f"Warnung DWD API: {e}", file=sys.stderr)
 
-            # 2. Open-Meteo Wetter & Globalstrahlung
+            # 2. Open-Meteo Wetter & Globalstrahlung & Sonnenzeiten
             try:
-                om_url = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&hourly=cloudcover,direct_normal_irradiance,temperature_2m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunshine_duration&timezone=Europe%2FBerlin&forecast_days=3"
+                om_url = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&hourly=cloudcover,direct_normal_irradiance,temperature_2m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunshine_duration,sunrise,sunset&timezone=Europe%2FBerlin&forecast_days=3"
                 async with session.get(om_url, timeout=aiohttp.ClientTimeout(total=4)) as r:
                     if r.status == 200:
                         om = await r.json()
@@ -361,12 +441,26 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
                         weather_data["open_meteo"]["sunshine_today_h"] = round(sunshine_sec[0] / 3600.0, 1) if sunshine_sec else 0
                         weather_data["open_meteo"]["sunshine_tomorrow_h"] = round(sunshine_sec[1] / 3600.0, 1) if len(sunshine_sec) > 1 else 0
                         
+                        sr_list = daily.get("sunrise", [])
+                        ss_list = daily.get("sunset", [])
+                        if sr_list and sr_list[0]:
+                            weather_data["open_meteo"]["sunrise"] = sr_list[0].split("T")[-1] if "T" in sr_list[0] else sr_list[0]
+                        if ss_list and ss_list[0]:
+                            weather_data["open_meteo"]["sunset"] = ss_list[0].split("T")[-1] if "T" in ss_list[0] else ss_list[0]
+
                         hourly_cc = om.get("hourly", {}).get("cloudcover", [])
                         if hourly_cc:
                             now_hour = datetime.now().hour
                             weather_data["open_meteo"]["cloud_cover"] = hourly_cc[min(now_hour, len(hourly_cc) - 1)]
             except Exception as e:
                 print(f"Warnung Open-Meteo API: {e}", file=sys.stderr)
+
+        # Fallback Sonnenzeiten via NOAA-Berechnung falls Open-Meteo fehlt
+        if not weather_data["open_meteo"].get("sunrise") or not weather_data["open_meteo"].get("sunset"):
+            sr, ss = get_sun_times()
+            if sr and ss:
+                weather_data["open_meteo"]["sunrise"] = sr.strftime("%H:%M")
+                weather_data["open_meteo"]["sunset"] = ss.strftime("%H:%M")
 
     except Exception as e:
         print(f"Warnung Wetterabruf allgemein: {e}", file=sys.stderr)
@@ -670,7 +764,7 @@ async def generate_payload() -> Dict[str, Any]:
     return payload
 
 
-def export_and_push() -> bool:
+def export_and_push() -> tuple[bool, Dict[str, Any]]:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     payload = loop.run_until_complete(generate_payload())
@@ -683,6 +777,7 @@ def export_and_push() -> bool:
     now_str = datetime.now().strftime("%d.%m %H:%M:%S")
     print(f"[{now_str}] ✅ data.json geschrieben.")
 
+    pushed = False
     # Git Commit & Push mit Historien-Schutz (--amend wenn möglich)
     try:
         status = subprocess.run(["git", "status", "--porcelain", "data.json"], cwd=BASE_DIR, capture_output=True, text=True)
@@ -700,31 +795,37 @@ def export_and_push() -> bool:
                 subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
 
             print(f"[{now_str}] 🚀 Telemetrie erfolgreich zu GitHub übertragen.")
-            return True
+            pushed = True
         else:
             print(f"[{now_str}] Keine Änderungen in data.json festgestellt.")
-            return False
     except Exception as e:
         print(f"[{now_str}] ⚠️ Fehler bei Git Push: {e}", file=sys.stderr)
-        return False
+
+    return pushed, payload
 
 
-def run_daemon(interval_sec: int = 120):
-    print(f"⚡ Starte EVCC Dashboard Exporter Daemon v2.0 (Zyklus: alle {interval_sec} Sekunden)...")
+def run_daemon(day_interval_sec: int = DAY_INTERVAL_SEC, night_interval_sec: int = NIGHT_INTERVAL_SEC):
+    print(f"⚡ Starte EVCC Dashboard Exporter Daemon v2.1 (Tag: {day_interval_sec}s, Nacht: {night_interval_sec}s / {round(night_interval_sec/60)}m)...")
     import time
     while True:
+        sleep_sec = day_interval_sec
         try:
-            export_and_push()
+            pushed, payload = export_and_push()
+            sleep_sec = get_dynamic_interval(payload, day_interval_sec, night_interval_sec)
         except Exception as e:
             print(f"Unerwarteter Exporter-Fehler: {e}", file=sys.stderr)
-        time.sleep(interval_sec)
+            sleep_sec = day_interval_sec
+        time.sleep(sleep_sec)
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] in ("--daemon", "-d", "daemon"):
-        interval = 120
+        day_iv = DAY_INTERVAL_SEC
+        night_iv = NIGHT_INTERVAL_SEC
         if len(sys.argv) > 2 and sys.argv[2].isdigit():
-            interval = int(sys.argv[2])
-        run_daemon(interval)
+            day_iv = int(sys.argv[2])
+        if len(sys.argv) > 3 and sys.argv[3].isdigit():
+            night_iv = int(sys.argv[3])
+        run_daemon(day_iv, night_iv)
     else:
         export_and_push()
