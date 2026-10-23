@@ -222,6 +222,11 @@
           <i data-lucide="history" class="w-4 h-4"></i>
           <span>Ladehistorie</span>
         </button>
+        <button id="nav-tab-users" onclick="switchDashboardTab('users')" class="hidden dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i data-lucide="shield-check" class="w-4 h-4 text-amber-500"></i>
+          <span>Benutzer-Zugriff</span>
+          <span id="tab-badge-users-count" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 ml-0.5">0</span>
+        </button>
       </nav>
     </div>
   </header>
@@ -713,7 +718,145 @@
 
     </div>
 
-  </main>
+    <!-- ========================================== -->
+    <!-- TAB 5: 🛡️ BENUTZER-ZUGRIFFSVERWALTUNG (ADMIN ONLY) -->
+    <!-- ========================================== -->
+    <div id="tab-content-users" class="tab-pane hidden space-y-6">
+
+      <!-- HEADER CARD -->
+      <div class="card-clean rounded-2xl p-6 shadow-sm bg-gradient-to-br from-amber-50/40 via-white to-slate-50/60 border border-amber-200/80">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </span>
+              <h2 class="text-lg font-bold text-slate-900 tracking-tight">Benutzer &amp; Zugriffsverwaltung</h2>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300 uppercase tracking-wide">Admin-Bereich</span>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed max-w-2xl">
+              Übersicht aller autorisierten Telegram-Nutzer mit Zugriff auf das EVCC &amp; Solar-Log Dashboard. Diese Übersicht ist ausschließlich für Administratoren sichtbar.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-2xs font-medium flex items-center gap-1.5">
+              <i data-lucide="message-square" class="w-3.5 h-3.5 text-sky-500"></i>
+              <span>Gruppe: <strong id="admin-group-name">EVCC Bayrhof Steuerung</strong></span>
+            </span>
+          </div>
+        </div>
+
+        <!-- STATS KPI TILES -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs">
+            <div class="text-[11px] font-semibold text-slate-500 flex items-center justify-between">
+              <span>Autorisierte Nutzer</span>
+              <i data-lucide="users" class="w-3.5 h-3.5 text-amber-600"></i>
+            </div>
+            <div class="text-xl font-bold text-slate-900 mt-1" id="admin-stat-total">0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Dauerhaft freigeschaltet</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs">
+            <div class="text-[11px] font-semibold text-slate-500 flex items-center justify-between">
+              <span>Administratoren</span>
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-600"></i>
+            </div>
+            <div class="text-xl font-bold text-amber-600 mt-1" id="admin-stat-admins">0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Volle Admin-Rechte</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs">
+            <div class="text-[11px] font-semibold text-slate-500 flex items-center justify-between">
+              <span>Gruppen-Mitglieder</span>
+              <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+            </div>
+            <div class="text-xl font-bold text-emerald-600 mt-1" id="admin-stat-members">0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Mitgliedszugang</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs">
+            <div class="text-[11px] font-semibold text-slate-500 flex items-center justify-between">
+              <span>Telegram Bot</span>
+              <i data-lucide="bot" class="w-3.5 h-3.5 text-sky-600"></i>
+            </div>
+            <div class="text-sm font-bold text-sky-700 mt-1.5 truncate" id="admin-stat-bot">@evcc_bayrhof_bot</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Gruppen- &amp; Auth-Bot</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER LIST TABLE CARD -->
+      <div class="card-clean rounded-2xl p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-200">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="list-checks" class="w-4 h-4 text-amber-600"></i>
+              <span>Zugriffsberechtigte Telegram-Accounts</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Alle registrierten Benutzer aus der Konfiguration und Gruppen-Synchronisation.</p>
+          </div>
+
+          <!-- Schnellsuche -->
+          <div class="relative w-full sm:w-64">
+            <input type="text" id="admin-user-search" oninput="filterAdminUserList()" placeholder="Suchen nach Name, ID..." class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500 transition">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none"></i>
+          </div>
+        </div>
+
+        <!-- TABELLE -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold text-[11px] bg-slate-50/70">
+                <th class="py-3 px-4 rounded-l-lg">Benutzer</th>
+                <th class="py-3 px-4">Telegram User-ID</th>
+                <th class="py-3 px-4">Rolle</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 rounded-r-lg">Freigabe am</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-table-body" class="divide-y divide-slate-100 bg-white">
+              <tr>
+                <td colspan="5" class="py-6 text-center text-slate-400">Lade autorisierte Benutzer...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ERKLÄRUNGS-BOX / INFO CARD -->
+      <div class="rounded-2xl p-5 bg-slate-50 border border-slate-200/90 text-xs text-slate-600 space-y-3">
+        <div class="font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-amber-500"></i>
+          <span>Funktionsweise des Zugriffs- &amp; Freigabesystems</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] leading-relaxed">
+          <div class="p-3 rounded-xl bg-white border border-slate-200 space-y-1">
+            <div class="font-semibold text-slate-800 flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold">1</span>
+              <span>Automatische Gruppen-Auth</span>
+            </div>
+            <p class="text-slate-500">Sobald ein neues Mitglied der Telegram-Gruppe beitritt oder eine Nachricht/Taste bedient, wird es automatisch dauerhaft autorisiert.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-white border border-slate-200 space-y-1">
+            <div class="font-semibold text-slate-800 flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-[10px] font-bold">2</span>
+              <span>Admin-Freigabe bei Fremdanfragen</span>
+            </div>
+            <p class="text-slate-500">Schreibt ein Nutzer den Bot privat an und ist noch nicht in der Gruppe, erhältst du als Master-Admin eine Freigabe-Anfrage mit Buttons.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-white border border-slate-200 space-y-1">
+            <div class="font-semibold text-slate-800 flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center text-[10px] font-bold">3</span>
+              <span>Automatischer Widerruf</span>
+            </div>
+            <p class="text-slate-500">Verlässt ein Mitglied die Telegram-Gruppe oder wird entfernt, entzieht der Bot dem Account automatisch den Dashboard-Zugriff.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
   <!-- FOOTER -->
   <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-slate-500">
@@ -738,6 +881,10 @@
     <button id="mob-tab-history" onclick="switchDashboardTab('history')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer">
       <i data-lucide="history" class="w-5 h-5"></i>
       <span class="text-[10px] mt-0.5 font-semibold">Historie</span>
+    </button>
+    <button id="mob-tab-users" onclick="switchDashboardTab('users')" class="hidden mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer">
+      <i data-lucide="shield-check" class="w-5 h-5 text-amber-500"></i>
+      <span class="text-[10px] mt-0.5 font-semibold">Benutzer</span>
     </button>
   </nav>
 
@@ -867,8 +1014,23 @@
           if (photoEl) photoEl.classList.add('hidden');
           if (fallbackEl) fallbackEl.classList.remove('hidden');
         }
-        if (window.lucide) lucide.createIcons();
       }
+
+      // Admin Tab Sichtbarkeit steuern (nur für Admins sichtbar)
+      const adminTabDesk = document.getElementById('nav-tab-users');
+      const adminTabMob = document.getElementById('mob-tab-users');
+      if (user && user.role === 'admin') {
+        if (adminTabDesk) adminTabDesk.classList.remove('hidden');
+        if (adminTabMob) adminTabMob.classList.remove('hidden');
+      } else {
+        if (adminTabDesk) adminTabDesk.classList.add('hidden');
+        if (adminTabMob) adminTabMob.classList.add('hidden');
+        if (sessionStorage.getItem('evcc_active_tab') === 'users') {
+          switchDashboardTab('overview');
+        }
+      }
+
+      if (window.lucide) lucide.createIcons();
     }
 
     function logoutTelegram() {
@@ -882,6 +1044,15 @@
       if (errBox) errBox.classList.add('hidden');
       const gate = document.getElementById('telegram-auth-gate');
       if (gate) gate.classList.remove('hidden');
+
+      // Admin Tab Buttons verbergen
+      const adminTabDesk = document.getElementById('nav-tab-users');
+      const adminTabMob = document.getElementById('mob-tab-users');
+      if (adminTabDesk) adminTabDesk.classList.add('hidden');
+      if (adminTabMob) adminTabMob.classList.add('hidden');
+      if (sessionStorage.getItem('evcc_active_tab') === 'users') {
+        switchDashboardTab('overview');
+      }
     }
 
     function toggleFallbackLogin() {
@@ -960,8 +1131,16 @@
     // TAB NAVIGATION & UI HELPERS
     // ==========================================
     function switchDashboardTab(tabId) {
-      const validTabs = ['overview', 'solarlog', 'forecast', 'history'];
+      const validTabs = ['overview', 'solarlog', 'forecast', 'history', 'users'];
       if (!validTabs.includes(tabId)) tabId = 'overview';
+
+      // Sicherheitsprüfung: Tab "users" darf nur von Admins geöffnet werden
+      if (tabId === 'users') {
+        const u = getAuthenticatedUser();
+        if (!u || u.role !== 'admin') {
+          tabId = 'overview';
+        }
+      }
 
       validTabs.forEach(t => {
         const pane = document.getElementById('tab-content-' + t);
@@ -1239,6 +1418,9 @@
       // 10. SolarLog Inverter Tabelle
       allInverters = data.solarlog?.inverters || [];
       renderSolarLogTable(data.solarlog || {});
+
+      // 11. Autorisierte Benutzer Übersicht (Admin)
+      renderUsersOverview(data.auth || {});
 
       lucide.createIcons();
     }
@@ -1665,6 +1847,137 @@
           </tr>
         `;
       }).join('');
+    }
+
+    // ==========================================
+    // ADMIN USERS OVERVIEW (NUR FÜR ADMINISTRATOR)
+    // ==========================================
+    let cachedAdminUsers = [];
+
+    function renderUsersOverview(authData) {
+      const u = getAuthenticatedUser();
+      const isAdmin = (u && u.role === 'admin');
+
+      const users = authData?.users || [];
+      cachedAdminUsers = users;
+
+      // Update KPIs & Metadaten
+      const totalEl = document.getElementById('admin-stat-total');
+      const adminsEl = document.getElementById('admin-stat-admins');
+      const membersEl = document.getElementById('admin-stat-members');
+      const botEl = document.getElementById('admin-stat-bot');
+      const groupEl = document.getElementById('admin-group-name');
+      const badgeCount = document.getElementById('tab-badge-users-count');
+
+      const adminCount = users.filter(x => x.role === 'admin').length;
+      const memberCount = users.filter(x => x.role !== 'admin').length;
+
+      if (totalEl) totalEl.textContent = users.length;
+      if (adminsEl) adminsEl.textContent = adminCount;
+      if (membersEl) membersEl.textContent = memberCount;
+      if (badgeCount) badgeCount.textContent = users.length;
+      if (botEl && authData.bot_username) botEl.textContent = '@' + authData.bot_username;
+      if (groupEl && authData.group_title) groupEl.textContent = authData.group_title;
+
+      if (!isAdmin) {
+        const tbody = document.getElementById('admin-users-table-body');
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Nur für Administratoren zugänglich.</td></tr>`;
+        }
+        return;
+      }
+
+      renderAdminUserTable(users);
+    }
+
+    function renderAdminUserTable(users) {
+      const tbody = document.getElementById('admin-users-table-body');
+      if (!tbody) return;
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-8 text-center text-slate-400">
+              <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
+              Keine autorisierten Benutzer gefunden.
+            </td>
+          </tr>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const unameClean = (u.username || '').replace(/^@/, '');
+        const unameDisplay = unameClean 
+          ? `<a href="https://t.me/${unameClean}" target="_blank" rel="noopener noreferrer" class="text-sky-600 hover:text-sky-700 hover:underline inline-flex items-center gap-1 font-medium">@${unameClean} <i data-lucide="external-link" class="w-3 h-3"></i></a>`
+          : `<span class="text-slate-400 italic">Kein Username</span>`;
+
+        const nameDisplay = u.first_name || 'Unbekannt';
+        const initial = (nameDisplay.charAt(0) || '👤').toUpperCase();
+
+        const roleBadge = u.role === 'admin'
+          ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500 text-white shadow-2xs">ADMIN</span>`
+          : `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-slate-100 text-slate-700 border border-slate-300">MITGLIED</span>`;
+
+        const statusBadge = u.status === 'approved'
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Aktiv</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Gesperrt</span>`;
+
+        let formattedDate = '-';
+        if (u.added_at) {
+          try {
+            const d = new Date(u.added_at);
+            formattedDate = d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+          } catch(e) {
+            formattedDate = u.added_at;
+          }
+        }
+
+        const avatarBg = u.role === 'admin' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-100 text-slate-700 border-slate-200';
+
+        return `
+          <tr class="hover:bg-slate-50/70 transition duration-150">
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                  ${initial}
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900">${nameDisplay}</div>
+                  <div class="text-[11px]">${unameDisplay}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-1.5">
+                <code class="font-mono bg-slate-100 px-2 py-0.5 rounded text-[11px] text-slate-800 border border-slate-200 select-all">${u.id}</code>
+              </div>
+            </td>
+            <td class="py-3 px-4">${roleBadge}</td>
+            <td class="py-3 px-4">${statusBadge}</td>
+            <td class="py-3 px-4 text-slate-600 font-mono text-[11px]">${formattedDate}</td>
+          </tr>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function filterAdminUserList() {
+      const q = (document.getElementById('admin-user-search')?.value || '').trim().toLowerCase();
+      if (!q) {
+        renderAdminUserTable(cachedAdminUsers);
+        return;
+      }
+      const filtered = cachedAdminUsers.filter(u => {
+        const idMatch = String(u.id || '').toLowerCase().includes(q);
+        const nameMatch = (u.first_name || '').toLowerCase().includes(q);
+        const unameMatch = (u.username || '').toLowerCase().includes(q);
+        const roleMatch = (u.role || '').toLowerCase().includes(q);
+        return idMatch || nameMatch || unameMatch || roleMatch;
+      });
+      renderAdminUserTable(filtered);
     }
 
     function startCountdown() {

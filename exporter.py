@@ -512,7 +512,8 @@ def fetch_auth_data() -> Dict[str, Any]:
             "group_chat_id": -1003964768309,
             "group_title": "EVCC Bayrhof Steuerung",
             "authorized_ids": ["15231751"],
-            "authorized_usernames": ["bdc_gumb_drop"]
+            "authorized_usernames": ["bdc_gumb_drop"],
+            "users": []
         }
 
 
