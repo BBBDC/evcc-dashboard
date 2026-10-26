@@ -88,6 +88,7 @@ def get_dynamic_interval(payload: Dict[str, Any], day_sec: int = DAY_INTERVAL_SE
         v.get("charging") is True or (v.get("charge_power", 0) or 0) > 0
         for v in vehicles
     )
+    wb_charging = payload.get("wallbox", {}).get("is_charging") is True or (payload.get("wallbox", {}).get("power_w", 0) > 100)
 
     is_day = False
     if sunrise and sunset:
@@ -101,8 +102,8 @@ def get_dynamic_interval(payload: Dict[str, Any], day_sec: int = DAY_INTERVAL_SE
         print(f"[{now_str}] ☀️ PV-Leistung aktiv ({pv_power} W) -> Tag-Intervall ({day_sec}s).")
         return day_sec
 
-    if is_charging:
-        print(f"[{now_str}] 🔌 Fahrzeug lädt aktiv -> Schnell-Intervall ({day_sec}s).")
+    if is_charging or wb_charging:
+        print(f"[{now_str}] 🔌 Fahrzeug lädt aktiv (Wallbox) -> Schnell-Intervall ({day_sec}s).")
         return day_sec
 
     if is_day:
@@ -611,6 +612,28 @@ def fetch_auth_data() -> Dict[str, Any]:
         }
 
 
+async def fetch_wallbox_telemetry() -> Dict[str, Any]:
+    try:
+        if str(BOT_DIR) not in sys.path:
+            sys.path.insert(0, str(BOT_DIR))
+        from bot.wallbox import get_wallbox_instance
+        wb = get_wallbox_instance()
+        telemetry = await wb.get_telemetry()
+        return telemetry
+    except Exception as e:
+        print(f"Warnung Wallbox-Telemetrie: {e}", file=sys.stderr)
+        return {
+            "online": False,
+            "error_msg": str(e),
+            "work_state": "UNKNOWN",
+            "status_label": "Nicht erreichbar",
+            "current_amps": 10,
+            "power_w": 0,
+            "power_kw": 0.0,
+            "auto_mode": True
+        }
+
+
 async def generate_payload() -> Dict[str, Any]:
     now = datetime.now()
     evcc_state = await fetch_evcc_state() or {}
@@ -618,6 +641,7 @@ async def generate_payload() -> Dict[str, Any]:
     charging_data = fetch_charging_db()
     solarlog_data = fetch_solarlog_db()
     weather_and_charging = await fetch_weather_and_charging_recommendations(evcc_state)
+    wallbox_data = await fetch_wallbox_telemetry()
 
     # EVCC Aufbereitung
     pv_list = evcc_state.get("pv", [])
@@ -754,6 +778,7 @@ async def generate_payload() -> Dict[str, Any]:
         },
         "charging_pv_system": charging_pv_system,
         "charging_readiness": charging_readiness,
+        "wallbox": wallbox_data,
         "influx_today": influx_stats,
         "weather_intelligence": weather_and_charging,
         "vehicles": list(vehicles_dict.values()),

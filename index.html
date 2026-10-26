@@ -327,6 +327,82 @@
 
       </div>
 
+      <!-- WALLBOX LIVE CONTROLLER (dé EV Charger) -->
+      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-indigo-600 bg-gradient-to-br from-indigo-50/20 via-white to-slate-50/40 shadow-sm" id="wallbox-card">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm">
+              <i data-lucide="plug-zap" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-bold text-slate-900">dé EV Charger (Wallbox)</h2>
+                <span id="wb-status-badge" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">Prüfe...</span>
+              </div>
+              <p class="text-xs text-slate-500" id="wb-status-desc">Verbindung wird geladen...</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="wb-mode-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300 flex items-center gap-1.5">
+              <i data-lucide="sun" class="w-3.5 h-3.5 text-amber-600"></i> PV-Automatik (10 A – 16 A)
+            </span>
+            <span id="wb-charge-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+              Standby
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-3.5">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Eingestellter Strom</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-2xl font-black text-slate-900" id="wb-current-amps">--</span>
+              <span class="text-xs font-bold text-slate-500">A</span>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium block mt-0.5" id="wb-target-kw">(~-- kW 3-phasig)</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Reale Ladeleistung</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-2xl font-black text-indigo-700" id="wb-power-kw">0,00</span>
+              <span class="text-xs font-bold text-slate-500">kW</span>
+            </div>
+            <span class="text-[11px] text-slate-500 font-mono block mt-0.5" id="wb-power-w">(0 W)</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Session-Energie</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-2xl font-black text-slate-900" id="wb-energy-kwh">--</span>
+              <span class="text-xs font-bold text-slate-500">kWh</span>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium block mt-0.5">Geladene Menge</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Temperatur</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-2xl font-black text-slate-900" id="wb-temp-c">--</span>
+              <span class="text-xs font-bold text-slate-500">°C</span>
+            </div>
+            <span class="text-[11px] text-emerald-600 font-semibold block mt-0.5">Normal</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-white/80 rounded-xl border border-slate-200 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-1.5 font-medium text-slate-700">
+            <i data-lucide="activity" class="w-4 h-4 text-indigo-600"></i>
+            <span>3-Phasen Messung (LAN 192.168.178.102):</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-3.5 text-xs font-mono">
+            <span id="wb-phase-l1"><b class="text-slate-800">L1:</b> -- V • -- A • -- W</span>
+            <span id="wb-phase-l2"><b class="text-slate-800">L2:</b> -- V • -- A • -- W</span>
+            <span id="wb-phase-l3"><b class="text-slate-800">L3:</b> -- V • -- A • -- W</span>
+          </div>
+        </div>
+      </div>
+
       <!-- FAHRZEUGE & HAUSVERBRAUCH -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -1466,10 +1542,68 @@
       allInverters = data.solarlog?.inverters || [];
       renderSolarLogTable(data.solarlog || {});
 
-      // 11. Autorisierte Benutzer Übersicht (Admin)
+      // 11. Wallbox (dé EV Charger)
+      renderWallbox(data.wallbox);
+
+      // 12. Autorisierte Benutzer Übersicht (Admin)
       renderUsersOverview(data.auth || {});
 
       lucide.createIcons();
+    }
+
+    function renderWallbox(wb) {
+      if (!wb) return;
+      const statusBadge = document.getElementById('wb-status-badge');
+      const statusDesc = document.getElementById('wb-status-desc');
+      const modeBadge = document.getElementById('wb-mode-badge');
+      const chargeBadge = document.getElementById('wb-charge-badge');
+
+      if (!statusBadge) return;
+
+      if (wb.online) {
+        statusBadge.className = "px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+        statusBadge.textContent = wb.status_label || 'Online';
+        statusDesc.textContent = wb.status_desc || 'Bereit';
+
+        const autoMode = wb.auto_mode !== false;
+        modeBadge.innerHTML = autoMode 
+          ? `<i data-lucide="sun" class="w-3.5 h-3.5 text-amber-600"></i> PV-Automatik (10A–16A)`
+          : `<i data-lucide="zap" class="w-3.5 h-3.5 text-indigo-600"></i> Manuell`;
+
+        const isCharging = wb.is_charging;
+        if (isCharging) {
+          chargeBadge.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse";
+          chargeBadge.textContent = "Lädt aktiv";
+        } else {
+          chargeBadge.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200";
+          chargeBadge.textContent = wb.is_plugged ? "Eingesteckt (Standby)" : "Nicht verbunden";
+        }
+
+        const amps = wb.current_amps || 10;
+        document.getElementById('wb-current-amps').textContent = amps;
+        const targetKw = ((3 * 230 * amps) / 1000).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        document.getElementById('wb-target-kw').textContent = `(~${targetKw} kW 3-phasig)`;
+
+        const powW = wb.power_w || 0;
+        const powKw = (powW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('wb-power-kw').textContent = powKw;
+        document.getElementById('wb-power-w').textContent = `(${powW.toLocaleString('de-DE')} W)`;
+
+        document.getElementById('wb-energy-kwh').textContent = (wb.energy_kwh ?? 0).toLocaleString('de-DE', { minimumFractionDigits: 1 });
+        document.getElementById('wb-temp-c').textContent = wb.temp_c ? wb.temp_c.toLocaleString('de-DE', { minimumFractionDigits: 1 }) : '--';
+
+        const ph = wb.phases || {};
+        const l1 = ph.l1 || {};
+        const l2 = ph.l2 || {};
+        const l3 = ph.l3 || {};
+        document.getElementById('wb-phase-l1').innerHTML = `<b class="text-slate-800">L1:</b> ${l1.voltage || 0} V • ${l1.current || 0} A • ${l1.power || 0} W`;
+        document.getElementById('wb-phase-l2').innerHTML = `<b class="text-slate-800">L2:</b> ${l2.voltage || 0} V • ${l2.current || 0} A • ${l2.power || 0} W`;
+        document.getElementById('wb-phase-l3').innerHTML = `<b class="text-slate-800">L3:</b> ${l3.voltage || 0} V • ${l3.current || 0} A • ${l3.power || 0} W`;
+      } else {
+        statusBadge.className = "px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200";
+        statusBadge.textContent = "Offline";
+        statusDesc.textContent = wb.error_msg || "Wallbox nicht erreichbar";
+      }
     }
 
     let targetChargeKW = parseFloat(localStorage.getItem('max_charging_kw')) || 7.5;
