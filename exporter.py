@@ -702,20 +702,32 @@ async def generate_payload() -> Dict[str, Any]:
     charging_pv_total_w = wr1_w + wr2_w + wr3_w
     charging_pv_total_kw = round(charging_pv_total_w / 1000.0, 2)
 
-    threshold_kw = 9.0
-    threshold_w = 9000
-    target_charge_kw = 6.0
-    buffer_kw = 3.0
+    wb_buffer_kw = float(wallbox_data.get("house_buffer_kw", 3.0))
+    wb_single_phase = bool(wallbox_data.get("single_phase_mode", False))
+    wb_watt_per_amp = 230.0 if wb_single_phase else 690.0
+    wb_min_amps = int(wallbox_data.get("min_current", 6))
+    wb_max_amps = int(wallbox_data.get("max_current", 16))
+
+    # Dynamische Startschwelle: Hauspuffer + 10% Reserve + Mindestladung (6A)
+    target_charge_kw = round((wb_min_amps * wb_watt_per_amp) / 1000.0, 2)
+    threshold_kw = wallbox_data.get("start_threshold_kw")
+    if not threshold_kw:
+        threshold_kw = round(((wb_buffer_kw * 1000.0 * 1.10) + (wb_min_amps * wb_watt_per_amp)) / 1000.0, 2)
+    threshold_w = threshold_kw * 1000.0
+
     is_charging_ready = charging_pv_total_w >= threshold_w
     diff_to_threshold_w = charging_pv_total_w - threshold_w
     diff_to_threshold_kw = round(diff_to_threshold_w / 1000.0, 2)
-    progress_pct = min(100.0, round((charging_pv_total_w / threshold_w) * 100.0, 1))
+    progress_pct = min(100.0, round((charging_pv_total_w / threshold_w) * 100.0, 1)) if threshold_w > 0 else 100.0
 
     charging_readiness = {
         "threshold_kw": threshold_kw,
         "threshold_w": threshold_w,
         "target_charge_kw": target_charge_kw,
-        "buffer_kw": buffer_kw,
+        "buffer_kw": wb_buffer_kw,
+        "buffer_with_margin_kw": round(wb_buffer_kw * 1.10, 2),
+        "min_current": wb_min_amps,
+        "max_current": wb_max_amps,
         "current_kw": charging_pv_total_kw,
         "current_w": charging_pv_total_w,
         "is_ready": is_charging_ready,

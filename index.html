@@ -680,13 +680,13 @@
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-slate-900">Manuelles 6 kW Ladekriterium:</span>
+                  <span class="text-xs font-bold text-slate-900">PV-Überschuss Ladekriterium:</span>
                   <span id="solar-threshold-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
                     Prüfe Schwelle...
                   </span>
                 </div>
-                <div class="text-[11px] text-slate-500 mt-0.5">
-                  Bedarf: Mindestens <b>9,0 kW</b> vom Dach (6 kW Ladeleistung + ~3 kW Hauspuffer)
+                <div class="text-[11px] text-slate-500 mt-0.5" id="threshold-requirement-desc">
+                  Bedarf: Mindestens <b>7,4 kW</b> vom Dach (Hauspuffer inkl. 10% Reserve + 6A Mindestladung)
                 </div>
               </div>
             </div>
@@ -694,7 +694,7 @@
             <!-- Telegram Debounce Info Badge -->
             <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200/80 text-[11px] font-medium">
               <i data-lucide="bell" class="w-3.5 h-3.5 text-sky-600 shrink-0"></i>
-              <span>Telegram-Alert: nach <b>5 Min. stabil</b> über/unter 9 kW</span>
+              <span id="threshold-debounce-badge">Telegram-Alert: nach <b>5 Min. stabil</b> über/unter Startschwelle</span>
             </div>
           </div>
 
@@ -702,7 +702,7 @@
           <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 space-y-2">
             <div class="flex justify-between items-center text-xs">
               <span class="text-slate-600">Aktuelle Fronius Lade-PV: <b class="text-slate-900 font-mono" id="threshold-current-kw">-- kW</b></span>
-              <span class="text-slate-500 font-medium" id="threshold-diff-text">Schwelle: <b>9,0 kW</b></span>
+              <span class="text-slate-500 font-medium" id="threshold-diff-text">Schwelle: <b>-- kW</b></span>
             </div>
             
             <div class="relative w-full bg-slate-200 rounded-full h-3 overflow-hidden">
@@ -711,14 +711,14 @@
 
             <div class="flex justify-between text-[11px] text-slate-400 font-mono">
               <span>0 kW</span>
-              <span>6 kW (Wallbox)</span>
-              <span class="font-bold text-slate-600">9 kW (Schwelle mit Hauspuffer)</span>
+              <span>4,1 kW (6A)</span>
+              <span class="font-bold text-slate-600" id="threshold-scale-thresh">Startschwelle mit Hauspuffer</span>
               <span>18,7 kWp</span>
             </div>
           </div>
 
           <div class="mt-2 text-[11px] text-slate-500 flex items-center justify-between" id="threshold-status-explanation">
-            <span>Sobald die Erzeugung über 9 kW liegt, reicht der reine Solarstrom für 6 kW Ladevorgang ohne Netzbezug.</span>
+            <span id="threshold-expl-text">Sobald die Erzeugung über der Startschwelle liegt, reicht der reine Solarstrom ohne Netzbezug.</span>
             <span class="font-semibold text-slate-700" id="threshold-decision-text">Warte auf Solarleistung</span>
           </div>
         </div>
@@ -1456,18 +1456,20 @@
       document.getElementById('trio-wr3').textContent = `${wr3_kw} kW`;
       document.getElementById('trio-total').textContent = `${(chPowW / 1000).toLocaleString('de-DE', { minimumFractionDigits: 2 })} kW`;
 
-      // 2b. Manuelles 6 kW Ladekriterium (≥ 9 kW Schwelle)
+      // 2b. Dynamisches PV-Überschuss Ladekriterium
       const readiness = data.charging_readiness || (chargingPV.charging_readiness) || {
-        threshold_kw: 9.0,
+        threshold_kw: 7.4,
         current_kw: chPowW / 1000,
-        is_ready: chPowW >= 9000,
-        diff_kw: (chPowW - 9000) / 1000,
-        progress_percent: Math.min(100, Math.round((chPowW / 9000) * 100))
+        is_ready: chPowW >= 7440,
+        diff_kw: (chPowW - 7440) / 1000,
+        progress_percent: Math.min(100, Math.round((chPowW / 7440) * 100))
       };
 
       const isReady = readiness.is_ready;
       const curKW = readiness.current_kw ?? (chPowW / 1000);
-      const threshKW = readiness.threshold_kw ?? 9.0;
+      const threshKW = readiness.threshold_kw ?? (data.wallbox?.start_threshold_kw ?? 7.4);
+      const bufferKW = readiness.buffer_kw ?? (data.wallbox?.house_buffer_kw ?? 3.0);
+      const targetChargeKW = readiness.target_charge_kw ?? 4.1;
       const progress = Math.min(100, Math.max(0, readiness.progress_percent ?? Math.round((curKW / threshKW) * 100)));
 
       // Update Hero Card Badge & Bar
@@ -1476,10 +1478,10 @@
       if (heroBadge) {
         if (isReady) {
           heroBadge.className = 'px-2 py-0.5 rounded-md font-bold text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1';
-          heroBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span> Bereit (≥ 9 kW)`;
+          heroBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span> Bereit (≥ ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW)`;
         } else {
           heroBadge.className = 'px-2 py-0.5 rounded-md font-bold text-[10px] bg-amber-50 text-amber-800 border border-amber-200';
-          heroBadge.textContent = `Warten (${curKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} / 9,0 kW)`;
+          heroBadge.textContent = `Warten (${curKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} / ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW)`;
         }
       }
       if (heroBar) {
@@ -1495,15 +1497,23 @@
       const diffEl = document.getElementById('threshold-diff-text');
       const progressBar = document.getElementById('threshold-progress-bar');
       const decisionEl = document.getElementById('threshold-decision-text');
+      const reqDesc = document.getElementById('threshold-requirement-desc');
+      const scaleThresh = document.getElementById('threshold-scale-thresh');
+      const debounceBadge = document.getElementById('threshold-debounce-badge');
 
       if (curKwEl) curKwEl.textContent = `${curKW.toLocaleString('de-DE', {minimumFractionDigits: 2})} kW`;
       if (progressBar) progressBar.style.width = `${progress}%`;
+      if (scaleThresh) scaleThresh.textContent = `${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW (Startschwelle)`;
+      if (debounceBadge) debounceBadge.innerHTML = `Telegram-Alert: nach <b>5 Min. stabil</b> über/unter ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW`;
+      if (reqDesc) {
+        reqDesc.innerHTML = `Bedarf: Mindestens <b>${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW</b> vom Dach (~${targetChargeKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW Ladeleistung + ~${(bufferKW * 1.10).toLocaleString('de-DE', {minimumFractionDigits: 1})} kW Hauspuffer inkl. 10% Reserve)`;
+      }
 
       if (isReady) {
         if (cardEl) cardEl.className = 'p-4 bg-emerald-50/60 rounded-xl border border-emerald-300 shadow-2xs mb-5 transition-all';
         if (cardBadge) {
           cardBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5';
-          cardBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span> 6 kW Laden empfohlen! (≥ 9,0 kW)`;
+          cardBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span> Laden empfohlen! (≥ ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW)`;
         }
         if (iconBox) iconBox.className = 'w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0';
         if (diffEl) diffEl.innerHTML = `<span class="text-emerald-700 font-bold">+${Math.abs(curKW - threshKW).toLocaleString('de-DE', {minimumFractionDigits: 2})} kW Puffer über Schwelle</span>`;
@@ -1517,10 +1527,10 @@
         if (cardEl) cardEl.className = 'p-4 bg-white rounded-xl border border-slate-200 shadow-2xs mb-5 transition-all';
         if (cardBadge) {
           cardBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200';
-          cardBadge.textContent = `Warten auf Solar-Überschuss (< 9,0 kW)`;
+          cardBadge.textContent = `Warten auf Solar-Überschuss (< ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW)`;
         }
         if (iconBox) iconBox.className = 'w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0';
-        if (diffEl) diffEl.innerHTML = `<span class="text-amber-700 font-semibold">Fehlen noch: ${missing.toLocaleString('de-DE', {minimumFractionDigits: 2})} kW bis 9,0 kW</span>`;
+        if (diffEl) diffEl.innerHTML = `<span class="text-amber-700 font-semibold">Fehlen noch: ${missing.toLocaleString('de-DE', {minimumFractionDigits: 2})} kW bis ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW</span>`;
         if (progressBar) progressBar.className = 'h-3 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500';
         if (decisionEl) {
           decisionEl.className = 'font-semibold text-slate-600';
@@ -1661,13 +1671,14 @@
         const ctrlAuto = document.getElementById('wb-ctrl-auto');
         if (ctrlAuto) {
           ctrlAuto.innerHTML = autoMode 
-            ? `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aktiv (10–16A)`
+            ? `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aktiv (6–16A)`
             : `<span class="w-2 h-2 rounded-full bg-amber-500"></span> Manuell`;
         }
 
         const ctrlBuffer = document.getElementById('wb-ctrl-buffer');
         if (ctrlBuffer) {
-          ctrlBuffer.textContent = `${(wb.house_buffer_kw ?? 3.0).toLocaleString('de-DE', {minimumFractionDigits: 1})} kW`;
+          const bVal = wb.house_buffer_kw ?? 3.0;
+          ctrlBuffer.innerHTML = `${bVal.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW <span class="text-[10px] text-slate-400 font-normal block">(+10%: ${(bVal * 1.10).toLocaleString('de-DE', {minimumFractionDigits: 2})} kW)</span>`;
         }
 
         const ctrlPlug = document.getElementById('wb-ctrl-plug');
