@@ -401,6 +401,26 @@ def fetch_solarlog_db() -> Dict[str, Any]:
     return result
 
 
+_LAST_WEATHER_CACHE: Optional[Dict[str, Any]] = None
+
+
+def _init_weather_cache_from_disk():
+    global _LAST_WEATHER_CACHE
+    try:
+        data_file = Path(__file__).parent / "data.json"
+        if data_file.exists():
+            with open(data_file, "r", encoding="utf-8") as f:
+                d = json.load(f)
+                wi = d.get("weather_intelligence")
+                if wi and wi.get("dwd", {}).get("temp_c") is not None:
+                    _LAST_WEATHER_CACHE = wi
+    except Exception:
+        pass
+
+
+_init_weather_cache_from_disk()
+
+
 async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any]) -> Dict[str, Any]:
     """
     Fragt Open-Meteo und DWD Bright Sky ab und berechnet die besten Ladefenster
@@ -589,6 +609,12 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
 
     except Exception as e:
         print(f"Fehler bei Ladefenster-Berechnung: {e}", file=sys.stderr)
+
+    global _LAST_WEATHER_CACHE
+    if weather_data.get("dwd", {}).get("temp_c") is not None or weather_data.get("charging_windows"):
+        _LAST_WEATHER_CACHE = weather_data
+    elif _LAST_WEATHER_CACHE:
+        return _LAST_WEATHER_CACHE
 
     return weather_data
 
