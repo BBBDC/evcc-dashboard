@@ -226,6 +226,7 @@ def fetch_charging_db() -> Dict[str, Any]:
         cols = [r["name"] for r in cur.fetchall()]
         has_cost = "total_cost" in cols
         has_price = "price_per_kwh" in cols
+        has_transfer = "transfer_status" in cols
 
         # Prüfe Tabelle vehicle_settings
         cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='vehicle_settings'")
@@ -241,9 +242,10 @@ def fetch_charging_db() -> Dict[str, Any]:
         # Letzte 20 Ladevorgänge
         price_col = "COALESCE(price_per_kwh, 0.30) as price_per_kwh," if has_price else "0.30 as price_per_kwh,"
         cost_col = "COALESCE(total_cost, round(kwh * 0.30, 2)) as total_cost," if has_cost else "round(kwh * 0.30, 2) as total_cost,"
+        transfer_col = "COALESCE(transfer_status, 'NONE') as transfer_status, transfer_at," if has_transfer else "'NONE' as transfer_status, NULL as transfer_at,"
 
         cur.execute(f"""
-            SELECT id, vehicle_id, vehicle_title, kwh, {price_col} {cost_col} charged_at, note
+            SELECT id, vehicle_id, vehicle_title, kwh, {price_col} {cost_col} {transfer_col} charged_at, note
             FROM charging_sessions
             ORDER BY charged_at DESC, id DESC
             LIMIT 20
