@@ -1,9 +1,9 @@
 {
   "meta": {
     "version": "2.2.0",
-    "timestamp": "2026-10-29T18:05:04.529781",
-    "display_time": "29.10.2026 18:05:04",
-    "display_date": "29.10.2026",
+    "timestamp": "2026-10-31T21:01:53.347870",
+    "display_time": "31.10.2026 21:01:53",
+    "display_date": "31.10.2026",
     "location": "Kempten (Allgäu)"
   },
   "energy": {
@@ -25,7 +25,7 @@
       {
         "title": "Solarlog_Anlage",
         "power_w": 0,
-        "energy_kwh": 2654.8
+        "energy_kwh": 2655.41
       }
     ]
   },
@@ -35,17 +35,17 @@
     "total_power_w": 0,
     "total_power_kw": 0.0,
     "charging_readiness": {
-      "threshold_kw": 6.34,
-      "threshold_w": 6340.0,
+      "threshold_kw": 7.44,
+      "threshold_w": 7440.0,
       "target_charge_kw": 4.14,
-      "buffer_kw": 2.0,
-      "buffer_with_margin_kw": 2.2,
+      "buffer_kw": 3.0,
+      "buffer_with_margin_kw": 3.3,
       "min_current": 6,
       "max_current": 16,
       "current_kw": 0.0,
       "current_w": 0,
       "is_ready": false,
-      "diff_kw": -6.34,
+      "diff_kw": -7.44,
       "progress_percent": 0.0
     },
     "wr1": {
@@ -68,57 +68,57 @@
     }
   },
   "charging_readiness": {
-    "threshold_kw": 6.34,
-    "threshold_w": 6340.0,
+    "threshold_kw": 7.44,
+    "threshold_w": 7440.0,
     "target_charge_kw": 4.14,
-    "buffer_kw": 2.0,
-    "buffer_with_margin_kw": 2.2,
+    "buffer_kw": 3.0,
+    "buffer_with_margin_kw": 3.3,
     "min_current": 6,
     "max_current": 16,
     "current_kw": 0.0,
     "current_w": 0,
     "is_ready": false,
-    "diff_kw": -6.34,
+    "diff_kw": -7.44,
     "progress_percent": 0.0
   },
   "wallbox": {
     "online": true,
-    "work_state": "IDLEINS",
-    "status_label": "Eingesteckt",
-    "status_desc": "Fahrzeug verbunden, Standby",
-    "current_amps": 8,
-    "target_charge_kw": 5.5,
+    "work_state": "SLEEP",
+    "status_label": "Ruhezustand",
+    "status_desc": "Wallbox schläft",
+    "current_amps": 11,
+    "target_charge_kw": 7.6,
     "do_charge": false,
     "power_w": 0,
     "power_kw": 0.0,
-    "temp_c": 22.0,
+    "temp_c": 20.0,
     "energy_kwh": 0.0,
-    "duration_sec": 200,
-    "is_plugged": true,
+    "duration_sec": 0,
+    "is_plugged": false,
     "is_charging": false,
     "phases": {
       "l1": {
-        "voltage": 234.0,
+        "voltage": 232.0,
         "current": 0.0,
         "power": 0
       },
       "l2": {
-        "voltage": 234.0,
+        "voltage": 232.0,
         "current": 0.0,
         "power": 0
       },
       "l3": {
-        "voltage": 234.0,
+        "voltage": 232.0,
         "current": 0.0,
         "power": 0
       }
     },
     "last_charge": {
-      "t": "2026-10-29 06:48:23",
-      "s": "06:48",
-      "e": "14:34",
-      "d": 27944,
-      "c": 213
+      "t": "2026-10-31 13:14:00",
+      "s": "13:14",
+      "e": "13:46",
+      "d": 1960,
+      "c": 34
     },
     "auto_mode": true,
     "plug_charge": false,
@@ -131,1818 +131,1818 @@
     "max_current_limit": 16,
     "min_current": 6,
     "max_current": 16,
-    "house_buffer_kw": 2.0,
-    "start_threshold_kw": 6.34,
-    "effective_buffer_kw": 2.2,
-    "is_paused_by_pv": false
+    "house_buffer_kw": 3.0,
+    "start_threshold_kw": 7.44,
+    "effective_buffer_kw": 3.3,
+    "is_paused_by_pv": true
   },
   "influx_today": {
-    "energy_kwh": 805.65,
-    "max_power_w": 124700,
-    "avg_power_w": 15712,
-    "date": "29.10.2026"
+    "energy_kwh": 707.35,
+    "max_power_w": 119762,
+    "avg_power_w": 11770,
+    "date": "31.10.2026"
   },
   "weather_intelligence": {
     "location": "Kempten (Allgäu)",
     "dwd": {
       "condition": "dry",
-      "temp_c": 6.4,
-      "cloud_cover": 50
+      "temp_c": 5.6,
+      "cloud_cover": 100
     },
     "open_meteo": {
       "temp_c": null,
-      "cloud_cover": 0,
-      "sunshine_today_h": 8.4,
-      "sunshine_tomorrow_h": 6.1,
-      "sunrise": "06:58",
-      "sunset": "17:06"
+      "cloud_cover": 97,
+      "sunshine_today_h": 8.0,
+      "sunshine_tomorrow_h": 2.6,
+      "sunrise": "07:01",
+      "sunset": "17:02"
     },
     "charging_windows": [
       {
         "day_label": "Heute",
-        "date": "29.10.2026",
-        "window": "10:15 – 14:15 Uhr",
+        "date": "31.10.2026",
+        "window": "09:30 – 14:30 Uhr",
         "target_kw": 7.5,
-        "max_kw": 13.5,
-        "avg_kw": 10.8,
+        "max_kw": 13.6,
+        "avg_kw": 11.6,
         "rating": "Optimal (Volle 7–8 kW Leistung)",
         "rating_code": "optimal",
         "badge_color": "emerald",
-        "comment": "Spitze 13.5 kW • Volle Ladeleistung (7–8 kW) durchgehend für ~4.2 Std. rein solar gedeckt!"
+        "comment": "Spitze 13.6 kW • Volle Ladeleistung (7–8 kW) durchgehend für ~5.2 Std. rein solar gedeckt!"
       },
       {
         "day_label": "Morgen",
-        "date": "30.10.2026",
-        "window": "10:00 – 15:00 Uhr (Teilladung)",
+        "date": "01.11.2026",
+        "window": "13:45 – 14:15 Uhr (Teilladung)",
         "target_kw": 7.5,
-        "max_kw": 7.1,
-        "avg_kw": 5.9,
+        "max_kw": 6.1,
+        "avg_kw": 4.9,
         "rating": "Gut (3-Phasen Teilladung 4–7 kW)",
         "rating_code": "good",
         "badge_color": "amber",
-        "comment": "Spitze 7.1 kW • 3-phasiges PV-Laden möglich (bis zu 7.1 kW)"
+        "comment": "Spitze 6.1 kW • 3-phasiges PV-Laden möglich (bis zu 6.1 kW)"
       },
       {
         "day_label": "Übermorgen",
-        "date": "31.10.2026",
-        "window": "12:15 – 13:00 Uhr",
+        "date": "02.11.2026",
+        "window": "08:30 – 15:15 Uhr (1-phasig)",
         "target_kw": 7.5,
-        "max_kw": 9.1,
-        "avg_kw": 8.3,
-        "rating": "Optimal (Volle 7–8 kW Leistung)",
-        "rating_code": "optimal",
-        "badge_color": "emerald",
-        "comment": "Spitze 9.1 kW • Volle Ladeleistung (7–8 kW) durchgehend für ~0.8 Std. rein solar gedeckt!"
+        "max_kw": 3.9,
+        "avg_kw": 0.0,
+        "rating": "Mäßig (1-phasig ab 1.4 kW)",
+        "rating_code": "moderate",
+        "badge_color": "slate",
+        "comment": "Nur für 1-phasiges Erhaltungsladen geeignet"
       }
     ],
     "days_overview": [
       {
         "day_label": "Heute",
-        "date": "29.10.2026",
+        "date": "31.10.2026",
         "energy_kwh": 0.0,
-        "max_kw": 13.5,
+        "max_kw": 13.6,
         "charging_possible": true
       },
       {
         "day_label": "Morgen",
-        "date": "30.10.2026",
-        "energy_kwh": 38.9,
-        "max_kw": 7.1,
+        "date": "01.11.2026",
+        "energy_kwh": 20.6,
+        "max_kw": 6.1,
         "charging_possible": true
       },
       {
         "day_label": "Übermorgen",
-        "date": "31.10.2026",
-        "energy_kwh": 32.3,
-        "max_kw": 9.1,
-        "charging_possible": true
+        "date": "02.11.2026",
+        "energy_kwh": 19.3,
+        "max_kw": 3.9,
+        "charging_possible": false
       }
     ],
     "charging_timeseries": [
       {
-        "t": "2026-10-29 00:00",
-        "day": "Heute",
-        "hour": "00:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 00:15",
-        "day": "Heute",
-        "hour": "00:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 00:30",
-        "day": "Heute",
-        "hour": "00:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 00:45",
-        "day": "Heute",
-        "hour": "00:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 01:00",
-        "day": "Heute",
-        "hour": "01:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 01:15",
-        "day": "Heute",
-        "hour": "01:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 01:30",
-        "day": "Heute",
-        "hour": "01:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 01:45",
-        "day": "Heute",
-        "hour": "01:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 02:00",
-        "day": "Heute",
-        "hour": "02:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 02:15",
-        "day": "Heute",
-        "hour": "02:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 02:30",
-        "day": "Heute",
-        "hour": "02:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 02:45",
-        "day": "Heute",
-        "hour": "02:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 03:00",
-        "day": "Heute",
-        "hour": "03:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 03:15",
-        "day": "Heute",
-        "hour": "03:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 03:30",
-        "day": "Heute",
-        "hour": "03:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 03:45",
-        "day": "Heute",
-        "hour": "03:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 04:00",
-        "day": "Heute",
-        "hour": "04:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 04:15",
-        "day": "Heute",
-        "hour": "04:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 04:30",
-        "day": "Heute",
-        "hour": "04:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 04:45",
-        "day": "Heute",
-        "hour": "04:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 05:00",
-        "day": "Heute",
-        "hour": "05:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 05:15",
-        "day": "Heute",
-        "hour": "05:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 05:30",
-        "day": "Heute",
-        "hour": "05:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 05:45",
-        "day": "Heute",
-        "hour": "05:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 06:00",
-        "day": "Heute",
-        "hour": "06:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 06:15",
-        "day": "Heute",
-        "hour": "06:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 06:30",
-        "day": "Heute",
-        "hour": "06:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 06:45",
-        "day": "Heute",
-        "hour": "06:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 07:00",
-        "day": "Heute",
-        "hour": "07:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 07:15",
-        "day": "Heute",
-        "hour": "07:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 07:30",
-        "day": "Heute",
-        "hour": "07:30",
-        "kw": 1.25
-      },
-      {
-        "t": "2026-10-29 07:45",
-        "day": "Heute",
-        "hour": "07:45",
-        "kw": 1.62
-      },
-      {
-        "t": "2026-10-29 08:00",
-        "day": "Heute",
-        "hour": "08:00",
-        "kw": 2.31
-      },
-      {
-        "t": "2026-10-29 08:15",
-        "day": "Heute",
-        "hour": "08:15",
-        "kw": 2.45
-      },
-      {
-        "t": "2026-10-29 08:30",
-        "day": "Heute",
-        "hour": "08:30",
-        "kw": 3.37
-      },
-      {
-        "t": "2026-10-29 08:45",
-        "day": "Heute",
-        "hour": "08:45",
-        "kw": 4.5
-      },
-      {
-        "t": "2026-10-29 09:00",
-        "day": "Heute",
-        "hour": "09:00",
-        "kw": 5.15
-      },
-      {
-        "t": "2026-10-29 09:15",
-        "day": "Heute",
-        "hour": "09:15",
-        "kw": 5.7
-      },
-      {
-        "t": "2026-10-29 09:30",
-        "day": "Heute",
-        "hour": "09:30",
-        "kw": 5.59
-      },
-      {
-        "t": "2026-10-29 09:45",
-        "day": "Heute",
-        "hour": "09:45",
-        "kw": 5.54
-      },
-      {
-        "t": "2026-10-29 10:00",
-        "day": "Heute",
-        "hour": "10:00",
-        "kw": 7.42
-      },
-      {
-        "t": "2026-10-29 10:15",
-        "day": "Heute",
-        "hour": "10:15",
-        "kw": 8.82
-      },
-      {
-        "t": "2026-10-29 10:30",
-        "day": "Heute",
-        "hour": "10:30",
-        "kw": 8.02
-      },
-      {
-        "t": "2026-10-29 10:45",
-        "day": "Heute",
-        "hour": "10:45",
-        "kw": 8.47
-      },
-      {
-        "t": "2026-10-29 11:00",
-        "day": "Heute",
-        "hour": "11:00",
-        "kw": 8.66
-      },
-      {
-        "t": "2026-10-29 11:15",
-        "day": "Heute",
-        "hour": "11:15",
-        "kw": 10.21
-      },
-      {
-        "t": "2026-10-29 11:30",
-        "day": "Heute",
-        "hour": "11:30",
-        "kw": 10.87
-      },
-      {
-        "t": "2026-10-29 11:45",
-        "day": "Heute",
-        "hour": "11:45",
-        "kw": 11.67
-      },
-      {
-        "t": "2026-10-29 12:00",
-        "day": "Heute",
-        "hour": "12:00",
-        "kw": 12.14
-      },
-      {
-        "t": "2026-10-29 12:15",
-        "day": "Heute",
-        "hour": "12:15",
-        "kw": 12.0
-      },
-      {
-        "t": "2026-10-29 12:30",
-        "day": "Heute",
-        "hour": "12:30",
-        "kw": 12.96
-      },
-      {
-        "t": "2026-10-29 12:45",
-        "day": "Heute",
-        "hour": "12:45",
-        "kw": 13.53
-      },
-      {
-        "t": "2026-10-29 13:00",
-        "day": "Heute",
-        "hour": "13:00",
-        "kw": 13.44
-      },
-      {
-        "t": "2026-10-29 13:15",
-        "day": "Heute",
-        "hour": "13:15",
-        "kw": 11.78
-      },
-      {
-        "t": "2026-10-29 13:30",
-        "day": "Heute",
-        "hour": "13:30",
-        "kw": 11.72
-      },
-      {
-        "t": "2026-10-29 13:45",
-        "day": "Heute",
-        "hour": "13:45",
-        "kw": 11.18
-      },
-      {
-        "t": "2026-10-29 14:00",
-        "day": "Heute",
-        "hour": "14:00",
-        "kw": 9.37
-      },
-      {
-        "t": "2026-10-29 14:15",
-        "day": "Heute",
-        "hour": "14:15",
-        "kw": 8.97
-      },
-      {
-        "t": "2026-10-29 14:30",
-        "day": "Heute",
-        "hour": "14:30",
-        "kw": 6.94
-      },
-      {
-        "t": "2026-10-29 14:45",
-        "day": "Heute",
-        "hour": "14:45",
-        "kw": 5.85
-      },
-      {
-        "t": "2026-10-29 15:00",
-        "day": "Heute",
-        "hour": "15:00",
-        "kw": 5.37
-      },
-      {
-        "t": "2026-10-29 15:15",
-        "day": "Heute",
-        "hour": "15:15",
-        "kw": 5.07
-      },
-      {
-        "t": "2026-10-29 15:30",
-        "day": "Heute",
-        "hour": "15:30",
-        "kw": 4.07
-      },
-      {
-        "t": "2026-10-29 15:45",
-        "day": "Heute",
-        "hour": "15:45",
-        "kw": 2.94
-      },
-      {
-        "t": "2026-10-29 16:00",
-        "day": "Heute",
-        "hour": "16:00",
-        "kw": 2.12
-      },
-      {
-        "t": "2026-10-29 16:15",
-        "day": "Heute",
-        "hour": "16:15",
-        "kw": 1.38
-      },
-      {
-        "t": "2026-10-29 16:30",
-        "day": "Heute",
-        "hour": "16:30",
-        "kw": 1.01
-      },
-      {
-        "t": "2026-10-29 16:45",
-        "day": "Heute",
-        "hour": "16:45",
-        "kw": 0.5
-      },
-      {
-        "t": "2026-10-29 17:00",
-        "day": "Heute",
-        "hour": "17:00",
-        "kw": 0.03
-      },
-      {
-        "t": "2026-10-29 17:15",
-        "day": "Heute",
-        "hour": "17:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 17:30",
-        "day": "Heute",
-        "hour": "17:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 17:45",
-        "day": "Heute",
-        "hour": "17:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 18:00",
-        "day": "Heute",
-        "hour": "18:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 18:15",
-        "day": "Heute",
-        "hour": "18:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 18:30",
-        "day": "Heute",
-        "hour": "18:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 18:45",
-        "day": "Heute",
-        "hour": "18:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 19:00",
-        "day": "Heute",
-        "hour": "19:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 19:15",
-        "day": "Heute",
-        "hour": "19:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 19:30",
-        "day": "Heute",
-        "hour": "19:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 19:45",
-        "day": "Heute",
-        "hour": "19:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 20:00",
-        "day": "Heute",
-        "hour": "20:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 20:15",
-        "day": "Heute",
-        "hour": "20:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 20:30",
-        "day": "Heute",
-        "hour": "20:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 20:45",
-        "day": "Heute",
-        "hour": "20:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 21:00",
-        "day": "Heute",
-        "hour": "21:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 21:15",
-        "day": "Heute",
-        "hour": "21:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 21:30",
-        "day": "Heute",
-        "hour": "21:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 21:45",
-        "day": "Heute",
-        "hour": "21:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 22:00",
-        "day": "Heute",
-        "hour": "22:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 22:15",
-        "day": "Heute",
-        "hour": "22:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 22:30",
-        "day": "Heute",
-        "hour": "22:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 22:45",
-        "day": "Heute",
-        "hour": "22:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 23:00",
-        "day": "Heute",
-        "hour": "23:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 23:15",
-        "day": "Heute",
-        "hour": "23:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 23:30",
-        "day": "Heute",
-        "hour": "23:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-29 23:45",
-        "day": "Heute",
-        "hour": "23:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 00:00",
-        "day": "Morgen",
-        "hour": "00:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 00:15",
-        "day": "Morgen",
-        "hour": "00:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 00:30",
-        "day": "Morgen",
-        "hour": "00:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 00:45",
-        "day": "Morgen",
-        "hour": "00:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 01:00",
-        "day": "Morgen",
-        "hour": "01:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 01:15",
-        "day": "Morgen",
-        "hour": "01:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 01:30",
-        "day": "Morgen",
-        "hour": "01:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 01:45",
-        "day": "Morgen",
-        "hour": "01:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 02:00",
-        "day": "Morgen",
-        "hour": "02:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 02:15",
-        "day": "Morgen",
-        "hour": "02:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 02:30",
-        "day": "Morgen",
-        "hour": "02:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 02:45",
-        "day": "Morgen",
-        "hour": "02:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 03:00",
-        "day": "Morgen",
-        "hour": "03:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 03:15",
-        "day": "Morgen",
-        "hour": "03:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 03:30",
-        "day": "Morgen",
-        "hour": "03:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 03:45",
-        "day": "Morgen",
-        "hour": "03:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 04:00",
-        "day": "Morgen",
-        "hour": "04:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 04:15",
-        "day": "Morgen",
-        "hour": "04:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 04:30",
-        "day": "Morgen",
-        "hour": "04:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 04:45",
-        "day": "Morgen",
-        "hour": "04:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 05:00",
-        "day": "Morgen",
-        "hour": "05:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 05:15",
-        "day": "Morgen",
-        "hour": "05:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 05:30",
-        "day": "Morgen",
-        "hour": "05:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 05:45",
-        "day": "Morgen",
-        "hour": "05:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 06:00",
-        "day": "Morgen",
-        "hour": "06:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 06:15",
-        "day": "Morgen",
-        "hour": "06:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 06:30",
-        "day": "Morgen",
-        "hour": "06:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 06:45",
-        "day": "Morgen",
-        "hour": "06:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 07:00",
-        "day": "Morgen",
-        "hour": "07:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 07:15",
-        "day": "Morgen",
-        "hour": "07:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 07:30",
-        "day": "Morgen",
-        "hour": "07:30",
-        "kw": 0.32
-      },
-      {
-        "t": "2026-10-30 07:45",
-        "day": "Morgen",
-        "hour": "07:45",
-        "kw": 0.8
-      },
-      {
-        "t": "2026-10-30 08:00",
-        "day": "Morgen",
-        "hour": "08:00",
-        "kw": 1.28
-      },
-      {
-        "t": "2026-10-30 08:15",
-        "day": "Morgen",
-        "hour": "08:15",
-        "kw": 1.51
-      },
-      {
-        "t": "2026-10-30 08:30",
-        "day": "Morgen",
-        "hour": "08:30",
-        "kw": 1.64
-      },
-      {
-        "t": "2026-10-30 08:45",
-        "day": "Morgen",
-        "hour": "08:45",
-        "kw": 2.13
-      },
-      {
-        "t": "2026-10-30 09:00",
-        "day": "Morgen",
-        "hour": "09:00",
-        "kw": 2.58
-      },
-      {
-        "t": "2026-10-30 09:15",
-        "day": "Morgen",
-        "hour": "09:15",
-        "kw": 2.79
-      },
-      {
-        "t": "2026-10-30 09:30",
-        "day": "Morgen",
-        "hour": "09:30",
-        "kw": 3.32
-      },
-      {
-        "t": "2026-10-30 09:45",
-        "day": "Morgen",
-        "hour": "09:45",
-        "kw": 3.11
-      },
-      {
-        "t": "2026-10-30 10:00",
-        "day": "Morgen",
-        "hour": "10:00",
-        "kw": 5.38
-      },
-      {
-        "t": "2026-10-30 10:15",
-        "day": "Morgen",
-        "hour": "10:15",
-        "kw": 5.95
-      },
-      {
-        "t": "2026-10-30 10:30",
-        "day": "Morgen",
-        "hour": "10:30",
-        "kw": 6.11
-      },
-      {
-        "t": "2026-10-30 10:45",
-        "day": "Morgen",
-        "hour": "10:45",
-        "kw": 6.73
-      },
-      {
-        "t": "2026-10-30 11:00",
-        "day": "Morgen",
-        "hour": "11:00",
-        "kw": 5.61
-      },
-      {
-        "t": "2026-10-30 11:15",
-        "day": "Morgen",
-        "hour": "11:15",
-        "kw": 5.49
-      },
-      {
-        "t": "2026-10-30 11:30",
-        "day": "Morgen",
-        "hour": "11:30",
-        "kw": 6.61
-      },
-      {
-        "t": "2026-10-30 11:45",
-        "day": "Morgen",
-        "hour": "11:45",
-        "kw": 5.13
-      },
-      {
-        "t": "2026-10-30 12:00",
-        "day": "Morgen",
-        "hour": "12:00",
-        "kw": 6.03
-      },
-      {
-        "t": "2026-10-30 12:15",
-        "day": "Morgen",
-        "hour": "12:15",
-        "kw": 5.65
-      },
-      {
-        "t": "2026-10-30 12:30",
-        "day": "Morgen",
-        "hour": "12:30",
-        "kw": 5.99
-      },
-      {
-        "t": "2026-10-30 12:45",
-        "day": "Morgen",
-        "hour": "12:45",
-        "kw": 7.11
-      },
-      {
-        "t": "2026-10-30 13:00",
-        "day": "Morgen",
-        "hour": "13:00",
-        "kw": 6.85
-      },
-      {
-        "t": "2026-10-30 13:15",
-        "day": "Morgen",
-        "hour": "13:15",
-        "kw": 5.72
-      },
-      {
-        "t": "2026-10-30 13:30",
-        "day": "Morgen",
-        "hour": "13:30",
-        "kw": 5.5
-      },
-      {
-        "t": "2026-10-30 13:45",
-        "day": "Morgen",
-        "hour": "13:45",
-        "kw": 6.54
-      },
-      {
-        "t": "2026-10-30 14:00",
-        "day": "Morgen",
-        "hour": "14:00",
-        "kw": 6.85
-      },
-      {
-        "t": "2026-10-30 14:15",
-        "day": "Morgen",
-        "hour": "14:15",
-        "kw": 5.73
-      },
-      {
-        "t": "2026-10-30 14:30",
-        "day": "Morgen",
-        "hour": "14:30",
-        "kw": 5.43
-      },
-      {
-        "t": "2026-10-30 14:45",
-        "day": "Morgen",
-        "hour": "14:45",
-        "kw": 3.71
-      },
-      {
-        "t": "2026-10-30 15:00",
-        "day": "Morgen",
-        "hour": "15:00",
-        "kw": 4.55
-      },
-      {
-        "t": "2026-10-30 15:15",
-        "day": "Morgen",
-        "hour": "15:15",
-        "kw": 3.81
-      },
-      {
-        "t": "2026-10-30 15:30",
-        "day": "Morgen",
-        "hour": "15:30",
-        "kw": 2.73
-      },
-      {
-        "t": "2026-10-30 15:45",
-        "day": "Morgen",
-        "hour": "15:45",
-        "kw": 2.46
-      },
-      {
-        "t": "2026-10-30 16:00",
-        "day": "Morgen",
-        "hour": "16:00",
-        "kw": 2.03
-      },
-      {
-        "t": "2026-10-30 16:15",
-        "day": "Morgen",
-        "hour": "16:15",
-        "kw": 1.21
-      },
-      {
-        "t": "2026-10-30 16:30",
-        "day": "Morgen",
-        "hour": "16:30",
-        "kw": 0.76
-      },
-      {
-        "t": "2026-10-30 16:45",
-        "day": "Morgen",
-        "hour": "16:45",
-        "kw": 0.34
-      },
-      {
-        "t": "2026-10-30 17:00",
-        "day": "Morgen",
-        "hour": "17:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 17:15",
-        "day": "Morgen",
-        "hour": "17:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 17:30",
-        "day": "Morgen",
-        "hour": "17:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 17:45",
-        "day": "Morgen",
-        "hour": "17:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 18:00",
-        "day": "Morgen",
-        "hour": "18:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 18:15",
-        "day": "Morgen",
-        "hour": "18:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 18:30",
-        "day": "Morgen",
-        "hour": "18:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 18:45",
-        "day": "Morgen",
-        "hour": "18:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 19:00",
-        "day": "Morgen",
-        "hour": "19:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 19:15",
-        "day": "Morgen",
-        "hour": "19:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 19:30",
-        "day": "Morgen",
-        "hour": "19:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 19:45",
-        "day": "Morgen",
-        "hour": "19:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 20:00",
-        "day": "Morgen",
-        "hour": "20:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 20:15",
-        "day": "Morgen",
-        "hour": "20:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 20:30",
-        "day": "Morgen",
-        "hour": "20:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 20:45",
-        "day": "Morgen",
-        "hour": "20:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 21:00",
-        "day": "Morgen",
-        "hour": "21:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 21:15",
-        "day": "Morgen",
-        "hour": "21:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 21:30",
-        "day": "Morgen",
-        "hour": "21:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 21:45",
-        "day": "Morgen",
-        "hour": "21:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 22:00",
-        "day": "Morgen",
-        "hour": "22:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 22:15",
-        "day": "Morgen",
-        "hour": "22:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 22:30",
-        "day": "Morgen",
-        "hour": "22:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 22:45",
-        "day": "Morgen",
-        "hour": "22:45",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 23:00",
-        "day": "Morgen",
-        "hour": "23:00",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 23:15",
-        "day": "Morgen",
-        "hour": "23:15",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 23:30",
-        "day": "Morgen",
-        "hour": "23:30",
-        "kw": 0.0
-      },
-      {
-        "t": "2026-10-30 23:45",
-        "day": "Morgen",
-        "hour": "23:45",
-        "kw": 0.0
-      },
-      {
         "t": "2026-10-31 00:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "00:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 00:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "00:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 00:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "00:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 00:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "00:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 01:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "01:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 01:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "01:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 01:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "01:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 01:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "01:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 02:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "02:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 02:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "02:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 02:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "02:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 02:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "02:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 03:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "03:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 03:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "03:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 03:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "03:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 03:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "03:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 04:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "04:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 04:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "04:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 04:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "04:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 04:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "04:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 05:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "05:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 05:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "05:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 05:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "05:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 05:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "05:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 06:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "06:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 06:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "06:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 06:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "06:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 06:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "06:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 07:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "07:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 07:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "07:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 07:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "07:30",
         "kw": 0.28
       },
       {
         "t": "2026-10-31 07:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "07:45",
-        "kw": 0.59
+        "kw": 0.78
       },
       {
         "t": "2026-10-31 08:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "08:00",
-        "kw": 0.82
+        "kw": 1.48
       },
       {
         "t": "2026-10-31 08:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "08:15",
-        "kw": 1.22
+        "kw": 2.76
       },
       {
         "t": "2026-10-31 08:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "08:30",
-        "kw": 1.32
+        "kw": 3.89
       },
       {
         "t": "2026-10-31 08:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "08:45",
-        "kw": 2.08
+        "kw": 4.02
       },
       {
         "t": "2026-10-31 09:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "09:00",
-        "kw": 2.56
+        "kw": 4.82
       },
       {
         "t": "2026-10-31 09:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "09:15",
-        "kw": 2.54
+        "kw": 6.46
       },
       {
         "t": "2026-10-31 09:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "09:30",
-        "kw": 2.87
+        "kw": 8.87
       },
       {
         "t": "2026-10-31 09:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "09:45",
-        "kw": 2.56
+        "kw": 11.14
       },
       {
         "t": "2026-10-31 10:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "10:00",
-        "kw": 2.35
+        "kw": 12.0
       },
       {
         "t": "2026-10-31 10:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "10:15",
-        "kw": 2.93
+        "kw": 12.29
       },
       {
         "t": "2026-10-31 10:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "10:30",
-        "kw": 3.28
+        "kw": 12.21
       },
       {
         "t": "2026-10-31 10:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "10:45",
-        "kw": 3.69
+        "kw": 12.66
       },
       {
         "t": "2026-10-31 11:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "11:00",
-        "kw": 3.31
+        "kw": 12.6
       },
       {
         "t": "2026-10-31 11:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "11:15",
-        "kw": 3.22
+        "kw": 12.8
       },
       {
         "t": "2026-10-31 11:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "11:30",
-        "kw": 3.95
+        "kw": 12.91
       },
       {
         "t": "2026-10-31 11:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "11:45",
-        "kw": 6.36
+        "kw": 11.76
       },
       {
         "t": "2026-10-31 12:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "12:00",
-        "kw": 6.07
+        "kw": 12.98
       },
       {
         "t": "2026-10-31 12:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "12:15",
-        "kw": 9.14
+        "kw": 13.62
       },
       {
         "t": "2026-10-31 12:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "12:30",
-        "kw": 8.25
+        "kw": 12.53
       },
       {
         "t": "2026-10-31 12:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "12:45",
-        "kw": 4.73
+        "kw": 12.95
       },
       {
         "t": "2026-10-31 13:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "13:00",
-        "kw": 7.56
+        "kw": 13.09
       },
       {
         "t": "2026-10-31 13:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "13:15",
-        "kw": 5.1
+        "kw": 12.37
       },
       {
         "t": "2026-10-31 13:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "13:30",
-        "kw": 3.69
+        "kw": 11.25
       },
       {
         "t": "2026-10-31 13:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "13:45",
-        "kw": 5.1
+        "kw": 9.68
       },
       {
         "t": "2026-10-31 14:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "14:00",
-        "kw": 4.18
+        "kw": 10.03
       },
       {
         "t": "2026-10-31 14:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "14:15",
-        "kw": 5.19
+        "kw": 9.33
       },
       {
         "t": "2026-10-31 14:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "14:30",
-        "kw": 3.04
+        "kw": 7.53
       },
       {
         "t": "2026-10-31 14:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "14:45",
-        "kw": 2.83
+        "kw": 5.62
       },
       {
         "t": "2026-10-31 15:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "15:00",
-        "kw": 3.63
+        "kw": 4.74
       },
       {
         "t": "2026-10-31 15:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "15:15",
-        "kw": 3.91
+        "kw": 4.32
       },
       {
         "t": "2026-10-31 15:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "15:30",
-        "kw": 2.34
+        "kw": 3.6
       },
       {
         "t": "2026-10-31 15:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "15:45",
-        "kw": 2.94
+        "kw": 2.97
       },
       {
         "t": "2026-10-31 16:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "16:00",
-        "kw": 2.34
+        "kw": 2.74
       },
       {
         "t": "2026-10-31 16:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "16:15",
-        "kw": 1.72
+        "kw": 1.53
       },
       {
         "t": "2026-10-31 16:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "16:30",
-        "kw": 1.01
+        "kw": 0.84
       },
       {
         "t": "2026-10-31 16:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "16:45",
-        "kw": 0.45
+        "kw": 0.26
       },
       {
         "t": "2026-10-31 17:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "17:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 17:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "17:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 17:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "17:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 17:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "17:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 18:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "18:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 18:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "18:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 18:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "18:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 18:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "18:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 19:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "19:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 19:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "19:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 19:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "19:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 19:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "19:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 20:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "20:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 20:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "20:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 20:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "20:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 20:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "20:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 21:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "21:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 21:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "21:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 21:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "21:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 21:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "21:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 22:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "22:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 22:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "22:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 22:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "22:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 22:45",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "22:45",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 23:00",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "23:00",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 23:15",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "23:15",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 23:30",
-        "day": "Übermorgen",
+        "day": "Heute",
         "hour": "23:30",
         "kw": 0.0
       },
       {
         "t": "2026-10-31 23:45",
+        "day": "Heute",
+        "hour": "23:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 00:00",
+        "day": "Morgen",
+        "hour": "00:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 00:15",
+        "day": "Morgen",
+        "hour": "00:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 00:30",
+        "day": "Morgen",
+        "hour": "00:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 00:45",
+        "day": "Morgen",
+        "hour": "00:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 01:00",
+        "day": "Morgen",
+        "hour": "01:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 01:15",
+        "day": "Morgen",
+        "hour": "01:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 01:30",
+        "day": "Morgen",
+        "hour": "01:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 01:45",
+        "day": "Morgen",
+        "hour": "01:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 02:00",
+        "day": "Morgen",
+        "hour": "02:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 02:15",
+        "day": "Morgen",
+        "hour": "02:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 02:30",
+        "day": "Morgen",
+        "hour": "02:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 02:45",
+        "day": "Morgen",
+        "hour": "02:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 03:00",
+        "day": "Morgen",
+        "hour": "03:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 03:15",
+        "day": "Morgen",
+        "hour": "03:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 03:30",
+        "day": "Morgen",
+        "hour": "03:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 03:45",
+        "day": "Morgen",
+        "hour": "03:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 04:00",
+        "day": "Morgen",
+        "hour": "04:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 04:15",
+        "day": "Morgen",
+        "hour": "04:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 04:30",
+        "day": "Morgen",
+        "hour": "04:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 04:45",
+        "day": "Morgen",
+        "hour": "04:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 05:00",
+        "day": "Morgen",
+        "hour": "05:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 05:15",
+        "day": "Morgen",
+        "hour": "05:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 05:30",
+        "day": "Morgen",
+        "hour": "05:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 05:45",
+        "day": "Morgen",
+        "hour": "05:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 06:00",
+        "day": "Morgen",
+        "hour": "06:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 06:15",
+        "day": "Morgen",
+        "hour": "06:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 06:30",
+        "day": "Morgen",
+        "hour": "06:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 06:45",
+        "day": "Morgen",
+        "hour": "06:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 07:00",
+        "day": "Morgen",
+        "hour": "07:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 07:15",
+        "day": "Morgen",
+        "hour": "07:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 07:30",
+        "day": "Morgen",
+        "hour": "07:30",
+        "kw": 0.18
+      },
+      {
+        "t": "2026-11-01 07:45",
+        "day": "Morgen",
+        "hour": "07:45",
+        "kw": 0.24
+      },
+      {
+        "t": "2026-11-01 08:00",
+        "day": "Morgen",
+        "hour": "08:00",
+        "kw": 0.48
+      },
+      {
+        "t": "2026-11-01 08:15",
+        "day": "Morgen",
+        "hour": "08:15",
+        "kw": 0.69
+      },
+      {
+        "t": "2026-11-01 08:30",
+        "day": "Morgen",
+        "hour": "08:30",
+        "kw": 1.14
+      },
+      {
+        "t": "2026-11-01 08:45",
+        "day": "Morgen",
+        "hour": "08:45",
+        "kw": 2.47
+      },
+      {
+        "t": "2026-11-01 09:00",
+        "day": "Morgen",
+        "hour": "09:00",
+        "kw": 1.17
+      },
+      {
+        "t": "2026-11-01 09:15",
+        "day": "Morgen",
+        "hour": "09:15",
+        "kw": 1.98
+      },
+      {
+        "t": "2026-11-01 09:30",
+        "day": "Morgen",
+        "hour": "09:30",
+        "kw": 3.84
+      },
+      {
+        "t": "2026-11-01 09:45",
+        "day": "Morgen",
+        "hour": "09:45",
+        "kw": 1.85
+      },
+      {
+        "t": "2026-11-01 10:00",
+        "day": "Morgen",
+        "hour": "10:00",
+        "kw": 1.78
+      },
+      {
+        "t": "2026-11-01 10:15",
+        "day": "Morgen",
+        "hour": "10:15",
+        "kw": 2.51
+      },
+      {
+        "t": "2026-11-01 10:30",
+        "day": "Morgen",
+        "hour": "10:30",
+        "kw": 1.79
+      },
+      {
+        "t": "2026-11-01 10:45",
+        "day": "Morgen",
+        "hour": "10:45",
+        "kw": 2.56
+      },
+      {
+        "t": "2026-11-01 11:00",
+        "day": "Morgen",
+        "hour": "11:00",
+        "kw": 2.53
+      },
+      {
+        "t": "2026-11-01 11:15",
+        "day": "Morgen",
+        "hour": "11:15",
+        "kw": 2.38
+      },
+      {
+        "t": "2026-11-01 11:30",
+        "day": "Morgen",
+        "hour": "11:30",
+        "kw": 1.59
+      },
+      {
+        "t": "2026-11-01 11:45",
+        "day": "Morgen",
+        "hour": "11:45",
+        "kw": 1.06
+      },
+      {
+        "t": "2026-11-01 12:00",
+        "day": "Morgen",
+        "hour": "12:00",
+        "kw": 2.38
+      },
+      {
+        "t": "2026-11-01 12:15",
+        "day": "Morgen",
+        "hour": "12:15",
+        "kw": 3.25
+      },
+      {
+        "t": "2026-11-01 12:30",
+        "day": "Morgen",
+        "hour": "12:30",
+        "kw": 2.99
+      },
+      {
+        "t": "2026-11-01 12:45",
+        "day": "Morgen",
+        "hour": "12:45",
+        "kw": 2.63
+      },
+      {
+        "t": "2026-11-01 13:00",
+        "day": "Morgen",
+        "hour": "13:00",
+        "kw": 4.09
+      },
+      {
+        "t": "2026-11-01 13:15",
+        "day": "Morgen",
+        "hour": "13:15",
+        "kw": 3.05
+      },
+      {
+        "t": "2026-11-01 13:30",
+        "day": "Morgen",
+        "hour": "13:30",
+        "kw": 3.52
+      },
+      {
+        "t": "2026-11-01 13:45",
+        "day": "Morgen",
+        "hour": "13:45",
+        "kw": 4.36
+      },
+      {
+        "t": "2026-11-01 14:00",
+        "day": "Morgen",
+        "hour": "14:00",
+        "kw": 4.26
+      },
+      {
+        "t": "2026-11-01 14:15",
+        "day": "Morgen",
+        "hour": "14:15",
+        "kw": 6.09
+      },
+      {
+        "t": "2026-11-01 14:30",
+        "day": "Morgen",
+        "hour": "14:30",
+        "kw": 3.63
+      },
+      {
+        "t": "2026-11-01 14:45",
+        "day": "Morgen",
+        "hour": "14:45",
+        "kw": 2.14
+      },
+      {
+        "t": "2026-11-01 15:00",
+        "day": "Morgen",
+        "hour": "15:00",
+        "kw": 2.19
+      },
+      {
+        "t": "2026-11-01 15:15",
+        "day": "Morgen",
+        "hour": "15:15",
+        "kw": 1.77
+      },
+      {
+        "t": "2026-11-01 15:30",
+        "day": "Morgen",
+        "hour": "15:30",
+        "kw": 1.29
+      },
+      {
+        "t": "2026-11-01 15:45",
+        "day": "Morgen",
+        "hour": "15:45",
+        "kw": 1.51
+      },
+      {
+        "t": "2026-11-01 16:00",
+        "day": "Morgen",
+        "hour": "16:00",
+        "kw": 1.06
+      },
+      {
+        "t": "2026-11-01 16:15",
+        "day": "Morgen",
+        "hour": "16:15",
+        "kw": 0.91
+      },
+      {
+        "t": "2026-11-01 16:30",
+        "day": "Morgen",
+        "hour": "16:30",
+        "kw": 0.66
+      },
+      {
+        "t": "2026-11-01 16:45",
+        "day": "Morgen",
+        "hour": "16:45",
+        "kw": 0.37
+      },
+      {
+        "t": "2026-11-01 17:00",
+        "day": "Morgen",
+        "hour": "17:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 17:15",
+        "day": "Morgen",
+        "hour": "17:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 17:30",
+        "day": "Morgen",
+        "hour": "17:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 17:45",
+        "day": "Morgen",
+        "hour": "17:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 18:00",
+        "day": "Morgen",
+        "hour": "18:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 18:15",
+        "day": "Morgen",
+        "hour": "18:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 18:30",
+        "day": "Morgen",
+        "hour": "18:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 18:45",
+        "day": "Morgen",
+        "hour": "18:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 19:00",
+        "day": "Morgen",
+        "hour": "19:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 19:15",
+        "day": "Morgen",
+        "hour": "19:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 19:30",
+        "day": "Morgen",
+        "hour": "19:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 19:45",
+        "day": "Morgen",
+        "hour": "19:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 20:00",
+        "day": "Morgen",
+        "hour": "20:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 20:15",
+        "day": "Morgen",
+        "hour": "20:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 20:30",
+        "day": "Morgen",
+        "hour": "20:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 20:45",
+        "day": "Morgen",
+        "hour": "20:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 21:00",
+        "day": "Morgen",
+        "hour": "21:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 21:15",
+        "day": "Morgen",
+        "hour": "21:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 21:30",
+        "day": "Morgen",
+        "hour": "21:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 21:45",
+        "day": "Morgen",
+        "hour": "21:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 22:00",
+        "day": "Morgen",
+        "hour": "22:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 22:15",
+        "day": "Morgen",
+        "hour": "22:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 22:30",
+        "day": "Morgen",
+        "hour": "22:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 22:45",
+        "day": "Morgen",
+        "hour": "22:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 23:00",
+        "day": "Morgen",
+        "hour": "23:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 23:15",
+        "day": "Morgen",
+        "hour": "23:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 23:30",
+        "day": "Morgen",
+        "hour": "23:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-01 23:45",
+        "day": "Morgen",
+        "hour": "23:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 00:00",
+        "day": "Übermorgen",
+        "hour": "00:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 00:15",
+        "day": "Übermorgen",
+        "hour": "00:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 00:30",
+        "day": "Übermorgen",
+        "hour": "00:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 00:45",
+        "day": "Übermorgen",
+        "hour": "00:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 01:00",
+        "day": "Übermorgen",
+        "hour": "01:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 01:15",
+        "day": "Übermorgen",
+        "hour": "01:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 01:30",
+        "day": "Übermorgen",
+        "hour": "01:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 01:45",
+        "day": "Übermorgen",
+        "hour": "01:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 02:00",
+        "day": "Übermorgen",
+        "hour": "02:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 02:15",
+        "day": "Übermorgen",
+        "hour": "02:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 02:30",
+        "day": "Übermorgen",
+        "hour": "02:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 02:45",
+        "day": "Übermorgen",
+        "hour": "02:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 03:00",
+        "day": "Übermorgen",
+        "hour": "03:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 03:15",
+        "day": "Übermorgen",
+        "hour": "03:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 03:30",
+        "day": "Übermorgen",
+        "hour": "03:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 03:45",
+        "day": "Übermorgen",
+        "hour": "03:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 04:00",
+        "day": "Übermorgen",
+        "hour": "04:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 04:15",
+        "day": "Übermorgen",
+        "hour": "04:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 04:30",
+        "day": "Übermorgen",
+        "hour": "04:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 04:45",
+        "day": "Übermorgen",
+        "hour": "04:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 05:00",
+        "day": "Übermorgen",
+        "hour": "05:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 05:15",
+        "day": "Übermorgen",
+        "hour": "05:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 05:30",
+        "day": "Übermorgen",
+        "hour": "05:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 05:45",
+        "day": "Übermorgen",
+        "hour": "05:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 06:00",
+        "day": "Übermorgen",
+        "hour": "06:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 06:15",
+        "day": "Übermorgen",
+        "hour": "06:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 06:30",
+        "day": "Übermorgen",
+        "hour": "06:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 06:45",
+        "day": "Übermorgen",
+        "hour": "06:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 07:00",
+        "day": "Übermorgen",
+        "hour": "07:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 07:15",
+        "day": "Übermorgen",
+        "hour": "07:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 07:30",
+        "day": "Übermorgen",
+        "hour": "07:30",
+        "kw": 0.25
+      },
+      {
+        "t": "2026-11-02 07:45",
+        "day": "Übermorgen",
+        "hour": "07:45",
+        "kw": 0.37
+      },
+      {
+        "t": "2026-11-02 08:00",
+        "day": "Übermorgen",
+        "hour": "08:00",
+        "kw": 0.67
+      },
+      {
+        "t": "2026-11-02 08:15",
+        "day": "Übermorgen",
+        "hour": "08:15",
+        "kw": 0.7
+      },
+      {
+        "t": "2026-11-02 08:30",
+        "day": "Übermorgen",
+        "hour": "08:30",
+        "kw": 1.44
+      },
+      {
+        "t": "2026-11-02 08:45",
+        "day": "Übermorgen",
+        "hour": "08:45",
+        "kw": 1.58
+      },
+      {
+        "t": "2026-11-02 09:00",
+        "day": "Übermorgen",
+        "hour": "09:00",
+        "kw": 1.91
+      },
+      {
+        "t": "2026-11-02 09:15",
+        "day": "Übermorgen",
+        "hour": "09:15",
+        "kw": 2.5
+      },
+      {
+        "t": "2026-11-02 09:30",
+        "day": "Übermorgen",
+        "hour": "09:30",
+        "kw": 3.4
+      },
+      {
+        "t": "2026-11-02 09:45",
+        "day": "Übermorgen",
+        "hour": "09:45",
+        "kw": 3.33
+      },
+      {
+        "t": "2026-11-02 10:00",
+        "day": "Übermorgen",
+        "hour": "10:00",
+        "kw": 3.52
+      },
+      {
+        "t": "2026-11-02 10:15",
+        "day": "Übermorgen",
+        "hour": "10:15",
+        "kw": 3.68
+      },
+      {
+        "t": "2026-11-02 10:30",
+        "day": "Übermorgen",
+        "hour": "10:30",
+        "kw": 2.98
+      },
+      {
+        "t": "2026-11-02 10:45",
+        "day": "Übermorgen",
+        "hour": "10:45",
+        "kw": 3.4
+      },
+      {
+        "t": "2026-11-02 11:00",
+        "day": "Übermorgen",
+        "hour": "11:00",
+        "kw": 3.0
+      },
+      {
+        "t": "2026-11-02 11:15",
+        "day": "Übermorgen",
+        "hour": "11:15",
+        "kw": 3.88
+      },
+      {
+        "t": "2026-11-02 11:30",
+        "day": "Übermorgen",
+        "hour": "11:30",
+        "kw": 3.85
+      },
+      {
+        "t": "2026-11-02 11:45",
+        "day": "Übermorgen",
+        "hour": "11:45",
+        "kw": 2.73
+      },
+      {
+        "t": "2026-11-02 12:00",
+        "day": "Übermorgen",
+        "hour": "12:00",
+        "kw": 2.19
+      },
+      {
+        "t": "2026-11-02 12:15",
+        "day": "Übermorgen",
+        "hour": "12:15",
+        "kw": 3.08
+      },
+      {
+        "t": "2026-11-02 12:30",
+        "day": "Übermorgen",
+        "hour": "12:30",
+        "kw": 3.52
+      },
+      {
+        "t": "2026-11-02 12:45",
+        "day": "Übermorgen",
+        "hour": "12:45",
+        "kw": 2.06
+      },
+      {
+        "t": "2026-11-02 13:00",
+        "day": "Übermorgen",
+        "hour": "13:00",
+        "kw": 2.32
+      },
+      {
+        "t": "2026-11-02 13:15",
+        "day": "Übermorgen",
+        "hour": "13:15",
+        "kw": 3.05
+      },
+      {
+        "t": "2026-11-02 13:30",
+        "day": "Übermorgen",
+        "hour": "13:30",
+        "kw": 2.1
+      },
+      {
+        "t": "2026-11-02 13:45",
+        "day": "Übermorgen",
+        "hour": "13:45",
+        "kw": 1.55
+      },
+      {
+        "t": "2026-11-02 14:00",
+        "day": "Übermorgen",
+        "hour": "14:00",
+        "kw": 1.83
+      },
+      {
+        "t": "2026-11-02 14:15",
+        "day": "Übermorgen",
+        "hour": "14:15",
+        "kw": 1.88
+      },
+      {
+        "t": "2026-11-02 14:30",
+        "day": "Übermorgen",
+        "hour": "14:30",
+        "kw": 1.89
+      },
+      {
+        "t": "2026-11-02 14:45",
+        "day": "Übermorgen",
+        "hour": "14:45",
+        "kw": 1.93
+      },
+      {
+        "t": "2026-11-02 15:00",
+        "day": "Übermorgen",
+        "hour": "15:00",
+        "kw": 1.49
+      },
+      {
+        "t": "2026-11-02 15:15",
+        "day": "Übermorgen",
+        "hour": "15:15",
+        "kw": 1.94
+      },
+      {
+        "t": "2026-11-02 15:30",
+        "day": "Übermorgen",
+        "hour": "15:30",
+        "kw": 1.15
+      },
+      {
+        "t": "2026-11-02 15:45",
+        "day": "Übermorgen",
+        "hour": "15:45",
+        "kw": 0.82
+      },
+      {
+        "t": "2026-11-02 16:00",
+        "day": "Übermorgen",
+        "hour": "16:00",
+        "kw": 0.58
+      },
+      {
+        "t": "2026-11-02 16:15",
+        "day": "Übermorgen",
+        "hour": "16:15",
+        "kw": 0.38
+      },
+      {
+        "t": "2026-11-02 16:30",
+        "day": "Übermorgen",
+        "hour": "16:30",
+        "kw": 0.19
+      },
+      {
+        "t": "2026-11-02 16:45",
+        "day": "Übermorgen",
+        "hour": "16:45",
+        "kw": 0.07
+      },
+      {
+        "t": "2026-11-02 17:00",
+        "day": "Übermorgen",
+        "hour": "17:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 17:15",
+        "day": "Übermorgen",
+        "hour": "17:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 17:30",
+        "day": "Übermorgen",
+        "hour": "17:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 17:45",
+        "day": "Übermorgen",
+        "hour": "17:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 18:00",
+        "day": "Übermorgen",
+        "hour": "18:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 18:15",
+        "day": "Übermorgen",
+        "hour": "18:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 18:30",
+        "day": "Übermorgen",
+        "hour": "18:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 18:45",
+        "day": "Übermorgen",
+        "hour": "18:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 19:00",
+        "day": "Übermorgen",
+        "hour": "19:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 19:15",
+        "day": "Übermorgen",
+        "hour": "19:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 19:30",
+        "day": "Übermorgen",
+        "hour": "19:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 19:45",
+        "day": "Übermorgen",
+        "hour": "19:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 20:00",
+        "day": "Übermorgen",
+        "hour": "20:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 20:15",
+        "day": "Übermorgen",
+        "hour": "20:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 20:30",
+        "day": "Übermorgen",
+        "hour": "20:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 20:45",
+        "day": "Übermorgen",
+        "hour": "20:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 21:00",
+        "day": "Übermorgen",
+        "hour": "21:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 21:15",
+        "day": "Übermorgen",
+        "hour": "21:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 21:30",
+        "day": "Übermorgen",
+        "hour": "21:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 21:45",
+        "day": "Übermorgen",
+        "hour": "21:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 22:00",
+        "day": "Übermorgen",
+        "hour": "22:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 22:15",
+        "day": "Übermorgen",
+        "hour": "22:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 22:30",
+        "day": "Übermorgen",
+        "hour": "22:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 22:45",
+        "day": "Übermorgen",
+        "hour": "22:45",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 23:00",
+        "day": "Übermorgen",
+        "hour": "23:00",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 23:15",
+        "day": "Übermorgen",
+        "hour": "23:15",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 23:30",
+        "day": "Übermorgen",
+        "hour": "23:30",
+        "kw": 0.0
+      },
+      {
+        "t": "2026-11-02 23:45",
         "day": "Übermorgen",
         "hour": "23:45",
         "kw": 0.0
@@ -2022,7 +2022,7 @@
         "price_per_kwh": 0.15,
         "total_cost": 3.19,
         "transfer_status": "SUCCESS",
-        "transfer_at": null,
+        "transfer_at": "2026-10-29 18:32:41",
         "charged_at": "2026-10-29 06:48:23",
         "note": "Übernommen von Wallbox (Session #5)"
       },
@@ -2069,13 +2069,13 @@
     "inverters": [
       {
         "wr_number": 1,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 17717,
+        "daysum": 17194,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 17.72,
+        "daysum_kwh": 17.19,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2083,13 +2083,13 @@
       },
       {
         "wr_number": 2,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 29485,
+        "daysum": 25196,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 29.48,
+        "daysum_kwh": 25.2,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2097,13 +2097,13 @@
       },
       {
         "wr_number": 3,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 17678,
+        "daysum": 17177,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 17.68,
+        "daysum_kwh": 17.18,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2111,13 +2111,13 @@
       },
       {
         "wr_number": 4,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 29156,
+        "daysum": 24898,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 29.16,
+        "daysum_kwh": 24.9,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2125,13 +2125,13 @@
       },
       {
         "wr_number": 5,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 17606,
+        "daysum": 17085,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 17.61,
+        "daysum_kwh": 17.09,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2139,13 +2139,13 @@
       },
       {
         "wr_number": 6,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 17935,
+        "daysum": 17390,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 17.93,
+        "daysum_kwh": 17.39,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2153,13 +2153,13 @@
       },
       {
         "wr_number": 7,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 16539,
+        "daysum": 16051,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 16.54,
+        "daysum_kwh": 16.05,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2167,13 +2167,13 @@
       },
       {
         "wr_number": 8,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 22068,
+        "daysum": 18785,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 22.07,
+        "daysum_kwh": 18.79,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2181,13 +2181,13 @@
       },
       {
         "wr_number": 9,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 29455,
+        "daysum": 25879,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 29.45,
+        "daysum_kwh": 25.88,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2195,13 +2195,13 @@
       },
       {
         "wr_number": 10,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 28179,
+        "daysum": 24904,
         "status": 2,
         "error": 0,
         "status_text": "Status 2, Error 0",
-        "daysum_kwh": 28.18,
+        "daysum_kwh": 24.9,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2209,13 +2209,13 @@
       },
       {
         "wr_number": 11,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 31250,
+        "daysum": 27367,
         "status": 2,
         "error": 0,
         "status_text": "Status 2, Error 0",
-        "daysum_kwh": 31.25,
+        "daysum_kwh": 27.37,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2223,13 +2223,13 @@
       },
       {
         "wr_number": 12,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 33144,
+        "daysum": 29271,
         "status": 2,
         "error": 0,
         "status_text": "Status 2, Error 0",
-        "daysum_kwh": 33.14,
+        "daysum_kwh": 29.27,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2237,13 +2237,13 @@
       },
       {
         "wr_number": 13,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 33086,
+        "daysum": 29176,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 33.09,
+        "daysum_kwh": 29.18,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2251,13 +2251,13 @@
       },
       {
         "wr_number": 14,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 31600,
+        "daysum": 27361,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 31.6,
+        "daysum_kwh": 27.36,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2265,7 +2265,7 @@
       },
       {
         "wr_number": 15,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
         "daysum": 0,
         "status": 0,
@@ -2279,13 +2279,13 @@
       },
       {
         "wr_number": 16,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
-        "daysum": 30471,
+        "daysum": 26898,
         "status": 0,
         "error": 0,
         "status_text": "Status 0, Error 0",
-        "daysum_kwh": 30.47,
+        "daysum_kwh": 26.9,
         "pac_kw": 0.0,
         "state_category": "standby",
         "state_badge": "Standby (0 W)",
@@ -2293,7 +2293,7 @@
       },
       {
         "wr_number": 17,
-        "last_update": "2026-10-29T17:30:00",
+        "last_update": "2026-10-31T17:29:00",
         "pac": 0,
         "daysum": 0,
         "status": 0,
@@ -2307,11 +2307,11 @@
       }
     ],
     "total_pac": 0.0,
-    "total_daysum_kwh": 385.37,
+    "total_daysum_kwh": 344.63,
     "active_count": 0,
     "standby_count": 17,
     "error_count": 0,
-    "last_update": "2026-10-29T17:30:00"
+    "last_update": "2026-10-31T17:29:00"
   },
   "auth": {
     "bot_username": "evcc_bayrhof_bot",
