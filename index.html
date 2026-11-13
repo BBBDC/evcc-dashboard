@@ -15,6 +15,24 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="EVCC">
   <meta name="theme-color" content="#f59e0b">
+
+  <!-- Immediate Theme Application (Prevents FOUC) -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('evcc_theme_mode') || 'auto';
+      let effective = saved;
+      if (saved === 'auto') {
+        effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      if (effective === 'dark') {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+    })();
+  </script>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -56,45 +74,324 @@
       }
     };
   </script>
-  <style>
+    <style>
+    /* =========================================================================
+       APPLE "LIQUID GLASS" DESIGN SYSTEM (iOS 26 / macOS 26)
+       ========================================================================= */
+    :root {
+      --liquid-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", -system-ui, "Segoe UI", Roboto, sans-serif;
+      --spring-bounce: cubic-bezier(0.22, 1.2, 0.36, 1);
+      --spring-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* Light Mode Glass Tokens */
+      --glass-surface-bg: rgba(255, 255, 255, 0.52);
+      --glass-surface-bg-hover: rgba(255, 255, 255, 0.72);
+      --glass-surface-blur: blur(24px) saturate(180%) brightness(1.05);
+      --glass-surface-border: 1px solid rgba(255, 255, 255, 0.65);
+      --glass-surface-border-specular: 1px solid rgba(255, 255, 255, 0.85);
+      --glass-surface-shadow: 
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 1px 0 rgba(255, 255, 255, 0.25),
+        0 12px 32px -4px rgba(15, 23, 42, 0.07),
+        0 4px 12px -2px rgba(15, 23, 42, 0.03);
+
+      /* Floating Navigation & Pills */
+      --glass-floating-bg: rgba(255, 255, 255, 0.72);
+      --glass-floating-blur: blur(28px) saturate(190%) brightness(1.08);
+      --glass-floating-shadow: 
+        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.98),
+        0 20px 48px -8px rgba(15, 23, 42, 0.12),
+        0 4px 14px -1px rgba(15, 23, 42, 0.05);
+
+      /* Nested Tiles & Inputs */
+      --glass-nested-bg: rgba(255, 255, 255, 0.55);
+      --glass-nested-border: 1px solid rgba(255, 255, 255, 0.7);
+
+      /* Spotlight Glow */
+      --glass-spotlight: rgba(255, 255, 255, 0.32);
+
+      color-scheme: light;
+    }
+
+    html.dark {
+      /* Dark Mode Glass Tokens */
+      --glass-surface-bg: rgba(24, 30, 48, 0.48);
+      --glass-surface-bg-hover: rgba(32, 40, 64, 0.65);
+      --glass-surface-blur: blur(28px) saturate(190%) brightness(1.02);
+      --glass-surface-border: 1px solid rgba(255, 255, 255, 0.14);
+      --glass-surface-border-specular: 1px solid rgba(255, 255, 255, 0.24);
+      --glass-surface-shadow: 
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 1px 0 rgba(0, 0, 0, 0.45),
+        0 16px 36px -6px rgba(0, 0, 0, 0.5),
+        0 4px 14px -2px rgba(0, 0, 0, 0.35);
+
+      /* Floating Navigation & Pills */
+      --glass-floating-bg: rgba(18, 24, 38, 0.75);
+      --glass-floating-blur: blur(32px) saturate(200%) brightness(1.04);
+      --glass-floating-shadow: 
+        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.28),
+        0 24px 56px -10px rgba(0, 0, 0, 0.7),
+        0 6px 18px -2px rgba(0, 0, 0, 0.45);
+
+      /* Nested Tiles & Inputs */
+      --glass-nested-bg: rgba(15, 20, 32, 0.55);
+      --glass-nested-border: 1px solid rgba(255, 255, 255, 0.08);
+
+      /* Spotlight Glow */
+      --glass-spotlight: rgba(255, 255, 255, 0.14);
+
+      color-scheme: dark;
+    }
+
     html, body {
+      font-family: var(--liquid-font);
       overscroll-behavior-y: contain;
       -webkit-overflow-scrolling: touch;
+      letter-spacing: -0.012em;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+
+    body {
+      background-color: #f6f8fc;
+      min-height: 100vh;
+    }
+    html.dark body {
+      background-color: #080c16;
+    }
+
+    h1, h2, h3, .font-heading {
+      letter-spacing: -0.025em;
+    }
+
+    /* Ambient Pulsing Animations */
+    @keyframes liquid-drift-1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(35px, 25px) scale(1.1); }
+    }
+    @keyframes liquid-drift-2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-30px, -35px) scale(1.08); }
+    }
+    @keyframes liquid-drift-3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(25px, -30px) scale(1.12); }
+    }
+    .animate-liquid-pulse-1 {
+      animation: liquid-drift-1 16s ease-in-out infinite;
+    }
+    .animate-liquid-pulse-2 {
+      animation: liquid-drift-2 20s ease-in-out infinite;
+    }
+    .animate-liquid-pulse-3 {
+      animation: liquid-drift-3 18s ease-in-out infinite;
+    }
+
     @keyframes pulse-subtle {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(1.08); }
+      50% { opacity: 0.65; transform: scale(1.12); }
     }
     .pulse-dot {
       animation: pulse-subtle 2s infinite ease-in-out;
     }
-    .card-clean {
-      background-color: #ffffff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+
+    /* Apple Liquid Glass Surface */
+    .card-clean, .liquid-card {
+      position: relative;
+      background: var(--glass-surface-bg) !important;
+      backdrop-filter: var(--glass-surface-blur);
+      -webkit-backdrop-filter: var(--glass-surface-blur);
+      border: var(--glass-surface-border) !important;
+      box-shadow: var(--glass-surface-shadow) !important;
+      border-radius: 26px;
+      transition: transform 0.35s var(--spring-bounce), box-shadow 0.35s var(--spring-smooth), background-color 0.25s ease;
+      overflow: hidden;
     }
-    .card-clean:hover {
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    .card-clean:hover, .liquid-card:hover {
+      transform: translateY(-2px) scale(1.008);
+      background: var(--glass-surface-bg-hover) !important;
+      box-shadow: 
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.98),
+        inset 0 -1px 1px 0 rgba(255, 255, 255, 0.3),
+        0 18px 42px -6px rgba(15, 23, 42, 0.11),
+        0 6px 16px -2px rgba(15, 23, 42, 0.05) !important;
+    }
+    html.dark .card-clean:hover, html.dark .liquid-card:hover {
+      box-shadow: 
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 -1px 1px 0 rgba(0, 0, 0, 0.5),
+        0 20px 44px -6px rgba(0, 0, 0, 0.55),
+        0 6px 16px -2px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    /* Floating Island (Navigation, Header, Bottom Nav) */
+    .liquid-floating-island {
+      background: var(--glass-floating-bg) !important;
+      backdrop-filter: var(--glass-floating-blur);
+      -webkit-backdrop-filter: var(--glass-floating-blur);
+      border: var(--glass-surface-border-specular) !important;
+      box-shadow: var(--glass-floating-shadow) !important;
+      transition: transform 0.35s var(--spring-bounce), box-shadow 0.35s var(--spring-smooth);
+    }
+
+    /* Modal Frosted Glass */
+    .liquid-modal-glass {
+      background: var(--glass-floating-bg) !important;
+      backdrop-filter: blur(36px) saturate(200%) brightness(1.05);
+      -webkit-backdrop-filter: blur(36px) saturate(200%) brightness(1.05);
+      border: var(--glass-surface-border-specular) !important;
+      box-shadow: 
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.95),
+        0 32px 64px -12px rgba(15, 23, 42, 0.3),
+        0 12px 24px -4px rgba(15, 23, 42, 0.15) !important;
+    }
+    html.dark .liquid-modal-glass {
+      box-shadow: 
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.25),
+        0 32px 64px -12px rgba(0, 0, 0, 0.75),
+        0 12px 24px -4px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Concentric Nested Tiles inside Cards (R_innen = R_aussen - Padding) */
+    .liquid-nested-tile,
+    .card-clean .bg-slate-50,
+    .card-clean .bg-slate-100,
+    .card-clean .bg-white\/80 {
+      background-color: var(--glass-nested-bg) !important;
+      border-color: var(--glass-nested-border) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 14px;
+    }
+
+    /* Interactive Cursor-Tracking Spotlight */
+    .liquid-spotlight {
+      position: relative;
+    }
+    .liquid-spotlight::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--glass-spotlight), transparent 70%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+    .liquid-spotlight:hover::before {
+      opacity: 1;
+    }
+
+    /* Spring Button Physics */
+    .liquid-btn {
+      transition: transform 0.25s var(--spring-bounce), background-color 0.2s ease, box-shadow 0.25s ease, color 0.2s ease;
+    }
+    .liquid-btn:hover {
+      transform: scale(1.03);
+    }
+    .liquid-btn:active {
+      transform: scale(0.97);
+    }
+
+    .liquid-nav-pill {
+      transition: transform 0.25s var(--spring-bounce), background 0.2s ease, box-shadow 0.25s ease, color 0.2s ease;
+    }
+    .liquid-nav-pill:hover {
+      transform: scale(1.025);
+    }
+    .liquid-nav-pill:active {
+      transform: scale(0.97);
+    }
+
+    /* Frosted Tables */
+    table thead tr {
+      background-color: rgba(255, 255, 255, 0.35) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    html.dark table thead tr {
+      background-color: rgba(15, 20, 32, 0.55) !important;
+      color: #94a3b8 !important;
+    }
+    table tbody tr {
+      background-color: transparent !important;
+      transition: background-color 0.2s ease;
+    }
+    table tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.4) !important;
+    }
+    html.dark table tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    /* Dark Mode Palette Harmonization */
+    html.dark .text-slate-900 {
+      color: #f8fafc !important;
+    }
+    html.dark .text-slate-800 {
+      color: #f1f5f9 !important;
+    }
+    html.dark .text-slate-700 {
+      color: #e2e8f0 !important;
+    }
+    html.dark .text-slate-600 {
+      color: #cbd5e1 !important;
+    }
+    html.dark .text-slate-500 {
+      color: #94a3b8 !important;
+    }
+    html.dark .text-slate-400 {
+      color: #64748b !important;
+    }
+    html.dark .border-slate-100,
+    html.dark .border-slate-200,
+    html.dark .border-slate-300 {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    html.dark input[type="text"],
+    html.dark select {
+      background-color: rgba(18, 24, 38, 0.7) !important;
+      color: #f8fafc !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+    html.dark input[type="text"]::placeholder {
+      color: #64748b !important;
+    }
+
+    /* Safe Area Insets for iOS PWA */
+    @supports (padding: max(0px)) {
+      .safe-bottom-space {
+        padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+      }
     }
   </style>
 </head>
-<body class="bg-slate-100/70 text-slate-800 min-h-screen font-sans antialiased pb-28 sm:pb-20 selection:bg-amber-100 selection:text-amber-900">
+<body class="text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased pb-32 sm:pb-24 selection:bg-amber-400/30 selection:text-amber-900 dark:selection:text-amber-200 relative overflow-x-hidden">
 
-  <!-- TELEGRAM AUTHENTICATION GATE OVERLAY -->
-  <div id="telegram-auth-gate" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 transition-all duration-300">
-    <div class="w-full max-w-md rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-2xl text-center space-y-5 relative overflow-hidden">
+  <!-- LIVING MESH GRADIENT STAGE (Apple Liquid Glass Optical Stage) -->
+  <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-32 -left-32 w-[540px] h-[540px] rounded-full bg-gradient-to-br from-amber-400/25 via-amber-300/15 to-transparent dark:from-amber-500/18 dark:via-amber-600/10 blur-[120px] animate-liquid-pulse-1"></div>
+    <div class="absolute top-1/4 -right-36 w-[620px] h-[620px] rounded-full bg-gradient-to-br from-emerald-400/20 via-teal-300/12 to-transparent dark:from-emerald-500/14 dark:via-teal-600/08 blur-[130px] animate-liquid-pulse-2"></div>
+    <div class="absolute bottom-16 left-1/4 w-[580px] h-[580px] rounded-full bg-gradient-to-br from-cyan-400/20 via-sky-300/12 to-transparent dark:from-cyan-500/14 dark:via-sky-600/08 blur-[125px] animate-liquid-pulse-3"></div>
+    <div class="absolute top-2/3 right-1/4 w-[480px] h-[480px] rounded-full bg-gradient-to-br from-indigo-400/16 via-purple-300/10 to-transparent dark:from-indigo-500/12 dark:via-purple-600/06 blur-[115px] animate-liquid-pulse-1"></div>
+  </div>
+
+  <!-- TELEGRAM AUTHENTICATION GATE OVERLAY (Apple Liquid Glass Modal) -->
+  <div id="telegram-auth-gate" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/60 backdrop-blur-xl p-4 transition-all duration-300">
+    <div class="w-full max-w-md rounded-3xl liquid-modal-glass p-6 sm:p-8 text-center space-y-5 relative overflow-hidden">
       <!-- Glow background accents -->
-      <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -top-24 -left-24 w-52 h-52 bg-amber-500/25 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-52 h-52 bg-emerald-500/25 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- Icon -->
-      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center mx-auto text-3xl shadow-lg shadow-amber-500/30">
+      <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center mx-auto text-3xl shadow-xl shadow-amber-500/30 ring-1 ring-white/50">
         ⚡
       </div>
 
       <div>
-        <h2 class="text-xl font-bold text-slate-900 tracking-tight">EVCC Bayrhof Steuerung</h2>
-        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">EVCC Bayrhof Steuerung</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
           Privater Zugang für Mitglieder der Telegram-Gruppe <strong>EVCC Bayrhof Steuerung</strong>. Bitte melde dich über Telegram an, um das Dashboard freizuschalten.
         </p>
       </div>
@@ -115,14 +412,14 @@
 
       <!-- Fallback / Alternative Login -->
       <div class="pt-1">
-        <button type="button" onclick="toggleFallbackLogin()" class="text-[11px] text-slate-500 hover:text-amber-600 transition cursor-pointer underline">
+        <button type="button" onclick="toggleFallbackLogin()" class="text-[11px] text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition cursor-pointer underline">
           Alternative: Über Benutzernamen oder User-ID anmelden
         </button>
-        <div id="fallback-login-container" class="hidden mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-left">
-          <label class="block text-[11px] text-slate-600 font-medium">Telegram Benutzername oder numerische User-ID:</label>
+        <div id="fallback-login-container" class="hidden mt-3 p-3.5 rounded-2xl liquid-nested-tile space-y-2.5 text-left">
+          <label class="block text-[11px] text-slate-600 dark:text-slate-300 font-medium">Telegram Benutzername oder numerische User-ID:</label>
           <div class="flex gap-2">
-            <input type="text" id="fallback-username-input" placeholder="z. B. Bdc_Gumb_Drop oder 8959373672" class="flex-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-xs text-slate-800 focus:outline-none focus:border-amber-500" onkeydown="if(event.key==='Enter') submitFallbackLogin()">
-            <button type="button" onclick="submitFallbackLogin()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition cursor-pointer shadow-sm">
+            <input type="text" id="fallback-username-input" placeholder="z. B. Bdc_Gumb_Drop oder 8959373672" class="flex-1 px-3 py-1.5 rounded-xl bg-white/70 dark:bg-slate-900/70 border border-slate-300 dark:border-white/10 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition" onkeydown="if(event.key==='Enter') submitFallbackLogin()">
+            <button type="button" onclick="submitFallbackLogin()" class="liquid-btn px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs transition cursor-pointer shadow-md shadow-amber-500/25">
               Login
             </button>
           </div>
@@ -130,16 +427,16 @@
       </div>
 
       <!-- Footer Info -->
-      <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+      <div class="pt-3 border-t border-slate-200/50 dark:border-white/10 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
         <p>Zugriff nur für autorisierte Gruppenmitglieder.</p>
-        <p>Noch nicht freigeschaltet? Öffne <a href="https://t.me/evcc_bayrhof_bot" target="_blank" class="text-amber-600 hover:text-amber-700 font-semibold underline">@evcc_bayrhof_bot</a> und sende <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700 font-mono">/start</code>.</p>
+        <p>Noch nicht freigeschaltet? Öffne <a href="https://t.me/evcc_bayrhof_bot" target="_blank" class="text-amber-600 dark:text-amber-400 hover:underline font-semibold">@evcc_bayrhof_bot</a> und sende <code class="bg-white/50 dark:bg-white/10 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300 font-mono text-[10px]">/start</code>.</p>
       </div>
     </div>
   </div>
 
-  <!-- PULL TO REFRESH INDICATOR (iOS Standalone & Mobile) -->
+  <!-- PULL TO REFRESH INDICATOR (Apple Liquid Glass Floating Pill) -->
   <div id="ptr-indicator" class="fixed inset-x-0 z-[100] flex justify-center pointer-events-none transition-transform duration-200 ease-out" style="top: max(env(safe-area-inset-top, 0px), 12px); transform: translateY(-160%);">
-    <div id="ptr-pill" class="px-4 py-2 rounded-full bg-slate-900/95 text-white shadow-xl backdrop-blur-md border border-slate-700/60 flex items-center gap-2.5 text-xs font-semibold select-none transition-all duration-200">
+    <div id="ptr-pill" class="px-4 py-2 rounded-full liquid-floating-island text-slate-900 dark:text-white flex items-center gap-2.5 text-xs font-semibold select-none shadow-2xl">
       <div id="ptr-icon-box" class="w-4 h-4 flex items-center justify-center transition-transform duration-150">
         <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14M19 12l-7 7-7-7"/>
@@ -149,83 +446,90 @@
     </div>
   </div>
 
-  <!-- TOP HEADER -->
-  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-sm pt-[env(safe-area-inset-top,0px)]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+  <!-- FLOATING TOP HEADER ISLAND (Apple Liquid Glass Architecture) -->
+  <header class="sticky top-2 sm:top-4 z-50 px-3 sm:px-6 max-w-7xl mx-auto pt-[env(safe-area-inset-top,0px)]">
+    <div class="liquid-floating-island px-4 sm:px-6 py-3 rounded-2xl sm:rounded-full flex flex-wrap items-center justify-between gap-3 sm:gap-4">
       
       <!-- Brand & Title -->
-      <div class="flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/25">
-          <i data-lucide="zap" class="w-6 h-6 stroke-[2.2]"></i>
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-lg shadow-amber-500/30 ring-1 ring-white/50">
+          <i data-lucide="zap" class="w-5 h-5 stroke-[2.4]"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg font-bold text-slate-900 tracking-tight">EVCC & Solar-Log Zentrale</h1>
-            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200/80">Live</span>
+            <h1 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">EVCC & Solar-Log Zentrale</h1>
+            <span class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot" id="live-indicator"></span> Live
+            </span>
           </div>
-          <p class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 pulse-dot" id="live-indicator"></span>
+          <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
             <span id="display-time">Lade Telemetrie...</span>
-            <span class="text-slate-300">•</span>
-            <span class="text-slate-500" id="display-location">Kempten (Allgäu)</span>
+            <span class="text-slate-300 dark:text-slate-600">•</span>
+            <span id="display-location">Kempten (Allgäu)</span>
           </p>
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="flex items-center space-x-3 ml-auto">
-        <div class="text-right text-xs text-slate-500 hidden sm:block">
+      <!-- Controls & Theme Toggle -->
+      <div class="flex items-center space-x-2 sm:space-x-3 ml-auto">
+        <div class="text-right text-xs text-slate-500 dark:text-slate-400 hidden lg:block leading-tight">
           <div>Automatischer Abgleich:</div>
-          <div class="font-semibold text-slate-700" id="countdown-text">in 45s</div>
+          <div class="font-semibold text-slate-700 dark:text-slate-200" id="countdown-text">in 45s</div>
         </div>
 
-        <button id="refresh-btn" onclick="loadTelemetryData(true)" ondblclick="window.location.reload()" title="Tippen: Telemetrie aktualisieren • Doppelklick: Seite komplett neu laden" class="flex items-center gap-2 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition duration-150 text-xs font-semibold shadow-sm active:scale-95">
+        <!-- Theme Toggle Button (Apple Glass Pill) -->
+        <button id="theme-toggle-btn" onclick="toggleTheme()" title="Design wechseln (Light / Dark)" class="liquid-btn p-2 rounded-full bg-white/40 dark:bg-white/10 hover:bg-white/60 dark:hover:bg-white/20 border border-white/50 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm cursor-pointer">
+          <i data-lucide="moon" class="w-4 h-4" id="theme-toggle-icon"></i>
+        </button>
+
+        <!-- Refresh Button -->
+        <button id="refresh-btn" onclick="loadTelemetryData(true)" ondblclick="window.location.reload()" title="Tippen: Telemetrie aktualisieren • Doppelklick: Seite komplett neu laden" class="liquid-btn flex items-center gap-2 px-3.5 py-1.5 bg-slate-900/90 hover:bg-slate-900 dark:bg-white/90 dark:hover:bg-white text-white dark:text-slate-900 rounded-full text-xs font-semibold shadow-md cursor-pointer">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
-          <span>Aktualisieren</span>
+          <span class="hidden sm:inline">Aktualisieren</span>
         </button>
 
         <!-- User Auth Badge & Logout -->
-        <div id="auth-user-badge" class="hidden flex items-center gap-2.5 pl-3 border-l border-slate-200">
-          <div class="relative w-8 h-8 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+        <div id="auth-user-badge" class="hidden flex items-center gap-2 sm:gap-2.5 pl-2 sm:pl-3 border-l border-slate-200/60 dark:border-slate-700/60">
+          <div class="relative w-8 h-8 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
             <img id="auth-user-photo" src="" alt="" class="w-full h-full object-cover hidden">
-            <span id="auth-user-avatar-fallback" class="text-xs font-bold text-amber-800">👤</span>
+            <span id="auth-user-avatar-fallback" class="text-xs font-bold text-amber-600 dark:text-amber-400">👤</span>
           </div>
           <div class="hidden md:flex flex-col text-left">
             <div class="flex items-center gap-1.5">
-              <span id="auth-user-name" class="text-xs font-bold text-slate-800 leading-tight">@User</span>
-              <span id="auth-user-role-badge" class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">MITGLIED</span>
+              <span id="auth-user-name" class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">@User</span>
+              <span id="auth-user-role-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-400/30">MITGLIED</span>
             </div>
-            <span class="text-[10px] text-slate-400">Bayrhof Gruppe</span>
+            <span class="text-[10px] text-slate-400 dark:text-slate-500">Bayrhof Gruppe</span>
           </div>
-          <button onclick="logoutTelegram()" title="Abmelden" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer">
+          <button onclick="logoutTelegram()" title="Abmelden" class="liquid-btn p-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-500/10 transition cursor-pointer">
             <i data-lucide="log-out" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
-      <!-- Desktop Navigation Tabs -->
-      <nav class="hidden md:flex items-center gap-2 w-full pt-2.5 border-t border-slate-100">
-        <button id="nav-tab-overview" onclick="switchDashboardTab('overview')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-amber-500 text-white shadow-sm cursor-pointer">
-          <i data-lucide="zap" class="w-4 h-4"></i>
+      <!-- Desktop Navigation Tabs (Pill Segmented Control) -->
+      <nav class="hidden md:flex items-center gap-1.5 w-full pt-2.5 border-t border-slate-200/40 dark:border-white/5">
+        <button id="nav-tab-overview" onclick="switchDashboardTab('overview')" class="dashboard-nav-btn liquid-nav-pill active flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/25 scale-[1.02] cursor-pointer">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
           <span>Live & Laden</span>
         </button>
-        <button id="nav-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer relative">
-          <i data-lucide="sun" class="w-4 h-4"></i>
+        <button id="nav-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer relative">
+          <i data-lucide="sun" class="w-3.5 h-3.5"></i>
           <span>Solar-Log (17 WR)</span>
           <span id="tab-badge-solarlog-errors" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white ml-0.5">0</span>
         </button>
-        <button id="nav-tab-forecast" onclick="switchDashboardTab('forecast')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
-          <i data-lucide="calendar-check" class="w-4 h-4"></i>
+        <button id="nav-tab-forecast" onclick="switchDashboardTab('forecast')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
+          <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
           <span>Ladefenster & Prognose</span>
         </button>
-        <button id="nav-tab-history" onclick="switchDashboardTab('history')" class="dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
-          <i data-lucide="history" class="w-4 h-4"></i>
+        <button id="nav-tab-history" onclick="switchDashboardTab('history')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
+          <i data-lucide="history" class="w-3.5 h-3.5"></i>
           <span>Ladehistorie</span>
         </button>
-        <button id="nav-tab-users" onclick="switchDashboardTab('users')" class="hidden dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
-          <i data-lucide="shield-check" class="w-4 h-4 text-amber-500"></i>
+        <button id="nav-tab-users" onclick="switchDashboardTab('users')" class="hidden dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-500"></i>
           <span>Benutzer-Zugriff</span>
-          <span id="tab-badge-users-count" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 ml-0.5">0</span>
+          <span id="tab-badge-users-count" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-400/30 ml-0.5">0</span>
         </button>
       </nav>
     </div>
@@ -243,7 +547,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Auto-Lade-PV Live (Fronius 3er-Verbund) -->
-        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-cyan-500 transition-all bg-gradient-to-br from-cyan-50/30 to-white">
+        <div class="card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-cyan-500 transition-all">
           <div class="flex justify-between items-start mb-2">
             <span class="text-xs font-bold uppercase tracking-wider text-cyan-800 flex items-center gap-1.5">
               <i data-lucide="battery-charging" class="w-4 h-4 text-cyan-600"></i> Auto-Lade-PV Live
@@ -273,7 +577,7 @@
         </div>
 
         <!-- Große Solar-Anlage (Solar-Log 220 kWp) -->
-        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-amber-500 transition-all">
+        <div class="card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-amber-500 transition-all">
           <div class="flex justify-between items-start mb-2">
             <span class="text-xs font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
               <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> Große PV-Anlage
@@ -291,7 +595,7 @@
         </div>
 
         <!-- Netz (Grid) -->
-        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-emerald-500 transition-all" id="grid-card">
+        <div class="card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-emerald-500 transition-all" id="grid-card">
           <div class="flex justify-between items-start mb-2">
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5" id="grid-header-label">
               <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-600" id="grid-icon"></i> Netzeinspeisung
@@ -309,7 +613,7 @@
         </div>
 
         <!-- Tagesertrag (InfluxDB) -->
-        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-sky-500 transition-all">
+        <div class="card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-sky-500 transition-all">
           <div class="flex justify-between items-start mb-2">
             <span class="text-xs font-bold uppercase tracking-wider text-sky-800 flex items-center gap-1.5">
               <i data-lucide="bar-chart-2" class="w-4 h-4 text-sky-600"></i> Ertrag Heute
@@ -328,7 +632,7 @@
       </div>
 
       <!-- WALLBOX LIVE CONTROLLER (dé EV Charger) -->
-      <div class="card-clean rounded-2xl p-5 border-l-4 border-l-indigo-600 bg-gradient-to-br from-indigo-50/20 via-white to-slate-50/40 shadow-sm" id="wallbox-card">
+      <div class="card-clean liquid-spotlight rounded-[28px] p-6 border-l-4 border-l-indigo-500 shadow-sm" id="wallbox-card">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm">
@@ -475,7 +779,7 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="vehicles-container">
             <!-- Dynamisch via JS -->
-            <div class="card-clean rounded-2xl p-5 animate-pulse text-center py-10 text-slate-400">
+            <div class="card-clean liquid-spotlight rounded-[28px] p-5 animate-pulse text-center py-10 text-slate-400">
               Fahrzeugdaten laden...
             </div>
           </div>
@@ -485,8 +789,8 @@
         <div class="space-y-4">
           
           <!-- Hausverbrauch & PV-Kopplung -->
-          <div class="card-clean rounded-2xl p-5">
-            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
+          <div class="card-clean liquid-spotlight rounded-[28px] p-5">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
               <i data-lucide="home" class="w-5 h-5 text-purple-600"></i>
               Hausverbrauch & Deckung
             </h2>
@@ -503,7 +807,7 @@
           </div>
 
           <!-- Schnell-Aktion Ladefenster & Prognose -->
-          <div class="card-clean rounded-2xl p-5 bg-gradient-to-br from-amber-50/60 to-white border border-amber-200/80">
+          <div class="card-clean liquid-spotlight rounded-[28px] p-5 border border-amber-400/30">
             <div class="flex items-start justify-between gap-2 mb-2">
               <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
@@ -536,8 +840,8 @@
     <div id="tab-content-solarlog" class="tab-pane hidden space-y-6">
       
       <!-- SOLAR-LOG WECHSELRICHTER TABELLE (UNTEREINANDER & FILTERBAR) -->
-      <div class="card-clean rounded-2xl p-6 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-200">
+      <div class="card-clean liquid-spotlight rounded-[28px] p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-200/40 dark:border-white/5">
           <div>
             <div class="flex items-center gap-2">
               <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
@@ -615,7 +919,7 @@
     <div id="tab-content-forecast" class="tab-pane hidden space-y-6">
       
       <!-- INTELLIGENTE LADEFENSTER & ERTRAGSPROGNOSE (NUR AUS FRONIUS 3ER-VERBUND!) -->
-      <div class="card-clean rounded-2xl p-6 bg-gradient-to-r from-cyan-50/50 via-white to-amber-50/40 border-cyan-200">
+      <div class="card-clean liquid-spotlight rounded-[28px] p-6 border border-cyan-400/30">
         
         <!-- Hinweis-Box: Trennung Großanlage vs. Auto-Lade-PV -->
         <div class="p-3.5 bg-sky-50 border border-sky-200 rounded-xl mb-5 text-xs text-sky-950 flex items-start gap-3 shadow-xs">
@@ -770,8 +1074,8 @@
       </div>
 
       <!-- Wetterdienst-Messwerte -->
-      <div class="card-clean rounded-2xl p-5">
-        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
+      <div class="card-clean liquid-spotlight rounded-[28px] p-5">
+        <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
           <i data-lucide="cloud-sun" class="w-5 h-5 text-sky-600"></i>
           Wetterdienst-Messwerte & Sonnenprognose
         </h2>
@@ -800,17 +1104,17 @@
       
       <!-- Übersichtskarten Ladevorgänge -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-emerald-500">
+        <div class="card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-emerald-500">
           <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Erfasste Vorgänge</div>
           <div class="text-2xl font-extrabold text-slate-900 mt-1" id="history-total-count">0</div>
           <div class="text-[11px] text-slate-400 mt-1">Über Bot & manuell</div>
         </div>
-        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-sky-500">
+        <div class="card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-sky-500">
           <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Erfassung via Bot</div>
           <div class="text-xs font-semibold text-slate-700 mt-1">@evcc_bayrhof_bot</div>
           <div class="text-[11px] text-slate-400 mt-1">Befehl <code>/laden</code> in Telegram</div>
         </div>
-        <div class="card-clean rounded-2xl p-5 border-l-4 border-l-amber-500">
+        <div class="card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-amber-500">
           <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Fahrzeuge</div>
           <div class="text-xs font-semibold text-slate-700 mt-1">Cupra Tavascan & Raval</div>
           <div class="text-[11px] text-slate-400 mt-1">Automatische Zuordnung</div>
@@ -818,8 +1122,8 @@
       </div>
 
       <!-- Letzte Ladevorgänge Tabelle -->
-      <div class="card-clean rounded-2xl p-6 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+      <div class="card-clean liquid-spotlight rounded-[28px] p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200/40 dark:border-white/5">
           <div>
             <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="history" class="w-5 h-5 text-emerald-600"></i>
@@ -858,7 +1162,7 @@
     <div id="tab-content-users" class="tab-pane hidden space-y-6">
 
       <!-- HEADER CARD -->
-      <div class="card-clean rounded-2xl p-6 shadow-sm bg-gradient-to-br from-amber-50/40 via-white to-slate-50/60 border border-amber-200/80">
+      <div class="card-clean liquid-spotlight rounded-[28px] p-6 shadow-sm border border-amber-400/30">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div class="space-y-1">
             <div class="flex items-center gap-2">
@@ -921,8 +1225,8 @@
       </div>
 
       <!-- USER LIST TABLE CARD -->
-      <div class="card-clean rounded-2xl p-6 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-200">
+      <div class="card-clean liquid-spotlight rounded-[28px] p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-200/40 dark:border-white/5">
           <div>
             <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="list-checks" class="w-4 h-4 text-amber-600"></i>
@@ -960,7 +1264,7 @@
       </div>
 
       <!-- ERKLÄRUNGS-BOX / INFO CARD -->
-      <div class="rounded-2xl p-5 bg-slate-50 border border-slate-200/90 text-xs text-slate-600 space-y-3">
+      <div class="rounded-[26px] p-5 liquid-nested-tile text-xs text-slate-600 dark:text-slate-300 space-y-3">
         <div class="font-bold text-slate-800 flex items-center gap-2">
           <i data-lucide="info" class="w-4 h-4 text-amber-500"></i>
           <span>Funktionsweise des Zugriffs- &amp; Freigabesystems</span>
@@ -997,35 +1301,35 @@
     <p>EVCC & Solar-Log Web Dashboard • Gehostet auf GitHub Pages • Automatische Telemetrie alle 2 Minuten</p>
   </footer>
 
-  <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-2 py-1.5 pb-[max(env(safe-area-inset-bottom,0px),8px)] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] flex items-center justify-around">
-    <button id="mob-tab-overview" onclick="switchDashboardTab('overview')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-amber-600 font-bold active:scale-95 bg-amber-50 cursor-pointer">
+  <!-- MOBILE FLOATING BOTTOM NAVIGATION BAR (Apple Liquid Glass Floating Pill) -->
+  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-4 left-3 right-3 sm:left-6 sm:right-6 max-w-md mx-auto z-40 liquid-floating-island px-2 py-1.5 pb-[max(env(safe-area-inset-bottom,0px),10px)] rounded-full flex items-center justify-around shadow-2xl">
+    <button id="mob-tab-overview" onclick="switchDashboardTab('overview')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-amber-600 dark:text-amber-400 font-bold bg-amber-500/15 scale-[1.04] cursor-pointer">
       <i data-lucide="zap" class="w-5 h-5"></i>
       <span class="text-[10px] mt-0.5 font-semibold">Laden</span>
     </button>
-    <button id="mob-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer relative">
+    <button id="mob-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer relative">
       <i data-lucide="sun" class="w-5 h-5"></i>
       <span class="text-[10px] mt-0.5 font-semibold">Solar-Log</span>
-      <span id="mob-badge-solarlog-errors" class="hidden absolute top-1 right-5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+      <span id="mob-badge-solarlog-errors" class="hidden absolute top-1 right-5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900"></span>
     </button>
-    <button id="mob-tab-forecast" onclick="switchDashboardTab('forecast')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer">
+    <button id="mob-tab-forecast" onclick="switchDashboardTab('forecast')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
       <i data-lucide="calendar-check" class="w-5 h-5"></i>
       <span class="text-[10px] mt-0.5 font-semibold">Prognose</span>
     </button>
-    <button id="mob-tab-history" onclick="switchDashboardTab('history')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer">
+    <button id="mob-tab-history" onclick="switchDashboardTab('history')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
       <i data-lucide="history" class="w-5 h-5"></i>
       <span class="text-[10px] mt-0.5 font-semibold">Historie</span>
     </button>
-    <button id="mob-tab-users" onclick="switchDashboardTab('users')" class="hidden mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer">
+    <button id="mob-tab-users" onclick="switchDashboardTab('users')" class="hidden mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
       <i data-lucide="shield-check" class="w-5 h-5 text-amber-500"></i>
       <span class="text-[10px] mt-0.5 font-semibold">Benutzer</span>
     </button>
   </nav>
 
-  <!-- TOAST NOTIFICATION BANNER -->
-  <div id="toast-banner" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="px-4 py-3 rounded-xl bg-slate-900/95 border border-slate-700 text-white text-xs font-semibold shadow-2xl flex items-center gap-2.5 backdrop-blur-md">
-      <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+  <!-- TOAST NOTIFICATION BANNER (Apple Floating Pill) -->
+  <div id="toast-banner" class="fixed bottom-24 md:bottom-8 right-4 sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="px-4 py-3 rounded-full liquid-floating-island text-slate-900 dark:text-white text-xs font-semibold shadow-2xl flex items-center gap-2.5 border border-white/60 dark:border-white/20">
+      <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">✓</span>
       <span id="toast-message">Dashboard erfolgreich aktualisiert!</span>
     </div>
   </div>
@@ -1035,6 +1339,73 @@
     // ==========================================
     // TELEGRAM AUTHENTICATION & ACCESS CONTROL
     // ==========================================
+    
+    // ==========================================
+    // THEME ENGINE (Apple Liquid Glass: Light / Dark)
+    // ==========================================
+    function initThemeMode() {
+      const saved = localStorage.getItem('evcc_theme_mode') || 'auto';
+      let effective = saved;
+      if (saved === 'auto') {
+        effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      setTheme(effective, false);
+
+      // System Preference Listener
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if ((localStorage.getItem('evcc_theme_mode') || 'auto') === 'auto') {
+          setTheme(e.matches ? 'dark' : 'light', false);
+        }
+      });
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next, true);
+    }
+
+    function setTheme(theme, save = true) {
+      if (theme === 'dark') {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+      if (save) {
+        try { localStorage.setItem('evcc_theme_mode', theme); } catch(e) {}
+      }
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const icon = document.getElementById('theme-toggle-icon');
+      if (icon) {
+        icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    // Interactive Cursor-Tracking Spotlight for Liquid Glass surfaces
+    (function initLiquidGlassTracking() {
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        document.addEventListener('mousemove', (e) => {
+          const cards = document.querySelectorAll('.liquid-spotlight, .card-clean, .liquid-floating-island');
+          cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            if (x >= -60 && x <= rect.width + 60 && y >= -60 && y <= rect.height + 60) {
+              card.style.setProperty('--mouse-x', `${x}px`);
+              card.style.setProperty('--mouse-y', `${y}px`);
+            }
+          });
+        }, { passive: true });
+      }
+    })();
+
     let currentAuthUser = null;
     let hasLoadedRemoteAuthData = false;
 
@@ -1333,9 +1704,9 @@
         const dBtn = document.getElementById('nav-tab-' + t);
         if (dBtn) {
           if (t === tabId) {
-            dBtn.className = 'dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-amber-500 text-white shadow-sm cursor-pointer';
+            dBtn.className = 'dashboard-nav-btn liquid-nav-pill active flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/25 scale-[1.02] cursor-pointer';
           } else {
-            dBtn.className = 'dashboard-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer';
+            dBtn.className = 'dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer';
           }
         }
 
@@ -1343,9 +1714,9 @@
         const mBtn = document.getElementById('mob-tab-' + t);
         if (mBtn) {
           if (t === tabId) {
-            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-amber-600 font-bold active:scale-95 bg-amber-50 cursor-pointer';
+            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-amber-600 dark:text-amber-400 font-bold bg-amber-500/15 scale-[1.04] cursor-pointer';
           } else {
-            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition text-slate-500 font-medium active:scale-95 cursor-pointer relative';
+            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer relative';
           }
         }
       });
@@ -1511,7 +1882,7 @@
       }
 
       if (isReady) {
-        if (cardEl) cardEl.className = 'p-4 bg-emerald-50/60 rounded-xl border border-emerald-300 shadow-2xs mb-5 transition-all';
+        if (cardEl) cardEl.className = 'p-5 liquid-nested-tile rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-5 transition-all shadow-sm';
         if (cardBadge) {
           cardBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5';
           cardBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span> Laden empfohlen! (≥ ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW)`;
@@ -1525,7 +1896,7 @@
         }
       } else {
         const missing = Math.max(0, threshKW - curKW);
-        if (cardEl) cardEl.className = 'p-4 bg-white rounded-xl border border-slate-200 shadow-2xs mb-5 transition-all';
+        if (cardEl) cardEl.className = 'p-5 liquid-nested-tile rounded-2xl border border-white/50 dark:border-white/10 mb-5 transition-all shadow-sm';
         if (cardBadge) {
           cardBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200';
           cardBadge.textContent = `Warten auf Solar-Überschuss (< ${threshKW.toLocaleString('de-DE', {minimumFractionDigits: 1})} kW)`;
@@ -1559,14 +1930,14 @@
       document.getElementById('grid-power-w').textContent = `(${Math.abs(gridW).toLocaleString('de-DE')} W)`;
 
       if (isExport) {
-        gridCard.className = 'card-clean rounded-2xl p-5 border-l-4 border-l-emerald-500 transition-all';
+        gridCard.className = 'card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-emerald-500 transition-all';
         gridKwEl.className = 'text-3xl font-extrabold text-emerald-700 tracking-tight';
         gridModeEl.textContent = 'Einspeisung';
         gridModeEl.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200';
         gridDirectionEl.textContent = 'Überschuss wird eingespeist';
         gridIconEl.setAttribute('data-lucide', 'arrow-up-right');
       } else {
-        gridCard.className = 'card-clean rounded-2xl p-5 border-l-4 border-l-amber-500 transition-all';
+        gridCard.className = 'card-clean liquid-spotlight rounded-[26px] p-5 border-l-4 border-l-amber-500 transition-all';
         gridKwEl.className = 'text-3xl font-extrabold text-amber-700 tracking-tight';
         gridModeEl.textContent = 'Netzbezug';
         gridModeEl.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200';
@@ -1737,9 +2108,9 @@
       document.querySelectorAll('.target-btn').forEach(btn => {
         const btnVal = parseFloat(btn.dataset.val);
         if (Math.abs(btnVal - targetChargeKW) < 0.1) {
-          btn.className = 'target-btn px-2.5 py-1 rounded font-bold bg-white text-cyan-900 shadow-xs border border-slate-200 transition';
+          btn.className = 'target-btn px-3 py-1 rounded-full font-bold bg-white dark:bg-white/20 text-cyan-900 dark:text-cyan-200 shadow-md border border-white/50 dark:border-white/20 transition-all scale-[1.02]';
         } else {
-          btn.className = 'target-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900 transition';
+          btn.className = 'target-btn px-3 py-1 rounded-full font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all';
         }
       });
 
@@ -1846,7 +2217,7 @@
         }
 
         return `
-          <div class="p-4 rounded-xl border ${cardBg} shadow-sm flex flex-col justify-between">
+          <div class="p-4 rounded-2xl border ${cardBg} shadow-sm flex flex-col justify-between liquid-spotlight">
             <div>
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
@@ -1906,7 +2277,7 @@
         }
 
         return `
-          <div class="card-clean rounded-2xl p-5 flex flex-col justify-between">
+          <div class="card-clean liquid-spotlight rounded-[26px] p-5 flex flex-col justify-between">
             <div>
               <div class="flex items-start justify-between mb-3">
                 <div class="flex items-center gap-2.5">
@@ -1993,7 +2364,7 @@
         }
 
         return `
-        <tr class="hover:bg-slate-50 transition">
+        <tr class="hover:bg-white/40 dark:hover:bg-white/5 transition border-b border-slate-200/30 dark:border-white/5">
           <td class="py-2.5 px-3 font-mono text-slate-600">${s.charged_at}</td>
           <td class="py-2.5 px-3 font-semibold text-slate-900">${s.vehicle_title}</td>
           <td class="py-2.5 px-3 text-right font-mono font-bold text-sky-700">
@@ -2047,9 +2418,9 @@
       currentInverterFilter = filterType;
       document.querySelectorAll('.filter-tab').forEach(btn => {
         if (btn.dataset.filter === filterType) {
-          btn.className = 'filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-sm transition';
+          btn.className = 'filter-tab px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-md transition-all scale-[1.02]';
         } else {
-          btn.className = 'filter-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+          btn.className = 'filter-tab px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all';
         }
       });
       applyInverterFilters();
@@ -2101,7 +2472,7 @@
         }
 
         return `
-          <tr class="hover:bg-slate-50/80 transition">
+          <tr class="hover:bg-white/40 dark:hover:bg-white/5 transition border-b border-slate-200/30 dark:border-white/5">
             <!-- WR Name -->
             <td class="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">
               <div class="flex items-center gap-2">
@@ -2243,7 +2614,7 @@
         const avatarBg = u.role === 'admin' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-100 text-slate-700 border-slate-200';
 
         return `
-          <tr class="hover:bg-slate-50/70 transition duration-150">
+          <tr class="hover:bg-white/40 dark:hover:bg-white/5 transition duration-150 border-b border-slate-200/30 dark:border-white/5">
             <td class="py-3 px-4">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
@@ -2300,6 +2671,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      initThemeMode();
       lucide.createIcons();
       initAuthOnLoad();
       const savedTab = sessionStorage.getItem('evcc_active_tab') || 'overview';
