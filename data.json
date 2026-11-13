@@ -1,16 +1,16 @@
 {
   "meta": {
     "version": "2.2.0",
-    "timestamp": "2026-11-13T09:23:30.063834",
-    "display_time": "13.11.2026 09:23:30",
+    "timestamp": "2026-11-13T09:40:00.710523",
+    "display_time": "13.11.2026 09:40:00",
     "display_date": "13.11.2026",
     "location": "Kempten (Allgäu)"
   },
   "energy": {
-    "pv_power_w": 12227,
-    "pv_power_kw": 12.23,
-    "grid_power_w": -12227,
-    "grid_power_kw": -12.23,
+    "pv_power_w": 19902,
+    "pv_power_kw": 19.9,
+    "grid_power_w": -19902,
+    "grid_power_kw": -19.9,
     "grid_mode": "export",
     "home_power_w": 0,
     "home_power_kw": 0.0,
@@ -19,21 +19,21 @@
     "pv_plants": [
       {
         "title": "Fronius rechts",
-        "power_w": 314,
+        "power_w": 533,
         "energy_kwh": 17.65
       },
       {
         "title": "Solarlog_Anlage",
-        "power_w": 11913,
-        "energy_kwh": 2657.51
+        "power_w": 19369,
+        "energy_kwh": 2657.52
       }
     ]
   },
   "charging_pv_system": {
     "title": "Fronius 3er-Verbund (Auto-Lade-PV)",
     "installed_kwp": 18.67,
-    "total_power_w": 837,
-    "total_power_kw": 0.84,
+    "total_power_w": 1421,
+    "total_power_kw": 1.42,
     "charging_readiness": {
       "threshold_kw": 6.34,
       "threshold_w": 6340.0,
@@ -42,28 +42,28 @@
       "buffer_with_margin_kw": 2.2,
       "min_current": 6,
       "max_current": 16,
-      "current_kw": 0.84,
-      "current_w": 837,
+      "current_kw": 1.42,
+      "current_w": 1421,
       "is_ready": false,
-      "diff_kw": -5.5,
-      "progress_percent": 13.2
+      "diff_kw": -4.92,
+      "progress_percent": 22.4
     },
     "wr1": {
       "title": "Fronius rechts (Messwert)",
-      "power_w": 314,
-      "power_kw": 0.31,
+      "power_w": 533,
+      "power_kw": 0.53,
       "ratio_percent": 100
     },
     "wr2": {
       "title": "Wechselrichter 2 (Partner-WR)",
-      "power_w": 314,
-      "power_kw": 0.31,
+      "power_w": 533,
+      "power_kw": 0.53,
       "ratio_percent": 100
     },
     "wr3": {
       "title": "Wechselrichter 3 (Zusatz-WR)",
-      "power_w": 209,
-      "power_kw": 0.21,
+      "power_w": 355,
+      "power_kw": 0.35,
       "ratio_percent": 66.7
     }
   },
@@ -75,11 +75,11 @@
     "buffer_with_margin_kw": 2.2,
     "min_current": 6,
     "max_current": 16,
-    "current_kw": 0.84,
-    "current_w": 837,
+    "current_kw": 1.42,
+    "current_w": 1421,
     "is_ready": false,
-    "diff_kw": -5.5,
-    "progress_percent": 13.2
+    "diff_kw": -4.92,
+    "progress_percent": 22.4
   },
   "wallbox": {
     "online": true,
@@ -137,9 +137,9 @@
     "is_paused_by_pv": true
   },
   "influx_today": {
-    "energy_kwh": 11.28,
-    "max_power_w": 13467,
-    "avg_power_w": 543,
+    "energy_kwh": 18.45,
+    "max_power_w": 20191,
+    "avg_power_w": 853,
     "date": "13.11.2026"
   },
   "weather_intelligence": {
@@ -147,7 +147,7 @@
     "dwd": {
       "condition": "dry",
       "temp_c": 0.7,
-      "cloud_cover": 88
+      "cloud_cover": 100
     },
     "open_meteo": {
       "temp_c": null,
@@ -161,14 +161,14 @@
       {
         "day_label": "Heute",
         "date": "13.11.2026",
-        "window": "09:15 – 13:15 Uhr",
+        "window": "09:15 – 13:30 Uhr",
         "target_kw": 7.5,
-        "max_kw": 11.6,
-        "avg_kw": 9.7,
+        "max_kw": 10.3,
+        "avg_kw": 9.1,
         "rating": "Optimal (Volle 7–8 kW Leistung)",
         "rating_code": "optimal",
         "badge_color": "emerald",
-        "comment": "Spitze 11.6 kW • Volle Ladeleistung (7–8 kW) durchgehend für ~3.8 Std. rein solar gedeckt!"
+        "comment": "Spitze 10.3 kW • Volle Ladeleistung (7–8 kW) durchgehend für ~4.2 Std. rein solar gedeckt!"
       },
       {
         "day_label": "Morgen",
@@ -176,7 +176,7 @@
         "window": "09:00 – 15:15 Uhr",
         "target_kw": 7.5,
         "max_kw": 15.0,
-        "avg_kw": 12.4,
+        "avg_kw": 12.5,
         "rating": "Optimal (Volle 7–8 kW Leistung)",
         "rating_code": "optimal",
         "badge_color": "emerald",
@@ -199,8 +199,8 @@
       {
         "day_label": "Heute",
         "date": "13.11.2026",
-        "energy_kwh": 51.8,
-        "max_kw": 11.6,
+        "energy_kwh": 48.9,
+        "max_kw": 10.3,
         "charging_possible": true
       },
       {
@@ -421,199 +421,199 @@
         "t": "2026-11-13 08:15",
         "day": "Heute",
         "hour": "08:15",
-        "kw": 2.82
+        "kw": 4.29
       },
       {
         "t": "2026-11-13 08:30",
         "day": "Heute",
         "hour": "08:30",
-        "kw": 3.41
+        "kw": 5.42
       },
       {
         "t": "2026-11-13 08:45",
         "day": "Heute",
         "hour": "08:45",
-        "kw": 5.4
+        "kw": 5.7
       },
       {
         "t": "2026-11-13 09:00",
         "day": "Heute",
         "hour": "09:00",
-        "kw": 7.03
+        "kw": 7.18
       },
       {
         "t": "2026-11-13 09:15",
         "day": "Heute",
         "hour": "09:15",
-        "kw": 9.07
+        "kw": 8.09
       },
       {
         "t": "2026-11-13 09:30",
         "day": "Heute",
         "hour": "09:30",
-        "kw": 9.54
+        "kw": 8.56
       },
       {
         "t": "2026-11-13 09:45",
         "day": "Heute",
         "hour": "09:45",
-        "kw": 10.07
+        "kw": 9.12
       },
       {
         "t": "2026-11-13 10:00",
         "day": "Heute",
         "hour": "10:00",
-        "kw": 9.67
+        "kw": 8.88
       },
       {
         "t": "2026-11-13 10:15",
         "day": "Heute",
         "hour": "10:15",
-        "kw": 10.15
+        "kw": 9.85
       },
       {
         "t": "2026-11-13 10:30",
         "day": "Heute",
         "hour": "10:30",
-        "kw": 10.22
+        "kw": 9.48
       },
       {
         "t": "2026-11-13 10:45",
         "day": "Heute",
         "hour": "10:45",
-        "kw": 10.17
+        "kw": 10.24
       },
       {
         "t": "2026-11-13 11:00",
         "day": "Heute",
         "hour": "11:00",
-        "kw": 11.57
+        "kw": 10.3
       },
       {
         "t": "2026-11-13 11:15",
         "day": "Heute",
         "hour": "11:15",
-        "kw": 10.64
+        "kw": 10.05
       },
       {
         "t": "2026-11-13 11:30",
         "day": "Heute",
         "hour": "11:30",
-        "kw": 10.08
+        "kw": 9.76
       },
       {
         "t": "2026-11-13 11:45",
         "day": "Heute",
         "hour": "11:45",
-        "kw": 10.78
+        "kw": 9.17
       },
       {
         "t": "2026-11-13 12:00",
         "day": "Heute",
         "hour": "12:00",
-        "kw": 8.26
+        "kw": 8.48
       },
       {
         "t": "2026-11-13 12:15",
         "day": "Heute",
         "hour": "12:15",
-        "kw": 8.45
+        "kw": 8.77
       },
       {
         "t": "2026-11-13 12:30",
         "day": "Heute",
         "hour": "12:30",
-        "kw": 8.43
+        "kw": 8.47
       },
       {
         "t": "2026-11-13 12:45",
         "day": "Heute",
         "hour": "12:45",
-        "kw": 7.3
+        "kw": 9.04
       },
       {
         "t": "2026-11-13 13:00",
         "day": "Heute",
         "hour": "13:00",
-        "kw": 7.16
+        "kw": 8.24
       },
       {
         "t": "2026-11-13 13:15",
         "day": "Heute",
         "hour": "13:15",
-        "kw": 8.01
+        "kw": 7.2
       },
       {
         "t": "2026-11-13 13:30",
         "day": "Heute",
         "hour": "13:30",
-        "kw": 7.34
+        "kw": 7.76
       },
       {
         "t": "2026-11-13 13:45",
         "day": "Heute",
         "hour": "13:45",
-        "kw": 7.38
+        "kw": 7.42
       },
       {
         "t": "2026-11-13 14:00",
         "day": "Heute",
         "hour": "14:00",
-        "kw": 7.11
+        "kw": 6.75
       },
       {
         "t": "2026-11-13 14:15",
         "day": "Heute",
         "hour": "14:15",
-        "kw": 6.0
+        "kw": 6.43
       },
       {
         "t": "2026-11-13 14:30",
         "day": "Heute",
         "hour": "14:30",
-        "kw": 5.82
+        "kw": 6.26
       },
       {
         "t": "2026-11-13 14:45",
         "day": "Heute",
         "hour": "14:45",
-        "kw": 5.43
+        "kw": 5.55
       },
       {
         "t": "2026-11-13 15:00",
         "day": "Heute",
         "hour": "15:00",
-        "kw": 4.94
+        "kw": 5.3
       },
       {
         "t": "2026-11-13 15:15",
         "day": "Heute",
         "hour": "15:15",
-        "kw": 3.69
+        "kw": 4.12
       },
       {
         "t": "2026-11-13 15:30",
         "day": "Heute",
         "hour": "15:30",
-        "kw": 3.08
+        "kw": 3.56
       },
       {
         "t": "2026-11-13 15:45",
         "day": "Heute",
         "hour": "15:45",
-        "kw": 2.81
+        "kw": 2.94
       },
       {
         "t": "2026-11-13 16:00",
         "day": "Heute",
         "hour": "16:00",
-        "kw": 1.87
+        "kw": 1.97
       },
       {
         "t": "2026-11-13 16:15",
         "day": "Heute",
         "hour": "16:15",
-        "kw": 1.16
+        "kw": 1.23
       },
       {
         "t": "2026-11-13 16:30",
@@ -991,7 +991,7 @@
         "t": "2026-11-14 08:00",
         "day": "Morgen",
         "hour": "08:00",
-        "kw": 2.87
+        "kw": 2.85
       },
       {
         "t": "2026-11-14 08:15",
@@ -1021,13 +1021,13 @@
         "t": "2026-11-14 09:15",
         "day": "Morgen",
         "hour": "09:15",
-        "kw": 9.49
+        "kw": 9.48
       },
       {
         "t": "2026-11-14 09:30",
         "day": "Morgen",
         "hour": "09:30",
-        "kw": 10.44
+        "kw": 10.5
       },
       {
         "t": "2026-11-14 09:45",
@@ -1039,31 +1039,31 @@
         "t": "2026-11-14 10:00",
         "day": "Morgen",
         "hour": "10:00",
-        "kw": 12.17
+        "kw": 12.22
       },
       {
         "t": "2026-11-14 10:15",
         "day": "Morgen",
         "hour": "10:15",
-        "kw": 12.87
+        "kw": 12.9
       },
       {
         "t": "2026-11-14 10:30",
         "day": "Morgen",
         "hour": "10:30",
-        "kw": 13.44
+        "kw": 13.5
       },
       {
         "t": "2026-11-14 10:45",
         "day": "Morgen",
         "hour": "10:45",
-        "kw": 13.93
+        "kw": 13.96
       },
       {
         "t": "2026-11-14 11:00",
         "day": "Morgen",
         "hour": "11:00",
-        "kw": 14.2
+        "kw": 14.25
       },
       {
         "t": "2026-11-14 11:15",
@@ -1075,19 +1075,19 @@
         "t": "2026-11-14 11:30",
         "day": "Morgen",
         "hour": "11:30",
-        "kw": 14.95
+        "kw": 14.96
       },
       {
         "t": "2026-11-14 11:45",
         "day": "Morgen",
         "hour": "11:45",
-        "kw": 14.38
+        "kw": 14.39
       },
       {
         "t": "2026-11-14 12:00",
         "day": "Morgen",
         "hour": "12:00",
-        "kw": 14.21
+        "kw": 14.22
       },
       {
         "t": "2026-11-14 12:15",
@@ -2069,203 +2069,203 @@
     "inverters": [
       {
         "wr_number": 1,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 119,
-        "daysum": 136,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 674,
+        "daysum": 370,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.14,
-        "pac_kw": 0.12,
+        "daysum_kwh": 0.37,
+        "pac_kw": 0.67,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 2,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 137,
-        "daysum": 213,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 748,
+        "daysum": 476,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.21,
-        "pac_kw": 0.14,
+        "daysum_kwh": 0.48,
+        "pac_kw": 0.75,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 3,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 121,
-        "daysum": 134,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 673,
+        "daysum": 365,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.13,
-        "pac_kw": 0.12,
+        "daysum_kwh": 0.36,
+        "pac_kw": 0.67,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 4,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 133,
-        "daysum": 213,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 757,
+        "daysum": 479,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.21,
-        "pac_kw": 0.13,
+        "daysum_kwh": 0.48,
+        "pac_kw": 0.76,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 5,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 113,
-        "daysum": 133,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 665,
+        "daysum": 364,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.13,
-        "pac_kw": 0.11,
+        "daysum_kwh": 0.36,
+        "pac_kw": 0.67,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 6,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 115,
-        "daysum": 136,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 681,
+        "daysum": 370,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.14,
-        "pac_kw": 0.12,
+        "daysum_kwh": 0.37,
+        "pac_kw": 0.68,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 7,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 106,
-        "daysum": 124,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 631,
+        "daysum": 344,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.12,
-        "pac_kw": 0.11,
+        "daysum_kwh": 0.34,
+        "pac_kw": 0.63,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 8,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 95,
-        "daysum": 148,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 549,
+        "daysum": 339,
         "status": 7,
         "error": 0,
         "status_text": "Status 7, Error 0",
-        "daysum_kwh": 0.15,
-        "pac_kw": 0.1,
+        "daysum_kwh": 0.34,
+        "pac_kw": 0.55,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "Normalbetrieb"
       },
       {
         "wr_number": 9,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 178,
-        "daysum": 242,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 889,
+        "daysum": 558,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 0.24,
-        "pac_kw": 0.18,
+        "daysum_kwh": 0.56,
+        "pac_kw": 0.89,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 10,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 164,
-        "daysum": 221,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 796,
+        "daysum": 506,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 0.22,
-        "pac_kw": 0.16,
+        "daysum_kwh": 0.51,
+        "pac_kw": 0.8,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 11,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 199,
-        "daysum": 272,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 993,
+        "daysum": 625,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 0.27,
-        "pac_kw": 0.2,
+        "daysum_kwh": 0.62,
+        "pac_kw": 0.99,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 12,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 209,
-        "daysum": 281,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 1015,
+        "daysum": 643,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 0.28,
-        "pac_kw": 0.21,
+        "daysum_kwh": 0.64,
+        "pac_kw": 1.01,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 13,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 204,
-        "daysum": 278,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 1015,
+        "daysum": 639,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 0.28,
-        "pac_kw": 0.2,
+        "daysum_kwh": 0.64,
+        "pac_kw": 1.01,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 14,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 195,
-        "daysum": 262,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 974,
+        "daysum": 610,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 0.26,
-        "pac_kw": 0.2,
+        "daysum_kwh": 0.61,
+        "pac_kw": 0.97,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 15,
-        "last_update": "2026-11-13T08:55:00",
+        "last_update": "2026-11-13T09:25:00",
         "pac": 0,
         "daysum": 0,
         "status": 0,
@@ -2279,21 +2279,21 @@
       },
       {
         "wr_number": 16,
-        "last_update": "2026-11-13T08:55:00",
-        "pac": 184,
-        "daysum": 241,
+        "last_update": "2026-11-13T09:25:00",
+        "pac": 900,
+        "daysum": 564,
         "status": 3,
         "error": 0,
         "status_text": "Status 3, Error 0",
-        "daysum_kwh": 0.24,
-        "pac_kw": 0.18,
+        "daysum_kwh": 0.56,
+        "pac_kw": 0.9,
         "state_category": "active",
         "state_badge": "Einspeisung",
         "status_desc": "MPP-Betrieb"
       },
       {
         "wr_number": 17,
-        "last_update": "2026-11-13T08:55:00",
+        "last_update": "2026-11-13T09:25:00",
         "pac": 0,
         "daysum": 0,
         "status": 0,
@@ -2306,12 +2306,12 @@
         "status_desc": "Standby / Nacht"
       }
     ],
-    "total_pac": 2272.0,
-    "total_daysum_kwh": 3.03,
+    "total_pac": 11960.0,
+    "total_daysum_kwh": 7.25,
     "active_count": 15,
     "standby_count": 2,
     "error_count": 0,
-    "last_update": "2026-11-13T08:55:00"
+    "last_update": "2026-11-13T09:25:00"
   },
   "auth": {
     "bot_username": "evcc_bayrhof_bot",
