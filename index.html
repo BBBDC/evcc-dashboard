@@ -192,54 +192,41 @@
       transition: background-color 0.4s ease, color 0.3s ease;
     }
 
-    /* Living Wallpaper Canvas */
+    /* Living Wallpaper Mesh Stage (Hardware-Accelerated & Static for 0% Idle GPU) */
+    #living-mesh-stage {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -10;
+      contain: strict;
+      transform: translateZ(0);
+      background-image: 
+        radial-gradient(circle at 10% 12%, rgba(245, 158, 11, 0.70) 0%, transparent 48%),
+        radial-gradient(circle at 90% 16%, rgba(16, 185, 129, 0.65) 0%, transparent 46%),
+        radial-gradient(circle at 25% 70%, rgba(6, 182, 212, 0.65) 0%, transparent 52%),
+        radial-gradient(circle at 85% 82%, rgba(99, 102, 241, 0.60) 0%, transparent 50%),
+        radial-gradient(circle at 50% 40%, rgba(236, 72, 153, 0.40) 0%, transparent 45%);
+      background-attachment: fixed;
+      background-size: cover;
+      transition: opacity 0.3s ease;
+    }
+    html.dark #living-mesh-stage {
+      background-image: 
+        radial-gradient(circle at 10% 12%, rgba(245, 158, 11, 0.55) 0%, transparent 48%),
+        radial-gradient(circle at 90% 16%, rgba(16, 185, 129, 0.48) 0%, transparent 46%),
+        radial-gradient(circle at 25% 70%, rgba(6, 182, 212, 0.52) 0%, transparent 52%),
+        radial-gradient(circle at 85% 82%, rgba(99, 102, 241, 0.50) 0%, transparent 50%),
+        radial-gradient(circle at 50% 40%, rgba(236, 72, 153, 0.32) 0%, transparent 45%);
+    }
+
     body {
       background-color: var(--bg-canvas);
-      background-image: 
-        radial-gradient(at 12% 12%, rgba(245, 158, 11, calc(var(--user-bg-vibrancy, 0.45) * 0.8)) 0px, transparent 50%),
-        radial-gradient(at 88% 18%, rgba(16, 185, 129, calc(var(--user-bg-vibrancy, 0.45) * 0.7)) 0px, transparent 48%),
-        radial-gradient(at 28% 70%, rgba(6, 182, 212, calc(var(--user-bg-vibrancy, 0.45) * 0.75)) 0px, transparent 52%),
-        radial-gradient(at 82% 82%, rgba(99, 102, 241, calc(var(--user-bg-vibrancy, 0.45) * 0.65)) 0px, transparent 50%);
-      background-attachment: fixed;
-      background-size: cover;
       min-height: 100vh;
-    }
-    html.dark body {
-      background-color: var(--bg-canvas);
-      background-image: 
-        radial-gradient(at 12% 12%, rgba(245, 158, 11, calc(var(--user-bg-vibrancy, 0.45) * 0.6)) 0px, transparent 50%),
-        radial-gradient(at 88% 18%, rgba(16, 185, 129, calc(var(--user-bg-vibrancy, 0.45) * 0.5)) 0px, transparent 48%),
-        radial-gradient(at 28% 70%, rgba(6, 182, 212, calc(var(--user-bg-vibrancy, 0.45) * 0.55)) 0px, transparent 52%),
-        radial-gradient(at 82% 82%, rgba(99, 102, 241, calc(var(--user-bg-vibrancy, 0.45) * 0.5)) 0px, transparent 50%);
-      background-attachment: fixed;
-      background-size: cover;
+      color: var(--text-main);
     }
 
     h1, h2, h3, .font-heading {
       letter-spacing: -0.025em;
-    }
-
-    /* Ambient Pulsing Animations for Mesh Stage Orbs */
-    @keyframes liquid-drift-1 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(45px, 35px) scale(1.12); }
-    }
-    @keyframes liquid-drift-2 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-40px, -45px) scale(1.09); }
-    }
-    @keyframes liquid-drift-3 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(35px, -40px) scale(1.14); }
-    }
-    .animate-liquid-pulse-1 {
-      animation: liquid-drift-1 18s ease-in-out infinite;
-    }
-    .animate-liquid-pulse-2 {
-      animation: liquid-drift-2 22s ease-in-out infinite;
-    }
-    .animate-liquid-pulse-3 {
-      animation: liquid-drift-3 20s ease-in-out infinite;
     }
 
     @keyframes pulse-subtle {
@@ -263,6 +250,8 @@
       border-radius: 28px;
       transition: transform 0.35s var(--spring-bounce), box-shadow 0.35s var(--spring-smooth), background-color 0.25s ease;
       overflow: hidden;
+      contain: layout paint;
+      transform: translateZ(0);
     }
     .card-clean:hover, .liquid-card:hover {
       transform: translateY(-2px) scale(1.008);
@@ -316,7 +305,7 @@
       box-shadow: var(--glass-surface-shadow), inset 5px 0 22px -2px rgba(99, 102, 241, 0.4) !important;
     }
 
-    /* Floating Island (Navigation, Header, Bottom Nav) */
+    /* Floating Island (Navigation, Header, Bottom Nav - GPU Layer Promoted) */
     .liquid-floating-island {
       position: relative;
       background: var(--glass-floating-bg) !important;
@@ -326,6 +315,9 @@
       box-shadow: var(--glass-floating-shadow) !important;
       transition: transform 0.35s var(--spring-bounce), box-shadow 0.35s var(--spring-smooth);
       overflow: visible !important;
+      contain: layout;
+      transform: translateZ(0);
+      will-change: transform;
     }
 
     /* Modal Frosted Glass */
@@ -341,6 +333,7 @@
         0 36px 72px -12px rgba(15, 23, 42, 0.35),
         0 14px 28px -4px rgba(15, 23, 42, 0.18) !important;
       overflow: hidden;
+      transform: translateZ(0);
     }
     html.dark .liquid-modal-glass {
       box-shadow: 
@@ -350,7 +343,7 @@
         0 14px 28px -4px rgba(0, 0, 0, 0.55) !important;
     }
 
-    /* Nested Tiles inside Glass Cards (Concentric R_innen = 16px) */
+    /* Nested Tiles inside Glass Cards (Concentric R_innen = 16px - High Perf, Inherits Parent Blur) */
     .liquid-nested-tile,
     .card-clean .bg-white,
     .card-clean .bg-slate-50,
@@ -358,13 +351,11 @@
     .card-clean .bg-white\/80 {
       background-color: var(--glass-nested-bg) !important;
       border: var(--glass-nested-border) !important;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       box-shadow: var(--glass-nested-shadow) !important;
       border-radius: 16px;
     }
 
-    /* Interactive Cursor-Tracking Spotlight */
+    /* Ambient Specular Highlight (Pure GPU CSS, Zero Reflows) */
     .liquid-spotlight {
       position: relative;
     }
@@ -373,7 +364,7 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background: radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--glass-spotlight), transparent 70%);
+      background: radial-gradient(420px circle at 50% 0%, var(--glass-spotlight), transparent 70%);
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -404,15 +395,15 @@
       transform: scale(0.98);
     }
 
-    /* Frosted Glass Tables */
+    /* Frosted Glass Tables (High Perf, Inherits Card Blur) */
     table thead tr {
-      background-color: rgba(255, 255, 255, 0.4) !important;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background-color: rgba(255, 255, 255, 0.45) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.35);
     }
     html.dark table thead tr {
-      background-color: rgba(15, 20, 32, 0.6) !important;
+      background-color: rgba(15, 20, 32, 0.65) !important;
       color: #94a3b8 !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     table tbody tr {
       background-color: transparent !important;
@@ -469,13 +460,8 @@
 </head>
 <body class="text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased pb-32 sm:pb-24 selection:bg-amber-400/30 selection:text-amber-900 dark:selection:text-amber-200 relative overflow-x-hidden">
 
-  <!-- LIVING MESH GRADIENT STAGE (High-Chroma Apple Wallpaper for Liquid Refraction) -->
-  <div id="living-mesh-stage" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden transition-opacity duration-300" aria-hidden="true" style="opacity: var(--user-bg-vibrancy, 0.75);">
-    <div class="absolute -top-48 -left-48 w-[820px] h-[820px] rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 blur-[130px] animate-liquid-pulse-1"></div>
-    <div class="absolute top-1/4 -right-48 w-[880px] h-[880px] rounded-full bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 blur-[140px] animate-liquid-pulse-2"></div>
-    <div class="absolute bottom-10 left-1/4 w-[840px] h-[840px] rounded-full bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 blur-[135px] animate-liquid-pulse-3"></div>
-    <div class="absolute top-2/3 right-1/4 w-[720px] h-[720px] rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-violet-700 blur-[130px] animate-liquid-pulse-1"></div>
-  </div>
+  <!-- LIVING MESH GRADIENT STAGE (High-Chroma Apple Wallpaper - Static GPU-Optimized) -->
+  <div id="living-mesh-stage" class="fixed inset-0 pointer-events-none -z-10 transition-opacity duration-300" aria-hidden="true" style="opacity: var(--user-bg-vibrancy, 0.75);"></div>
 
   <!-- TELEGRAM AUTHENTICATION GATE OVERLAY (Apple Liquid Glass Modal) -->
   <div id="telegram-auth-gate" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/60 backdrop-blur-xl p-4 transition-all duration-300">
@@ -1669,23 +1655,7 @@
       }
     }
 
-    // Interactive Cursor-Tracking Spotlight for Liquid Glass surfaces
-    (function initLiquidGlassTracking() {
-      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-        document.addEventListener('mousemove', (e) => {
-          const cards = document.querySelectorAll('.liquid-spotlight, .card-clean, .liquid-floating-island');
-          cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            if (x >= -60 && x <= rect.width + 60 && y >= -60 && y <= rect.height + 60) {
-              card.style.setProperty('--mouse-x', `${x}px`);
-              card.style.setProperty('--mouse-y', `${y}px`);
-            }
-          });
-        }, { passive: true });
-      }
-    })();
+
 
     let currentAuthUser = null;
     let hasLoadedRemoteAuthData = false;
