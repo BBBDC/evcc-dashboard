@@ -16,7 +16,7 @@
   <meta name="apple-mobile-web-app-title" content="EVCC">
   <meta name="theme-color" content="#f59e0b">
 
-  <!-- Immediate Theme Application (Prevents FOUC) -->
+  <!-- Immediate Theme & Glass Settings Application (Prevents FOUC) -->
   <script>
     (function() {
       const saved = localStorage.getItem('evcc_theme_mode') || 'auto';
@@ -31,6 +31,19 @@
         document.documentElement.classList.remove('dark');
         document.documentElement.classList.add('light');
       }
+
+      // Preload user glass settings
+      try {
+        const savedGlass = localStorage.getItem('evcc_glass_settings');
+        if (savedGlass) {
+          const g = JSON.parse(savedGlass);
+          if (g && g.opacity !== undefined) {
+            document.documentElement.style.setProperty('--user-glass-opacity', g.opacity / 100);
+            document.documentElement.style.setProperty('--user-glass-blur', (g.blur || 28) + 'px');
+            document.documentElement.style.setProperty('--user-bg-vibrancy', (g.bgGlow || 45) / 100);
+          }
+        }
+      } catch(e) {}
     })();
   </script>
   <!-- Tailwind CSS -->
@@ -83,10 +96,16 @@
       --spring-bounce: cubic-bezier(0.22, 1.2, 0.36, 1);
       --spring-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
+      /* User Controllable Glass & Wallpaper Parameters */
+      --user-glass-opacity: 0.30;
+      --user-glass-blur: 28px;
+      --user-bg-vibrancy: 0.45;
+      --user-sheen-opacity: 0.35;
+
       /* Apple Liquid Glass - Light Mode */
-      --glass-surface-bg: rgba(255, 255, 255, 0.26);
-      --glass-surface-bg-hover: rgba(255, 255, 255, 0.38);
-      --glass-surface-blur: blur(28px) saturate(210%) brightness(1.06);
+      --glass-surface-bg: rgba(255, 255, 255, var(--user-glass-opacity, 0.30));
+      --glass-surface-bg-hover: rgba(255, 255, 255, calc(var(--user-glass-opacity, 0.30) + 0.12));
+      --glass-surface-blur: blur(var(--user-glass-blur, 28px)) saturate(200%) brightness(1.06);
       --glass-surface-border: 1px solid rgba(255, 255, 255, 0.65);
       --glass-surface-border-specular: 1.5px solid rgba(255, 255, 255, 0.85);
       --glass-surface-shadow: 
@@ -97,8 +116,8 @@
         0 4px 14px -2px rgba(15, 23, 42, 0.05);
 
       /* Floating Navigation & Pills */
-      --glass-floating-bg: rgba(255, 255, 255, 0.38);
-      --glass-floating-blur: blur(32px) saturate(220%) brightness(1.08);
+      --glass-floating-bg: rgba(255, 255, 255, calc(var(--user-glass-opacity, 0.30) + 0.15));
+      --glass-floating-blur: blur(calc(var(--user-glass-blur, 28px) + 6px)) saturate(215%) brightness(1.08);
       --glass-floating-shadow: 
         inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.98),
         inset 0 -1px 1px 0 rgba(255, 255, 255, 0.3),
@@ -106,8 +125,8 @@
         0 6px 18px -2px rgba(15, 23, 42, 0.07);
 
       /* Nested Tiles & Inputs (Glass on Glass) */
-      --glass-nested-bg: rgba(255, 255, 255, 0.32);
-      --glass-nested-border: 1px solid rgba(255, 255, 255, 0.55);
+      --glass-nested-bg: rgba(255, 255, 255, calc(var(--user-glass-opacity, 0.30) + 0.08));
+      --glass-nested-border: 1px solid rgba(255, 255, 255, 0.6);
       --glass-nested-shadow: 
         inset 0 1px 1px 0 rgba(255, 255, 255, 0.8),
         0 4px 12px -2px rgba(15, 23, 42, 0.03);
@@ -126,9 +145,9 @@
 
     html.dark {
       /* Apple Liquid Glass - Dark Mode */
-      --glass-surface-bg: rgba(18, 24, 38, 0.42);
-      --glass-surface-bg-hover: rgba(24, 32, 50, 0.55);
-      --glass-surface-blur: blur(32px) saturate(210%) brightness(1.03);
+      --glass-surface-bg: rgba(18, 24, 38, calc(var(--user-glass-opacity, 0.30) * 1.35));
+      --glass-surface-bg-hover: rgba(24, 32, 50, calc(var(--user-glass-opacity, 0.30) * 1.5));
+      --glass-surface-blur: blur(var(--user-glass-blur, 28px)) saturate(200%) brightness(1.03);
       --glass-surface-border: 1px solid rgba(255, 255, 255, 0.14);
       --glass-surface-border-specular: 1.5px solid rgba(255, 255, 255, 0.28);
       --glass-surface-shadow: 
@@ -139,8 +158,8 @@
         0 6px 18px -2px rgba(0, 0, 0, 0.45);
 
       /* Floating Navigation & Pills */
-      --glass-floating-bg: rgba(14, 18, 30, 0.58);
-      --glass-floating-blur: blur(36px) saturate(220%) brightness(1.05);
+      --glass-floating-bg: rgba(14, 18, 30, calc(var(--user-glass-opacity, 0.30) * 1.6));
+      --glass-floating-blur: blur(calc(var(--user-glass-blur, 28px) + 6px)) saturate(215%) brightness(1.05);
       --glass-floating-shadow: 
         inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.35),
         inset 0 -1px 1px 0 rgba(0, 0, 0, 0.7),
@@ -177,10 +196,10 @@
     body {
       background-color: var(--bg-canvas);
       background-image: 
-        radial-gradient(at 12% 12%, rgba(245, 158, 11, 0.38) 0px, transparent 50%),
-        radial-gradient(at 88% 18%, rgba(16, 185, 129, 0.32) 0px, transparent 48%),
-        radial-gradient(at 28% 70%, rgba(6, 182, 212, 0.35) 0px, transparent 52%),
-        radial-gradient(at 82% 82%, rgba(99, 102, 241, 0.3) 0px, transparent 50%);
+        radial-gradient(at 12% 12%, rgba(245, 158, 11, calc(var(--user-bg-vibrancy, 0.45) * 0.8)) 0px, transparent 50%),
+        radial-gradient(at 88% 18%, rgba(16, 185, 129, calc(var(--user-bg-vibrancy, 0.45) * 0.7)) 0px, transparent 48%),
+        radial-gradient(at 28% 70%, rgba(6, 182, 212, calc(var(--user-bg-vibrancy, 0.45) * 0.75)) 0px, transparent 52%),
+        radial-gradient(at 82% 82%, rgba(99, 102, 241, calc(var(--user-bg-vibrancy, 0.45) * 0.65)) 0px, transparent 50%);
       background-attachment: fixed;
       background-size: cover;
       min-height: 100vh;
@@ -188,10 +207,10 @@
     html.dark body {
       background-color: var(--bg-canvas);
       background-image: 
-        radial-gradient(at 12% 12%, rgba(245, 158, 11, 0.28) 0px, transparent 50%),
-        radial-gradient(at 88% 18%, rgba(16, 185, 129, 0.24) 0px, transparent 48%),
-        radial-gradient(at 28% 70%, rgba(6, 182, 212, 0.28) 0px, transparent 52%),
-        radial-gradient(at 82% 82%, rgba(99, 102, 241, 0.24) 0px, transparent 50%);
+        radial-gradient(at 12% 12%, rgba(245, 158, 11, calc(var(--user-bg-vibrancy, 0.45) * 0.6)) 0px, transparent 50%),
+        radial-gradient(at 88% 18%, rgba(16, 185, 129, calc(var(--user-bg-vibrancy, 0.45) * 0.5)) 0px, transparent 48%),
+        radial-gradient(at 28% 70%, rgba(6, 182, 212, calc(var(--user-bg-vibrancy, 0.45) * 0.55)) 0px, transparent 52%),
+        radial-gradient(at 82% 82%, rgba(99, 102, 241, calc(var(--user-bg-vibrancy, 0.45) * 0.5)) 0px, transparent 50%);
       background-attachment: fixed;
       background-size: cover;
     }
@@ -273,6 +292,8 @@
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.1) 32%, transparent 62%);
       pointer-events: none;
       z-index: 1;
+      opacity: calc(var(--user-sheen-opacity, 0.35) / 0.35);
+      transition: opacity 0.25s ease;
     }
     html.dark .card-clean::after, html.dark .liquid-card::after, html.dark .liquid-floating-island::after {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.03) 32%, transparent 62%);
@@ -304,7 +325,7 @@
       border: var(--glass-surface-border-specular) !important;
       box-shadow: var(--glass-floating-shadow) !important;
       transition: transform 0.35s var(--spring-bounce), box-shadow 0.35s var(--spring-smooth);
-      overflow: hidden;
+      overflow: visible !important;
     }
 
     /* Modal Frosted Glass */
@@ -377,10 +398,10 @@
       transition: transform 0.25s var(--spring-bounce), background 0.2s ease, box-shadow 0.25s ease, color 0.2s ease;
     }
     .liquid-nav-pill:hover {
-      transform: scale(1.025);
+      transform: scale(1.02);
     }
     .liquid-nav-pill:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
 
     /* Frosted Glass Tables */
@@ -449,11 +470,11 @@
 <body class="text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased pb-32 sm:pb-24 selection:bg-amber-400/30 selection:text-amber-900 dark:selection:text-amber-200 relative overflow-x-hidden">
 
   <!-- LIVING MESH GRADIENT STAGE (High-Chroma Apple Wallpaper for Liquid Refraction) -->
-  <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden" aria-hidden="true">
-    <div class="absolute -top-40 -left-40 w-[680px] h-[680px] rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 opacity-60 dark:opacity-40 blur-[110px] animate-liquid-pulse-1"></div>
-    <div class="absolute top-1/4 -right-40 w-[740px] h-[740px] rounded-full bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 opacity-55 dark:opacity-35 blur-[120px] animate-liquid-pulse-2"></div>
-    <div class="absolute bottom-10 left-1/4 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 opacity-55 dark:opacity-38 blur-[115px] animate-liquid-pulse-3"></div>
-    <div class="absolute top-2/3 right-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-violet-700 opacity-50 dark:opacity-35 blur-[110px] animate-liquid-pulse-1"></div>
+  <div id="living-mesh-stage" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden transition-opacity duration-300" aria-hidden="true" style="opacity: var(--user-bg-vibrancy, 0.45);">
+    <div class="absolute -top-48 -left-48 w-[820px] h-[820px] rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 blur-[130px] animate-liquid-pulse-1"></div>
+    <div class="absolute top-1/4 -right-48 w-[880px] h-[880px] rounded-full bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 blur-[140px] animate-liquid-pulse-2"></div>
+    <div class="absolute bottom-10 left-1/4 w-[840px] h-[840px] rounded-full bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 blur-[135px] animate-liquid-pulse-3"></div>
+    <div class="absolute top-2/3 right-1/4 w-[720px] h-[720px] rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-violet-700 blur-[130px] animate-liquid-pulse-1"></div>
   </div>
 
   <!-- TELEGRAM AUTHENTICATION GATE OVERLAY (Apple Liquid Glass Modal) -->
@@ -556,6 +577,11 @@
           <div class="font-semibold text-slate-700 dark:text-slate-200" id="countdown-text">in 45s</div>
         </div>
 
+        <!-- Glass Settings Button (Apple Control Center) -->
+        <button id="glass-settings-btn" onclick="toggleGlassSettingsPopover()" title="Liquid Glass Feineinstellung" class="liquid-btn p-2 rounded-full bg-white/40 dark:bg-white/10 hover:bg-white/60 dark:hover:bg-white/20 border border-white/50 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm cursor-pointer">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+        </button>
+
         <!-- Theme Toggle Button (Apple Glass Pill) -->
         <button id="theme-toggle-btn" onclick="toggleTheme()" title="Design wechseln (Light / Dark)" class="liquid-btn p-2 rounded-full bg-white/40 dark:bg-white/10 hover:bg-white/60 dark:hover:bg-white/20 border border-white/50 dark:border-white/10 text-slate-700 dark:text-slate-200 shadow-sm cursor-pointer">
           <i data-lucide="moon" class="w-4 h-4" id="theme-toggle-icon"></i>
@@ -586,27 +612,99 @@
         </div>
       </div>
 
-      <!-- Desktop Navigation Tabs (Pill Segmented Control) -->
+      <!-- LIQUID GLASS CONTROL CENTER POPOVER (Apple Control Center) -->
+      <div id="glass-settings-popover" class="hidden absolute top-full right-4 sm:right-6 mt-3 w-80 sm:w-96 rounded-3xl liquid-modal-glass p-5 z-[150] shadow-2xl space-y-4 border border-white/60 dark:border-white/15">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200/40 dark:border-white/10">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xs shadow-sm shadow-indigo-500/30 ring-1 ring-white/50">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="font-bold text-sm text-slate-900 dark:text-white block leading-tight">Liquid Glass Feineinstellung</span>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400">Echtzeit-Anpassung der Optik</span>
+            </div>
+          </div>
+          <button onclick="toggleGlassSettingsPopover()" class="liquid-btn p-1.5 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-white/20 transition cursor-pointer">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Slider 1: Glas-Deckkraft (Transparenz) -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold text-slate-700 dark:text-slate-300">Glas-Deckkraft (Karten)</span>
+            <span class="font-bold text-slate-900 dark:text-white font-mono bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-md border border-white/50 dark:border-white/10" id="val-glass-opacity">30%</span>
+          </div>
+          <input type="range" id="slider-glass-opacity" min="12" max="60" value="30" step="2" oninput="onGlassOpacityChange(this.value)" class="w-full accent-amber-500 cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+            <span>Kristall (12%)</span>
+            <span>Ausgewogen (30%)</span>
+            <span>Matt / Ruhig (60%)</span>
+          </div>
+        </div>
+
+        <!-- Slider 2: Hintergrund-Leuchtkraft (Wallpaper Glow) -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold text-slate-700 dark:text-slate-300">Hintergrund-Transparenz / Glow</span>
+            <span class="font-bold text-slate-900 dark:text-white font-mono bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-md border border-white/50 dark:border-white/10" id="val-bg-glow">45%</span>
+          </div>
+          <input type="range" id="slider-bg-glow" min="10" max="75" value="45" step="5" oninput="onBgGlowChange(this.value)" class="w-full accent-cyan-500 cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+            <span>Sanft (10%)</span>
+            <span>Seidig (45%)</span>
+            <span>Vibrant (75%)</span>
+          </div>
+        </div>
+
+        <!-- Schnellwahl Presets -->
+        <div class="pt-2 border-t border-slate-200/40 dark:border-white/10 space-y-2">
+          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Schnellwahl-Profile:</span>
+          <div class="grid grid-cols-3 gap-1.5 text-xs">
+            <button type="button" onclick="applyGlassPreset('silky')" class="liquid-btn p-2 rounded-xl liquid-nested-tile text-[11px] font-semibold text-center hover:scale-[1.02] transition active:scale-95 cursor-pointer">
+              🍏 Seidig
+            </button>
+            <button type="button" onclick="applyGlassPreset('balance')" class="liquid-btn p-2 rounded-xl liquid-nested-tile text-[11px] font-bold text-center hover:scale-[1.02] transition active:scale-95 cursor-pointer">
+              ✨ Balance
+            </button>
+            <button type="button" onclick="applyGlassPreset('crystal')" class="liquid-btn p-2 rounded-xl liquid-nested-tile text-[11px] font-semibold text-center hover:scale-[1.02] transition active:scale-95 cursor-pointer">
+              💎 Kristall
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs (Pill Segmented Control with Apple Squircle Badges) -->
       <nav class="hidden md:flex items-center gap-1.5 w-full pt-2.5 border-t border-slate-200/40 dark:border-white/5">
-        <button id="nav-tab-overview" onclick="switchDashboardTab('overview')" class="dashboard-nav-btn liquid-nav-pill active flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/25 scale-[1.02] cursor-pointer">
-          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+        <button id="nav-tab-overview" onclick="switchDashboardTab('overview')" class="dashboard-nav-btn liquid-nav-pill active flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-white/75 dark:bg-white/20 text-slate-900 dark:text-white shadow-md shadow-slate-900/5 ring-1 ring-white/60 dark:ring-white/15 scale-[1.02] cursor-pointer">
+          <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-sm shadow-amber-500/35 ring-1 ring-white/50 shrink-0">
+            <i data-lucide="zap" class="w-3.5 h-3.5 stroke-[2.2]"></i>
+          </span>
           <span>Live & Laden</span>
         </button>
-        <button id="nav-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer relative">
-          <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+        <button id="nav-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer relative">
+          <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-500 text-white flex items-center justify-center shadow-sm shadow-amber-500/25 ring-1 ring-white/40 opacity-75 shrink-0">
+            <i data-lucide="sun" class="w-3.5 h-3.5 stroke-[2.2]"></i>
+          </span>
           <span>Solar-Log (17 WR)</span>
           <span id="tab-badge-solarlog-errors" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white ml-0.5">0</span>
         </button>
-        <button id="nav-tab-forecast" onclick="switchDashboardTab('forecast')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
-          <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+        <button id="nav-tab-forecast" onclick="switchDashboardTab('forecast')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
+          <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 text-white flex items-center justify-center shadow-sm shadow-cyan-500/25 ring-1 ring-white/40 opacity-75 shrink-0">
+            <i data-lucide="calendar-check" class="w-3.5 h-3.5 stroke-[2.2]"></i>
+          </span>
           <span>Ladefenster & Prognose</span>
         </button>
-        <button id="nav-tab-history" onclick="switchDashboardTab('history')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
-          <i data-lucide="history" class="w-3.5 h-3.5"></i>
+        <button id="nav-tab-history" onclick="switchDashboardTab('history')" class="dashboard-nav-btn liquid-nav-pill flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
+          <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center shadow-sm shadow-emerald-500/25 ring-1 ring-white/40 opacity-75 shrink-0">
+            <i data-lucide="history" class="w-3.5 h-3.5 stroke-[2.2]"></i>
+          </span>
           <span>Ladehistorie</span>
         </button>
-        <button id="nav-tab-users" onclick="switchDashboardTab('users')" class="hidden dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-500"></i>
+        <button id="nav-tab-users" onclick="switchDashboardTab('users')" class="hidden dashboard-nav-btn liquid-nav-pill flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer">
+          <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-sm shadow-indigo-500/25 ring-1 ring-white/40 opacity-75 shrink-0">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 stroke-[2.2]"></i>
+          </span>
           <span>Benutzer-Zugriff</span>
           <span id="tab-badge-users-count" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-400/30 ml-0.5">0</span>
         </button>
@@ -1380,28 +1478,38 @@
     <p>EVCC & Solar-Log Web Dashboard • Gehostet auf GitHub Pages • Automatische Telemetrie alle 2 Minuten</p>
   </footer>
 
-  <!-- MOBILE FLOATING BOTTOM NAVIGATION BAR (Apple Liquid Glass Floating Pill) -->
+  <!-- MOBILE FLOATING BOTTOM NAVIGATION BAR (Apple Liquid Glass Floating Pill with Squircle Badges) -->
   <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-4 left-3 right-3 sm:left-6 sm:right-6 max-w-md mx-auto z-40 liquid-floating-island px-2 py-1.5 pb-[max(env(safe-area-inset-bottom,0px),10px)] rounded-full flex items-center justify-around shadow-2xl">
-    <button id="mob-tab-overview" onclick="switchDashboardTab('overview')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-amber-600 dark:text-amber-400 font-bold bg-amber-500/15 scale-[1.04] cursor-pointer">
-      <i data-lucide="zap" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-0.5 font-semibold">Laden</span>
+    <button id="mob-tab-overview" onclick="switchDashboardTab('overview')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1 px-1.5 rounded-2xl transition-all text-slate-900 dark:text-white font-bold scale-[1.04] cursor-pointer">
+      <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/35 ring-1 ring-white/60">
+        <i data-lucide="zap" class="w-4 h-4 stroke-[2.2]"></i>
+      </span>
+      <span class="text-[9.5px] mt-1 font-semibold leading-none">Laden</span>
     </button>
-    <button id="mob-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer relative">
-      <i data-lucide="sun" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-0.5 font-semibold">Solar-Log</span>
-      <span id="mob-badge-solarlog-errors" class="hidden absolute top-1 right-5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900"></span>
+    <button id="mob-tab-solarlog" onclick="switchDashboardTab('solarlog')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1 px-1.5 rounded-2xl transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer relative">
+      <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 text-white flex items-center justify-center shadow-sm shadow-amber-500/20 ring-1 ring-white/30 opacity-70">
+        <i data-lucide="sun" class="w-4 h-4 stroke-[2.2]"></i>
+      </span>
+      <span class="text-[9.5px] mt-1 font-semibold leading-none">Solar-Log</span>
+      <span id="mob-badge-solarlog-errors" class="hidden absolute top-1 right-3 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900"></span>
     </button>
-    <button id="mob-tab-forecast" onclick="switchDashboardTab('forecast')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
-      <i data-lucide="calendar-check" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-0.5 font-semibold">Prognose</span>
+    <button id="mob-tab-forecast" onclick="switchDashboardTab('forecast')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1 px-1.5 rounded-2xl transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
+      <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 text-white flex items-center justify-center shadow-sm shadow-cyan-500/20 ring-1 ring-white/30 opacity-70">
+        <i data-lucide="calendar-check" class="w-4 h-4 stroke-[2.2]"></i>
+      </span>
+      <span class="text-[9.5px] mt-1 font-semibold leading-none">Prognose</span>
     </button>
-    <button id="mob-tab-history" onclick="switchDashboardTab('history')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
-      <i data-lucide="history" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-0.5 font-semibold">Historie</span>
+    <button id="mob-tab-history" onclick="switchDashboardTab('history')" class="mob-nav-btn flex-1 flex flex-col items-center justify-center py-1 px-1.5 rounded-2xl transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
+      <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center shadow-sm shadow-emerald-500/20 ring-1 ring-white/30 opacity-70">
+        <i data-lucide="history" class="w-4 h-4 stroke-[2.2]"></i>
+      </span>
+      <span class="text-[9.5px] mt-1 font-semibold leading-none">Historie</span>
     </button>
-    <button id="mob-tab-users" onclick="switchDashboardTab('users')" class="hidden mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
-      <i data-lucide="shield-check" class="w-5 h-5 text-amber-500"></i>
-      <span class="text-[10px] mt-0.5 font-semibold">Benutzer</span>
+    <button id="mob-tab-users" onclick="switchDashboardTab('users')" class="hidden mob-nav-btn flex-1 flex flex-col items-center justify-center py-1 px-1.5 rounded-2xl transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer">
+      <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-sm shadow-indigo-500/20 ring-1 ring-white/30 opacity-70">
+        <i data-lucide="shield-check" class="w-4 h-4 stroke-[2.2]"></i>
+      </span>
+      <span class="text-[9.5px] mt-1 font-semibold leading-none">Benutzer</span>
     </button>
   </nav>
 
@@ -1422,6 +1530,100 @@
     // ==========================================
     // THEME ENGINE (Apple Liquid Glass: Light / Dark)
     // ==========================================
+    
+    // ==========================================
+    // LIQUID GLASS CONTROLLER (Settings & Sliders)
+    // ==========================================
+    let glassSettings = {
+      opacity: 30,  // % (12 to 60)
+      bgGlow: 45,   // % (10 to 75)
+      blur: 28,     // px (16 to 36)
+      sheen: 35     // %
+    };
+
+    function initGlassSettings() {
+      try {
+        const saved = localStorage.getItem('evcc_glass_settings');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed) glassSettings = { ...glassSettings, ...parsed };
+        }
+      } catch(e) {}
+      applyGlassDOM();
+    }
+
+    function applyGlassDOM() {
+      const root = document.documentElement;
+      const op = glassSettings.opacity / 100;
+      const glow = glassSettings.bgGlow / 100;
+      const blur = glassSettings.blur;
+
+      root.style.setProperty('--user-glass-opacity', op);
+      root.style.setProperty('--user-glass-blur', `${blur}px`);
+      root.style.setProperty('--user-bg-vibrancy', glow);
+
+      const stage = document.getElementById('living-mesh-stage');
+      if (stage) stage.style.opacity = glow;
+
+      const sliderOp = document.getElementById('slider-glass-opacity');
+      const valOp = document.getElementById('val-glass-opacity');
+      if (sliderOp) sliderOp.value = glassSettings.opacity;
+      if (valOp) valOp.textContent = `${glassSettings.opacity}%`;
+
+      const sliderGlow = document.getElementById('slider-bg-glow');
+      const valGlow = document.getElementById('val-bg-glow');
+      if (sliderGlow) sliderGlow.value = glassSettings.bgGlow;
+      if (valGlow) valGlow.textContent = `${glassSettings.bgGlow}%`;
+    }
+
+    function onGlassOpacityChange(val) {
+      glassSettings.opacity = parseInt(val, 10);
+      glassSettings.blur = Math.round(18 + (glassSettings.opacity / 60) * 16);
+      saveGlassSettings();
+      applyGlassDOM();
+    }
+
+    function onBgGlowChange(val) {
+      glassSettings.bgGlow = parseInt(val, 10);
+      saveGlassSettings();
+      applyGlassDOM();
+    }
+
+    function applyGlassPreset(type) {
+      if (type === 'silky') {
+        glassSettings = { opacity: 45, bgGlow: 30, blur: 24, sheen: 25 };
+      } else if (type === 'balance') {
+        glassSettings = { opacity: 30, bgGlow: 45, blur: 28, sheen: 35 };
+      } else if (type === 'crystal') {
+        glassSettings = { opacity: 16, bgGlow: 65, blur: 32, sheen: 45 };
+      }
+      saveGlassSettings();
+      applyGlassDOM();
+    }
+
+    function saveGlassSettings() {
+      try {
+        localStorage.setItem('evcc_glass_settings', JSON.stringify(glassSettings));
+      } catch(e) {}
+    }
+
+    function toggleGlassSettingsPopover() {
+      const pop = document.getElementById('glass-settings-popover');
+      if (!pop) return;
+      pop.classList.toggle('hidden');
+    }
+
+    // Close popover when clicking outside
+    document.addEventListener('click', (e) => {
+      const pop = document.getElementById('glass-settings-popover');
+      const btn = document.getElementById('glass-settings-btn');
+      if (pop && !pop.classList.contains('hidden')) {
+        if (!pop.contains(e.target) && !btn?.contains(e.target)) {
+          pop.classList.add('hidden');
+        }
+      }
+    });
+
     function initThemeMode() {
       const saved = localStorage.getItem('evcc_theme_mode') || 'auto';
       let effective = saved;
@@ -1779,23 +1981,29 @@
           }
         }
 
-        // Desktop Tab Buttons
+        // Desktop Tab Buttons (Squircle Badges Handling)
         const dBtn = document.getElementById('nav-tab-' + t);
         if (dBtn) {
+          const badge = dBtn.querySelector('span:first-child');
           if (t === tabId) {
-            dBtn.className = 'dashboard-nav-btn liquid-nav-pill active flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/25 scale-[1.02] cursor-pointer';
+            dBtn.className = 'dashboard-nav-btn liquid-nav-pill active flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-white/80 dark:bg-white/20 text-slate-900 dark:text-white shadow-md ring-1 ring-white/70 dark:ring-white/20 scale-[1.02] cursor-pointer';
+            if (badge) badge.classList.replace('opacity-75', 'opacity-100');
           } else {
-            dBtn.className = 'dashboard-nav-btn liquid-nav-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer';
+            dBtn.className = 'dashboard-nav-btn liquid-nav-pill flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 cursor-pointer';
+            if (badge) badge.classList.replace('opacity-100', 'opacity-75');
           }
         }
 
-        // Mobile Bottom Tab Buttons
+        // Mobile Bottom Tab Buttons (Squircle Badges Handling)
         const mBtn = document.getElementById('mob-tab-' + t);
         if (mBtn) {
+          const badge = mBtn.querySelector('span:first-child');
           if (t === tabId) {
-            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-amber-600 dark:text-amber-400 font-bold bg-amber-500/15 scale-[1.04] cursor-pointer';
+            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1 px-1.5 rounded-2xl transition-all text-slate-900 dark:text-white font-bold scale-[1.04] cursor-pointer';
+            if (badge) badge.classList.replace('opacity-70', 'opacity-100');
           } else {
-            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-full transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer relative';
+            mBtn.className = 'mob-nav-btn flex-1 flex flex-col items-center justify-center py-1 px-1.5 rounded-2xl transition-all text-slate-500 dark:text-slate-400 font-medium active:scale-95 cursor-pointer relative';
+            if (badge) badge.classList.replace('opacity-100', 'opacity-70');
           }
         }
       });
@@ -2751,6 +2959,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       initThemeMode();
+      initGlassSettings();
       lucide.createIcons();
       initAuthOnLoad();
       const savedTab = sessionStorage.getItem('evcc_active_tab') || 'overview';
