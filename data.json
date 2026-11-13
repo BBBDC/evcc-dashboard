@@ -1,16 +1,16 @@
 {
   "meta": {
     "version": "2.2.0",
-    "timestamp": "2026-11-13T09:11:13.696452",
-    "display_time": "13.11.2026 09:11:13",
+    "timestamp": "2026-11-13T09:23:30.063834",
+    "display_time": "13.11.2026 09:23:30",
     "display_date": "13.11.2026",
     "location": "Kempten (Allgäu)"
   },
   "energy": {
-    "pv_power_w": 11815,
-    "pv_power_kw": 11.81,
-    "grid_power_w": -11815,
-    "grid_power_kw": -11.81,
+    "pv_power_w": 12227,
+    "pv_power_kw": 12.23,
+    "grid_power_w": -12227,
+    "grid_power_kw": -12.23,
     "grid_mode": "export",
     "home_power_w": 0,
     "home_power_kw": 0.0,
@@ -19,12 +19,12 @@
     "pv_plants": [
       {
         "title": "Fronius rechts",
-        "power_w": 327,
+        "power_w": 314,
         "energy_kwh": 17.65
       },
       {
         "title": "Solarlog_Anlage",
-        "power_w": 11488,
+        "power_w": 11913,
         "energy_kwh": 2657.51
       }
     ]
@@ -32,8 +32,8 @@
   "charging_pv_system": {
     "title": "Fronius 3er-Verbund (Auto-Lade-PV)",
     "installed_kwp": 18.67,
-    "total_power_w": 872,
-    "total_power_kw": 0.87,
+    "total_power_w": 837,
+    "total_power_kw": 0.84,
     "charging_readiness": {
       "threshold_kw": 6.34,
       "threshold_w": 6340.0,
@@ -42,28 +42,28 @@
       "buffer_with_margin_kw": 2.2,
       "min_current": 6,
       "max_current": 16,
-      "current_kw": 0.87,
-      "current_w": 872,
+      "current_kw": 0.84,
+      "current_w": 837,
       "is_ready": false,
-      "diff_kw": -5.47,
-      "progress_percent": 13.8
+      "diff_kw": -5.5,
+      "progress_percent": 13.2
     },
     "wr1": {
       "title": "Fronius rechts (Messwert)",
-      "power_w": 327,
-      "power_kw": 0.33,
+      "power_w": 314,
+      "power_kw": 0.31,
       "ratio_percent": 100
     },
     "wr2": {
       "title": "Wechselrichter 2 (Partner-WR)",
-      "power_w": 327,
-      "power_kw": 0.33,
+      "power_w": 314,
+      "power_kw": 0.31,
       "ratio_percent": 100
     },
     "wr3": {
       "title": "Wechselrichter 3 (Zusatz-WR)",
-      "power_w": 218,
-      "power_kw": 0.22,
+      "power_w": 209,
+      "power_kw": 0.21,
       "ratio_percent": 66.7
     }
   },
@@ -75,11 +75,11 @@
     "buffer_with_margin_kw": 2.2,
     "min_current": 6,
     "max_current": 16,
-    "current_kw": 0.87,
-    "current_w": 872,
+    "current_kw": 0.84,
+    "current_w": 837,
     "is_ready": false,
-    "diff_kw": -5.47,
-    "progress_percent": 13.8
+    "diff_kw": -5.5,
+    "progress_percent": 13.2
   },
   "wallbox": {
     "online": true,
@@ -137,9 +137,9 @@
     "is_paused_by_pv": true
   },
   "influx_today": {
-    "energy_kwh": 7.78,
-    "max_power_w": 12334,
-    "avg_power_w": 378,
+    "energy_kwh": 11.28,
+    "max_power_w": 13467,
+    "avg_power_w": 543,
     "date": "13.11.2026"
   },
   "weather_intelligence": {
@@ -152,7 +152,7 @@
     "open_meteo": {
       "temp_c": null,
       "cloud_cover": 55,
-      "sunshine_today_h": 8.0,
+      "sunshine_today_h": 8.1,
       "sunshine_tomorrow_h": 8.6,
       "sunrise": "07:21",
       "sunset": "16:44"
@@ -199,7 +199,7 @@
       {
         "day_label": "Heute",
         "date": "13.11.2026",
-        "energy_kwh": 53.7,
+        "energy_kwh": 51.8,
         "max_kw": 11.6,
         "charging_possible": true
       },
