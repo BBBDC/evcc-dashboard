@@ -40,7 +40,7 @@
           if (g && g.opacity !== undefined) {
             document.documentElement.style.setProperty('--user-glass-opacity', g.opacity / 100);
             document.documentElement.style.setProperty('--user-glass-blur', (g.blur || 28) + 'px');
-            document.documentElement.style.setProperty('--user-bg-vibrancy', (g.bgGlow || 45) / 100);
+            document.documentElement.style.setProperty('--user-bg-vibrancy', (g.bgGlow || 75) / 100);
           }
         }
       } catch(e) {}
@@ -97,14 +97,14 @@
       --spring-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
       /* User Controllable Glass & Wallpaper Parameters */
-      --user-glass-opacity: 0.30;
+      --user-glass-opacity: 0.60;
       --user-glass-blur: 28px;
-      --user-bg-vibrancy: 0.45;
+      --user-bg-vibrancy: 0.75;
       --user-sheen-opacity: 0.35;
 
       /* Apple Liquid Glass - Light Mode */
-      --glass-surface-bg: rgba(255, 255, 255, var(--user-glass-opacity, 0.30));
-      --glass-surface-bg-hover: rgba(255, 255, 255, calc(var(--user-glass-opacity, 0.30) + 0.12));
+      --glass-surface-bg: rgba(255, 255, 255, var(--user-glass-opacity, 0.60));
+      --glass-surface-bg-hover: rgba(255, 255, 255, min(0.98, calc(var(--user-glass-opacity, 0.60) + 0.08)));
       --glass-surface-blur: blur(var(--user-glass-blur, 28px)) saturate(200%) brightness(1.06);
       --glass-surface-border: 1px solid rgba(255, 255, 255, 0.65);
       --glass-surface-border-specular: 1.5px solid rgba(255, 255, 255, 0.85);
@@ -116,7 +116,7 @@
         0 4px 14px -2px rgba(15, 23, 42, 0.05);
 
       /* Floating Navigation & Pills */
-      --glass-floating-bg: rgba(255, 255, 255, calc(var(--user-glass-opacity, 0.30) + 0.15));
+      --glass-floating-bg: rgba(255, 255, 255, min(0.98, calc(var(--user-glass-opacity, 0.60) + 0.10)));
       --glass-floating-blur: blur(calc(var(--user-glass-blur, 28px) + 6px)) saturate(215%) brightness(1.08);
       --glass-floating-shadow: 
         inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.98),
@@ -125,7 +125,7 @@
         0 6px 18px -2px rgba(15, 23, 42, 0.07);
 
       /* Nested Tiles & Inputs (Glass on Glass) */
-      --glass-nested-bg: rgba(255, 255, 255, calc(var(--user-glass-opacity, 0.30) + 0.08));
+      --glass-nested-bg: rgba(255, 255, 255, min(0.95, calc(var(--user-glass-opacity, 0.60) + 0.06)));
       --glass-nested-border: 1px solid rgba(255, 255, 255, 0.6);
       --glass-nested-shadow: 
         inset 0 1px 1px 0 rgba(255, 255, 255, 0.8),
@@ -145,8 +145,8 @@
 
     html.dark {
       /* Apple Liquid Glass - Dark Mode */
-      --glass-surface-bg: rgba(18, 24, 38, calc(var(--user-glass-opacity, 0.30) * 1.35));
-      --glass-surface-bg-hover: rgba(24, 32, 50, calc(var(--user-glass-opacity, 0.30) * 1.5));
+      --glass-surface-bg: rgba(18, 24, 38, min(0.96, calc(var(--user-glass-opacity, 0.60) * 1.15)));
+      --glass-surface-bg-hover: rgba(24, 32, 50, min(0.98, calc(var(--user-glass-opacity, 0.60) * 1.25)));
       --glass-surface-blur: blur(var(--user-glass-blur, 28px)) saturate(200%) brightness(1.03);
       --glass-surface-border: 1px solid rgba(255, 255, 255, 0.14);
       --glass-surface-border-specular: 1.5px solid rgba(255, 255, 255, 0.28);
@@ -158,7 +158,7 @@
         0 6px 18px -2px rgba(0, 0, 0, 0.45);
 
       /* Floating Navigation & Pills */
-      --glass-floating-bg: rgba(14, 18, 30, calc(var(--user-glass-opacity, 0.30) * 1.6));
+      --glass-floating-bg: rgba(14, 18, 30, min(0.98, calc(var(--user-glass-opacity, 0.60) * 1.25)));
       --glass-floating-blur: blur(calc(var(--user-glass-blur, 28px) + 6px)) saturate(215%) brightness(1.05);
       --glass-floating-shadow: 
         inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.35),
@@ -470,7 +470,7 @@
 <body class="text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased pb-32 sm:pb-24 selection:bg-amber-400/30 selection:text-amber-900 dark:selection:text-amber-200 relative overflow-x-hidden">
 
   <!-- LIVING MESH GRADIENT STAGE (High-Chroma Apple Wallpaper for Liquid Refraction) -->
-  <div id="living-mesh-stage" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden transition-opacity duration-300" aria-hidden="true" style="opacity: var(--user-bg-vibrancy, 0.45);">
+  <div id="living-mesh-stage" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden transition-opacity duration-300" aria-hidden="true" style="opacity: var(--user-bg-vibrancy, 0.75);">
     <div class="absolute -top-48 -left-48 w-[820px] h-[820px] rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 blur-[130px] animate-liquid-pulse-1"></div>
     <div class="absolute top-1/4 -right-48 w-[880px] h-[880px] rounded-full bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 blur-[140px] animate-liquid-pulse-2"></div>
     <div class="absolute bottom-10 left-1/4 w-[840px] h-[840px] rounded-full bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 blur-[135px] animate-liquid-pulse-3"></div>
@@ -633,13 +633,13 @@
         <div class="space-y-1.5">
           <div class="flex justify-between items-center text-xs">
             <span class="font-semibold text-slate-700 dark:text-slate-300">Glas-Deckkraft (Karten)</span>
-            <span class="font-bold text-slate-900 dark:text-white font-mono bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-md border border-white/50 dark:border-white/10" id="val-glass-opacity">30%</span>
+            <span class="font-bold text-slate-900 dark:text-white font-mono bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-md border border-white/50 dark:border-white/10" id="val-glass-opacity">60%</span>
           </div>
-          <input type="range" id="slider-glass-opacity" min="12" max="60" value="30" step="2" oninput="onGlassOpacityChange(this.value)" class="w-full accent-amber-500 cursor-pointer">
+          <input type="range" id="slider-glass-opacity" min="10" max="95" value="60" step="1" oninput="onGlassOpacityChange(this.value)" class="w-full accent-amber-500 cursor-pointer">
           <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-            <span>Kristall (12%)</span>
-            <span>Ausgewogen (30%)</span>
-            <span>Matt / Ruhig (60%)</span>
+            <span>Kristall (10%)</span>
+            <span>Mittel (50%)</span>
+            <span>Opak (95%)</span>
           </div>
         </div>
 
@@ -647,13 +647,13 @@
         <div class="space-y-1.5">
           <div class="flex justify-between items-center text-xs">
             <span class="font-semibold text-slate-700 dark:text-slate-300">Hintergrund-Transparenz / Glow</span>
-            <span class="font-bold text-slate-900 dark:text-white font-mono bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-md border border-white/50 dark:border-white/10" id="val-bg-glow">45%</span>
+            <span class="font-bold text-slate-900 dark:text-white font-mono bg-white/60 dark:bg-white/10 px-2 py-0.5 rounded-md border border-white/50 dark:border-white/10" id="val-bg-glow">75%</span>
           </div>
-          <input type="range" id="slider-bg-glow" min="10" max="75" value="45" step="5" oninput="onBgGlowChange(this.value)" class="w-full accent-cyan-500 cursor-pointer">
+          <input type="range" id="slider-bg-glow" min="10" max="95" value="75" step="1" oninput="onBgGlowChange(this.value)" class="w-full accent-cyan-500 cursor-pointer">
           <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-            <span>Sanft (10%)</span>
-            <span>Seidig (45%)</span>
-            <span>Vibrant (75%)</span>
+            <span>Subtil (10%)</span>
+            <span>Mittel (50%)</span>
+            <span>Vibrant (95%)</span>
           </div>
         </div>
 
@@ -662,13 +662,13 @@
           <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Schnellwahl-Profile:</span>
           <div class="grid grid-cols-3 gap-1.5 text-xs">
             <button type="button" onclick="applyGlassPreset('silky')" class="liquid-btn p-2 rounded-xl liquid-nested-tile text-[11px] font-semibold text-center hover:scale-[1.02] transition active:scale-95 cursor-pointer">
-              🍏 Seidig
+              🍏 Seidig (60/75)
             </button>
-            <button type="button" onclick="applyGlassPreset('balance')" class="liquid-btn p-2 rounded-xl liquid-nested-tile text-[11px] font-bold text-center hover:scale-[1.02] transition active:scale-95 cursor-pointer">
-              ✨ Balance
+            <button type="button" onclick="applyGlassPreset('maximum')" class="liquid-btn p-2 rounded-xl liquid-nested-tile text-[11px] font-bold text-center hover:scale-[1.02] transition active:scale-95 cursor-pointer">
+              🔥 Maximum (95/95)
             </button>
             <button type="button" onclick="applyGlassPreset('crystal')" class="liquid-btn p-2 rounded-xl liquid-nested-tile text-[11px] font-semibold text-center hover:scale-[1.02] transition active:scale-95 cursor-pointer">
-              💎 Kristall
+              💎 Kristall (20/80)
             </button>
           </div>
         </div>
@@ -1535,9 +1535,9 @@
     // LIQUID GLASS CONTROLLER (Settings & Sliders)
     // ==========================================
     let glassSettings = {
-      opacity: 30,  // % (12 to 60)
-      bgGlow: 45,   // % (10 to 75)
-      blur: 28,     // px (16 to 36)
+      opacity: 60,  // % (10 to 95)
+      bgGlow: 75,   // % (10 to 95)
+      blur: 28,     // px (18 to 36)
       sheen: 35     // %
     };
 
@@ -1554,9 +1554,9 @@
 
     function applyGlassDOM() {
       const root = document.documentElement;
-      const op = glassSettings.opacity / 100;
-      const glow = glassSettings.bgGlow / 100;
-      const blur = glassSettings.blur;
+      const op = Math.min(0.95, Math.max(0.10, glassSettings.opacity / 100));
+      const glow = Math.min(0.95, Math.max(0.10, glassSettings.bgGlow / 100));
+      const blur = glassSettings.blur || 28;
 
       root.style.setProperty('--user-glass-opacity', op);
       root.style.setProperty('--user-glass-blur', `${blur}px`);
@@ -1577,25 +1577,25 @@
     }
 
     function onGlassOpacityChange(val) {
-      glassSettings.opacity = parseInt(val, 10);
-      glassSettings.blur = Math.round(18 + (glassSettings.opacity / 60) * 16);
+      glassSettings.opacity = Math.min(95, Math.max(10, parseInt(val, 10) || 60));
+      glassSettings.blur = Math.round(18 + (glassSettings.opacity / 95) * 18);
       saveGlassSettings();
       applyGlassDOM();
     }
 
     function onBgGlowChange(val) {
-      glassSettings.bgGlow = parseInt(val, 10);
+      glassSettings.bgGlow = Math.min(95, Math.max(10, parseInt(val, 10) || 75));
       saveGlassSettings();
       applyGlassDOM();
     }
 
     function applyGlassPreset(type) {
       if (type === 'silky') {
-        glassSettings = { opacity: 45, bgGlow: 30, blur: 24, sheen: 25 };
-      } else if (type === 'balance') {
-        glassSettings = { opacity: 30, bgGlow: 45, blur: 28, sheen: 35 };
+        glassSettings = { opacity: 60, bgGlow: 75, blur: 28, sheen: 35 };
+      } else if (type === 'maximum' || type === 'balance') {
+        glassSettings = { opacity: 95, bgGlow: 95, blur: 36, sheen: 40 };
       } else if (type === 'crystal') {
-        glassSettings = { opacity: 16, bgGlow: 65, blur: 32, sheen: 45 };
+        glassSettings = { opacity: 20, bgGlow: 80, blur: 24, sheen: 45 };
       }
       saveGlassSettings();
       applyGlassDOM();
