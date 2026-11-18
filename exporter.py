@@ -155,29 +155,52 @@ def fetch_influx_stats() -> Dict[str, Any]:
         client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG, timeout=10_000)
         query_api = client.query_api()
 
-        today = datetime.now(timezone.utc).date()
-        start = datetime.combine(today, datetime.min.time(), tzinfo=timezone.utc)
+        # Lokaler Tagesbeginn in UTC umrechnen (verhindert Versatz um Mitternacht)
+        local_now = datetime.now().astimezone()
+        start_of_day_local = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        start_utc = start_of_day_local.astimezone(timezone.utc)
 
+        # 1. Gesamtertrag: Primär die ungetaggte Gesamtreihe von evcc abfragen (vermeidet Doppelzählung)
         flux_energy = f'''
         from(bucket: "{INFLUX_BUCKET}")
-          |> range(start: {start.isoformat()})
-          |> filter(fn: (r) => r._measurement == "pvPower")
+          |> range(start: {start_utc.isoformat()})
+          |> filter(fn: (r) => r._measurement == "pvPower" and (not exists r.id or r.id == ""))
           |> aggregateWindow(every: 15m, fn: mean, createEmpty: false)
           |> integral(unit: 1h)
         '''
         tables = query_api.query(flux_energy)
         total_wh = 0.0
+        has_energy = False
         for table in tables:
             for record in table.records:
                 val = record.get_value()
                 if val is not None:
                     total_wh += val
+                    has_energy = True
+
+        # Fallback falls keine ungetaggte Gesamtreihe existiert: Einzel-Wechselrichter summieren
+        if not has_energy:
+            flux_energy_fb = f'''
+            from(bucket: "{INFLUX_BUCKET}")
+              |> range(start: {start_utc.isoformat()})
+              |> filter(fn: (r) => r._measurement == "pvPower" and exists r.id and r.id != "")
+              |> aggregateWindow(every: 15m, fn: mean, createEmpty: false)
+              |> integral(unit: 1h)
+            '''
+            tables_fb = query_api.query(flux_energy_fb)
+            for table in tables_fb:
+                for record in table.records:
+                    val = record.get_value()
+                    if val is not None:
+                        total_wh += val
+
         stats["energy_kwh"] = round(total_wh / 1000, 2)
 
+        # 2. Max/Avg Power: Ebenfalls auf die Gesamtreihe filtern
         flux_stats = f'''
         from(bucket: "{INFLUX_BUCKET}")
-          |> range(start: {start.isoformat()})
-          |> filter(fn: (r) => r._measurement == "pvPower")
+          |> range(start: {start_utc.isoformat()})
+          |> filter(fn: (r) => r._measurement == "pvPower" and (not exists r.id or r.id == ""))
           |> keep(columns: ["_value"])
           |> reduce(
               identity: {{min: 999999.0, max: 0.0, sum: 0.0, count: 0}},
