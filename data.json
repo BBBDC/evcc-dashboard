@@ -1,16 +1,16 @@
 {
   "meta": {
     "version": "2.2.0",
-    "timestamp": "2026-11-23T12:48:57.164952",
-    "display_time": "23.11.2026 12:48:57",
+    "timestamp": "2026-11-23T12:50:55.155715",
+    "display_time": "23.11.2026 12:50:55",
     "display_date": "23.11.2026",
     "location": "Kempten (Allgäu)"
   },
   "energy": {
-    "pv_power_w": 91303,
-    "pv_power_kw": 91.3,
-    "grid_power_w": -91303,
-    "grid_power_kw": -91.3,
+    "pv_power_w": 95824,
+    "pv_power_kw": 95.82,
+    "grid_power_w": -95824,
+    "grid_power_kw": -95.82,
     "grid_mode": "export",
     "home_power_w": 0,
     "home_power_kw": 0.0,
@@ -19,12 +19,12 @@
     "pv_plants": [
       {
         "title": "Fronius rechts",
-        "power_w": 3718,
+        "power_w": 3472,
         "energy_kwh": 17.72
       },
       {
         "title": "Solarlog_Anlage",
-        "power_w": 87585,
+        "power_w": 92352,
         "energy_kwh": 2659.52
       }
     ]
@@ -32,8 +32,8 @@
   "charging_pv_system": {
     "title": "Fronius 3er-Verbund (Auto-Lade-PV)",
     "installed_kwp": 18.67,
-    "total_power_w": 9915,
-    "total_power_kw": 9.91,
+    "total_power_w": 9259,
+    "total_power_kw": 9.26,
     "charging_readiness": {
       "threshold_kw": 6.34,
       "threshold_w": 6340.0,
@@ -42,28 +42,28 @@
       "buffer_with_margin_kw": 2.2,
       "min_current": 6,
       "max_current": 16,
-      "current_kw": 9.91,
-      "current_w": 9915,
+      "current_kw": 9.26,
+      "current_w": 9259,
       "is_ready": true,
-      "diff_kw": 3.58,
+      "diff_kw": 2.92,
       "progress_percent": 100.0
     },
     "wr1": {
       "title": "Fronius rechts (Messwert)",
-      "power_w": 3718,
-      "power_kw": 3.72,
+      "power_w": 3472,
+      "power_kw": 3.47,
       "ratio_percent": 100
     },
     "wr2": {
       "title": "Wechselrichter 2 (Partner-WR)",
-      "power_w": 3718,
-      "power_kw": 3.72,
+      "power_w": 3472,
+      "power_kw": 3.47,
       "ratio_percent": 100
     },
     "wr3": {
       "title": "Wechselrichter 3 (Zusatz-WR)",
-      "power_w": 2479,
-      "power_kw": 2.48,
+      "power_w": 2315,
+      "power_kw": 2.31,
       "ratio_percent": 66.7
     }
   },
@@ -75,10 +75,10 @@
     "buffer_with_margin_kw": 2.2,
     "min_current": 6,
     "max_current": 16,
-    "current_kw": 9.91,
-    "current_w": 9915,
+    "current_kw": 9.26,
+    "current_w": 9259,
     "is_ready": true,
-    "diff_kw": 3.58,
+    "diff_kw": 2.92,
     "progress_percent": 100.0
   },
   "wallbox": {
@@ -91,9 +91,9 @@
     "do_charge": false,
     "power_w": 7700,
     "power_kw": 7.7,
-    "temp_c": 16.0,
-    "energy_kwh": 0.7,
-    "duration_sec": 4860,
+    "temp_c": 17.0,
+    "energy_kwh": 0.9,
+    "duration_sec": 6060,
     "is_plugged": true,
     "is_charging": true,
     "phases": {
@@ -134,12 +134,17 @@
     "house_buffer_kw": 2.0,
     "start_threshold_kw": 6.34,
     "effective_buffer_kw": 2.2,
-    "is_paused_by_pv": false
+    "is_paused_by_pv": false,
+    "grid_override_active": false,
+    "grid_override_amps": 10,
+    "grid_override_started_at": null,
+    "grid_override_started_by_name": null,
+    "grid_override_has_charged": false
   },
   "influx_today": {
-    "energy_kwh": 55.88,
+    "energy_kwh": 58.21,
     "max_power_w": 111345,
-    "avg_power_w": 5006,
+    "avg_power_w": 5221,
     "date": "23.11.2026"
   },
   "weather_intelligence": {
@@ -199,7 +204,7 @@
       {
         "day_label": "Heute",
         "date": "23.11.2026",
-        "energy_kwh": 17.8,
+        "energy_kwh": 17.5,
         "max_kw": 8.3,
         "charging_possible": true
       },

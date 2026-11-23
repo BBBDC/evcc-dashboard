@@ -560,7 +560,7 @@
       <div class="flex items-center space-x-2 sm:space-x-3 ml-auto">
         <div class="text-right text-xs text-slate-500 dark:text-slate-400 hidden lg:block leading-tight">
           <div>Automatischer Abgleich:</div>
-          <div class="font-semibold text-slate-700 dark:text-slate-200" id="countdown-text">in 45s</div>
+          <div class="font-semibold text-slate-700 dark:text-slate-200" id="countdown-text">in 20s</div>
         </div>
 
         <!-- Glass Settings Button (Apple Control Center) -->
@@ -1999,15 +1999,34 @@
       }, 2400);
     }
 
+    const CLOUD_DATA_URL = 'https://evcc-dashboard-data.mayer-max-1994.workers.dev/data.json';
+    const REFRESH_INTERVAL_SEC = 20;
+
     let currentInverterFilter = 'all';
     let allInverters = [];
-    let countdownSeconds = 45;
+    let countdownSeconds = REFRESH_INTERVAL_SEC;
     let countdownInterval = null;
+    let isLoadingTelemetry = false;
 
     const fmtKW = (val) => (val !== null && val !== undefined) ? ((val > 100 ? val / 1000 : val)).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
     const fmtNumber = (val, decimals = 2) => (val !== null && val !== undefined) ? Number(val).toLocaleString('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : '--';
 
+    async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
+      const controller = new AbortController();
+      const timerId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const resp = await fetch(url, { cache: 'no-store', signal: controller.signal });
+        if (!resp.ok) return null;
+        return await resp.json();
+      } finally {
+        clearTimeout(timerId);
+      }
+    }
+
     async function loadTelemetryData(isManual = false) {
+      if (isLoadingTelemetry && !isManual) return;
+      isLoadingTelemetry = true;
+
       const refreshBtn = document.getElementById('refresh-btn');
       const refreshIcon = document.getElementById('refresh-icon');
 
@@ -2020,45 +2039,56 @@
       let data = null;
 
       try {
-        const resp = await fetch(`data.json?t=${timestamp}`, { cache: 'no-store' });
-        if (resp.ok) data = await resp.json();
-      } catch (e) {
-        console.warn("Relativer Abruf data.json fehlgeschlagen:", e);
-      }
-
-      if (!data) {
         try {
-          const rawUrl = `https://raw.githubusercontent.com/BBBDC/evcc-dashboard/main/data.json?t=${timestamp}`;
-          const resp = await fetch(rawUrl, { cache: 'no-store' });
-          if (resp.ok) data = await resp.json();
+          data = await fetchJsonWithTimeout(`${CLOUD_DATA_URL}?t=${timestamp}`, 8000);
         } catch (e) {
-          console.error("Fallback fehlgeschlagen:", e);
+          console.warn("Cloudflare R2 Abruf fehlgeschlagen:", e);
         }
-      }
 
-      if (data) {
-        if (data.auth) {
-          currentAuthData = data.auth;
-          hasLoadedRemoteAuthData = true;
+        if (!data) {
           try {
-            localStorage.setItem('evcc_auth_meta', JSON.stringify(data.auth));
-          } catch(e) {}
+            data = await fetchJsonWithTimeout(`data.json?t=${timestamp}`, 8000);
+          } catch (e) {
+            console.warn("Relativer Abruf data.json fehlgeschlagen:", e);
+          }
         }
-        renderDashboard(data);
-        initAuthOnLoad();
-      } else {
-        document.getElementById('display-time').textContent = 'Fehler beim Laden der Daten';
-      }
 
-      if (isManual) {
-        showToast('Dashboard erfolgreich aktualisiert!');
-        setTimeout(() => {
-          refreshIcon.classList.remove('animate-spin');
-          refreshBtn.disabled = false;
-        }, 500);
-      }
+        if (!data) {
+          try {
+            const rawUrl = `https://raw.githubusercontent.com/BBBDC/evcc-dashboard/main/data.json?t=${timestamp}`;
+            data = await fetchJsonWithTimeout(rawUrl, 8000);
+          } catch (e) {
+            console.error("Fallback fehlgeschlagen:", e);
+          }
+        }
 
-      countdownSeconds = 45;
+        if (data) {
+          if (data.auth) {
+            currentAuthData = data.auth;
+            hasLoadedRemoteAuthData = true;
+            try {
+              localStorage.setItem('evcc_auth_meta', JSON.stringify(data.auth));
+            } catch(e) {}
+          }
+          renderDashboard(data);
+          initAuthOnLoad();
+        } else {
+          document.getElementById('display-time').textContent = 'Fehler beim Laden der Daten';
+        }
+
+        if (isManual) {
+          showToast('Dashboard erfolgreich aktualisiert!');
+          setTimeout(() => {
+            refreshIcon.classList.remove('animate-spin');
+            refreshBtn.disabled = false;
+          }, 500);
+        }
+      } finally {
+        isLoadingTelemetry = false;
+        countdownSeconds = REFRESH_INTERVAL_SEC;
+        const countdownEl = document.getElementById('countdown-text');
+        if (countdownEl) countdownEl.textContent = `in ${countdownSeconds}s`;
+      }
     }
 
     function renderDashboard(data) {
@@ -2917,6 +2947,7 @@
     function startCountdown() {
       if (countdownInterval) clearInterval(countdownInterval);
       countdownInterval = setInterval(() => {
+        if (document.hidden) return;
         countdownSeconds--;
         const el = document.getElementById('countdown-text');
         if (el) el.textContent = `in ${countdownSeconds}s`;
@@ -2926,6 +2957,12 @@
         }
       }, 1000);
     }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        loadTelemetryData();
+      }
+    });
 
     window.addEventListener('DOMContentLoaded', () => {
       initThemeMode();

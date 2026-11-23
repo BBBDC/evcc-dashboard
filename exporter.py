@@ -11,6 +11,10 @@ Sammelt Daten aus:
 
 import sys
 import os
+import copy
+import contextlib
+import fcntl
+import hashlib
 import json
 import sqlite3
 import asyncio
@@ -18,6 +22,7 @@ import aiohttp
 import configparser
 import subprocess
 import math
+import time
 from zoneinfo import ZoneInfo
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -27,8 +32,11 @@ BASE_DIR = Path("/home/admin/evcc-dashboard")
 BOT_DIR = Path("/home/admin/evcc-bot")
 CONFIG_PATH = BOT_DIR / "config.ini"
 
-CHARGING_DB_PATH = Path.home() / ".local" / "share" / "evcc_bot" / "charging.db"
+STATE_DIR = Path.home() / ".local" / "share" / "evcc_bot"
+CHARGING_DB_PATH = STATE_DIR / "charging.db"
 SOLARLOG_DB_PATH = Path.home() / ".local" / "share" / "solarlog_monitor" / "solarlog.db"
+TRIGGER_FILE = STATE_DIR / "dashboard_export.trigger"
+LOCK_FILE = STATE_DIR / "dashboard_exporter.lock"
 
 # Zeitzone & Koordinaten Kempten (Allgäu)
 LOCAL_TZ = ZoneInfo("Europe/Berlin")
@@ -36,8 +44,14 @@ LAT = 47.7479
 LON = 10.3077
 
 # Dynamische Zyklus-Intervalle (Sekunden)
-DAY_INTERVAL_SEC = 120    # 2 Minuten tagsüber bei Sonnenschein oder Ladevorgang
-NIGHT_INTERVAL_SEC = 900  # 15 Minuten nachts im Ruhemodus (schont GitHub API & Pages)
+DAY_INTERVAL_SEC = 120    # 2 Minuten tagsüber bei Sonnenschein oder Ladevorgang (Git-Modus)
+NIGHT_INTERVAL_SEC = 900  # 15 Minuten nachts im Ruhemodus (Git-Modus)
+
+# Defaults für Cloudflare R2 Cloud-Modus
+DEFAULT_CLOUD_DAY_INTERVAL_SEC = 20
+DEFAULT_CLOUD_NIGHT_INTERVAL_SEC = 600
+DEFAULT_WEATHER_CACHE_SEC = 900
+DEFAULT_HEARTBEAT_SEC = 60
 
 
 def get_sun_times(dt: Optional[datetime] = None) -> tuple[Optional[datetime], Optional[datetime]]:
@@ -119,6 +133,34 @@ def load_config():
     if CONFIG_PATH.exists():
         config.read(CONFIG_PATH)
     return config
+
+
+def get_cloud_config(cfg: Optional[configparser.ConfigParser] = None) -> Dict[str, Any]:
+    """Liest die Konfiguration für den Cloudflare-R2-Export aus [dashboard_cloud]."""
+    c = cfg if cfg is not None else load_config()
+    sec = "dashboard_cloud"
+    enabled = c.getboolean(sec, "enabled", fallback=False) if c.has_section(sec) else False
+    default_day = DEFAULT_CLOUD_DAY_INTERVAL_SEC if enabled else DAY_INTERVAL_SEC
+    default_night = DEFAULT_CLOUD_NIGHT_INTERVAL_SEC if enabled else NIGHT_INTERVAL_SEC
+
+    def _safe_int(option: str, fallback: int, minimum: int = 1) -> int:
+        if not c.has_section(sec):
+            return fallback
+        try:
+            return max(minimum, c.getint(sec, option, fallback=fallback))
+        except (ValueError, configparser.Error):
+            return fallback
+
+    return {
+        "enabled": enabled,
+        "worker_url": c.get(sec, "worker_url", fallback="").strip().rstrip("/") if c.has_section(sec) else "",
+        "write_token": c.get(sec, "write_token", fallback="").strip() if c.has_section(sec) else "",
+        "day_interval_sec": _safe_int("day_interval_sec", default_day, minimum=5),
+        "night_interval_sec": _safe_int("night_interval_sec", default_night, minimum=10),
+        "weather_cache_sec": _safe_int("weather_cache_sec", DEFAULT_WEATHER_CACHE_SEC, minimum=0),
+        "heartbeat_sec": _safe_int("heartbeat_sec", DEFAULT_HEARTBEAT_SEC, minimum=5),
+        "git_fallback_enabled": c.getboolean(sec, "git_fallback_enabled", fallback=False) if c.has_section(sec) else False,
+    }
 
 
 config = load_config()
@@ -427,6 +469,8 @@ def fetch_solarlog_db() -> Dict[str, Any]:
 
 
 _LAST_WEATHER_CACHE: Optional[Dict[str, Any]] = None
+_WEATHER_HTTP_CACHE: Optional[Dict[str, Any]] = None
+_WEATHER_HTTP_FETCHED_AT: float = 0.0
 
 
 def _init_weather_cache_from_disk():
@@ -446,11 +490,16 @@ def _init_weather_cache_from_disk():
 _init_weather_cache_from_disk()
 
 
-async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any]) -> Dict[str, Any]:
+async def fetch_weather_and_charging_recommendations(
+    evcc_state: Dict[str, Any],
+    weather_cache_sec: int = DEFAULT_WEATHER_CACHE_SEC,
+) -> Dict[str, Any]:
     """
-    Fragt Open-Meteo und DWD Bright Sky ab und berechnet die besten Ladefenster
-    basierend auf der 220 kWp Solarprognose.
+    Fragt Open-Meteo und DWD Bright Sky ab (mit lokalem HTTP-Cache) und berechnet
+    die besten Ladefenster basierend auf der 220 kWp Solarprognose.
     """
+    global _WEATHER_HTTP_CACHE, _WEATHER_HTTP_FETCHED_AT
+
     weather_data = {
         "location": "Kempten (Allgäu)",
         "dwd": {"condition": "unbekannt", "temp_c": None, "cloud_cover": None},
@@ -459,57 +508,81 @@ async def fetch_weather_and_charging_recommendations(evcc_state: Dict[str, Any])
         "days_overview": []
     }
 
-    try:
-        async with aiohttp.ClientSession() as session:
-            # 1. DWD Bright Sky
-            try:
-                dwd_url = f"https://api.brightsky.dev/current_weather?lat={LAT}&lon={LON}"
-                async with session.get(dwd_url, timeout=aiohttp.ClientTimeout(total=4)) as r:
-                    if r.status == 200:
-                        d = await r.json()
-                        w = d.get("weather", {})
-                        weather_data["dwd"] = {
-                            "condition": w.get("condition", "trocken"),
-                            "temp_c": w.get("temperature"),
-                            "cloud_cover": w.get("cloud_cover")
-                        }
-            except Exception as e:
-                print(f"Warnung DWD API: {e}", file=sys.stderr)
+    now_mono = time.monotonic()
+    if (
+        weather_cache_sec > 0
+        and _WEATHER_HTTP_CACHE is not None
+        and (now_mono - _WEATHER_HTTP_FETCHED_AT) < weather_cache_sec
+    ):
+        weather_data["dwd"] = copy.deepcopy(_WEATHER_HTTP_CACHE["dwd"])
+        weather_data["open_meteo"] = copy.deepcopy(_WEATHER_HTTP_CACHE["open_meteo"])
+    else:
+        try:
+            async with aiohttp.ClientSession() as session:
+                # 1. DWD Bright Sky
+                try:
+                    dwd_url = f"https://api.brightsky.dev/current_weather?lat={LAT}&lon={LON}"
+                    async with session.get(dwd_url, timeout=aiohttp.ClientTimeout(total=4)) as r:
+                        if r.status == 200:
+                            d = await r.json()
+                            w = d.get("weather", {})
+                            weather_data["dwd"] = {
+                                "condition": w.get("condition", "trocken"),
+                                "temp_c": w.get("temperature"),
+                                "cloud_cover": w.get("cloud_cover")
+                            }
+                except Exception as e:
+                    print(f"Warnung DWD API: {e}", file=sys.stderr)
 
-            # 2. Open-Meteo Wetter & Globalstrahlung & Sonnenzeiten
-            try:
-                om_url = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&hourly=cloudcover,direct_normal_irradiance,temperature_2m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunshine_duration,sunrise,sunset&timezone=Europe%2FBerlin&forecast_days=3"
-                async with session.get(om_url, timeout=aiohttp.ClientTimeout(total=4)) as r:
-                    if r.status == 200:
-                        om = await r.json()
-                        daily = om.get("daily", {})
-                        sunshine_sec = daily.get("sunshine_duration", [0, 0, 0])
-                        weather_data["open_meteo"]["sunshine_today_h"] = round(sunshine_sec[0] / 3600.0, 1) if sunshine_sec else 0
-                        weather_data["open_meteo"]["sunshine_tomorrow_h"] = round(sunshine_sec[1] / 3600.0, 1) if len(sunshine_sec) > 1 else 0
-                        
-                        sr_list = daily.get("sunrise", [])
-                        ss_list = daily.get("sunset", [])
-                        if sr_list and sr_list[0]:
-                            weather_data["open_meteo"]["sunrise"] = sr_list[0].split("T")[-1] if "T" in sr_list[0] else sr_list[0]
-                        if ss_list and ss_list[0]:
-                            weather_data["open_meteo"]["sunset"] = ss_list[0].split("T")[-1] if "T" in ss_list[0] else ss_list[0]
+                # 2. Open-Meteo Wetter & Globalstrahlung & Sonnenzeiten
+                try:
+                    om_url = f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&hourly=cloudcover,direct_normal_irradiance,temperature_2m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunshine_duration,sunrise,sunset&timezone=Europe%2FBerlin&forecast_days=3"
+                    async with session.get(om_url, timeout=aiohttp.ClientTimeout(total=4)) as r:
+                        if r.status == 200:
+                            om = await r.json()
+                            daily = om.get("daily", {})
+                            sunshine_sec = daily.get("sunshine_duration", [0, 0, 0])
+                            weather_data["open_meteo"]["sunshine_today_h"] = round(sunshine_sec[0] / 3600.0, 1) if sunshine_sec else 0
+                            weather_data["open_meteo"]["sunshine_tomorrow_h"] = round(sunshine_sec[1] / 3600.0, 1) if len(sunshine_sec) > 1 else 0
+                            
+                            sr_list = daily.get("sunrise", [])
+                            ss_list = daily.get("sunset", [])
+                            if sr_list and sr_list[0]:
+                                weather_data["open_meteo"]["sunrise"] = sr_list[0].split("T")[-1] if "T" in sr_list[0] else sr_list[0]
+                            if ss_list and ss_list[0]:
+                                weather_data["open_meteo"]["sunset"] = ss_list[0].split("T")[-1] if "T" in ss_list[0] else ss_list[0]
 
-                        hourly_cc = om.get("hourly", {}).get("cloudcover", [])
-                        if hourly_cc:
-                            now_hour = datetime.now().hour
-                            weather_data["open_meteo"]["cloud_cover"] = hourly_cc[min(now_hour, len(hourly_cc) - 1)]
-            except Exception as e:
-                print(f"Warnung Open-Meteo API: {e}", file=sys.stderr)
+                            hourly_cc = om.get("hourly", {}).get("cloudcover", [])
+                            if hourly_cc:
+                                now_hour = datetime.now().hour
+                                weather_data["open_meteo"]["cloud_cover"] = hourly_cc[min(now_hour, len(hourly_cc) - 1)]
+                except Exception as e:
+                    print(f"Warnung Open-Meteo API: {e}", file=sys.stderr)
 
-        # Fallback Sonnenzeiten via NOAA-Berechnung falls Open-Meteo fehlt
-        if not weather_data["open_meteo"].get("sunrise") or not weather_data["open_meteo"].get("sunset"):
-            sr, ss = get_sun_times()
-            if sr and ss:
-                weather_data["open_meteo"]["sunrise"] = sr.strftime("%H:%M")
-                weather_data["open_meteo"]["sunset"] = ss.strftime("%H:%M")
+        except Exception as e:
+            print(f"Warnung Wetterabruf allgemein: {e}", file=sys.stderr)
 
-    except Exception as e:
-        print(f"Warnung Wetterabruf allgemein: {e}", file=sys.stderr)
+        has_fresh_weather = (
+            weather_data["dwd"].get("temp_c") is not None
+            or weather_data["open_meteo"].get("sunshine_today_h") is not None
+        )
+        if has_fresh_weather:
+            _WEATHER_HTTP_CACHE = {
+                "dwd": copy.deepcopy(weather_data["dwd"]),
+                "open_meteo": copy.deepcopy(weather_data["open_meteo"]),
+            }
+            _WEATHER_HTTP_FETCHED_AT = time.monotonic()
+        elif _WEATHER_HTTP_CACHE is not None:
+            # Fallback auf letzten gültigen Wetter-Cache, aber Zeitstempel nicht verlängern
+            weather_data["dwd"] = copy.deepcopy(_WEATHER_HTTP_CACHE["dwd"])
+            weather_data["open_meteo"] = copy.deepcopy(_WEATHER_HTTP_CACHE["open_meteo"])
+
+    # Fallback Sonnenzeiten via NOAA-Berechnung falls Open-Meteo fehlt
+    if not weather_data["open_meteo"].get("sunrise") or not weather_data["open_meteo"].get("sunset"):
+        sr, ss = get_sun_times()
+        if sr and ss:
+            weather_data["open_meteo"]["sunrise"] = sr.strftime("%H:%M")
+            weather_data["open_meteo"]["sunset"] = ss.strftime("%H:%M")
 
     # 3. Ladefenster-Berechnung AUSSCHLIESSLICH aus Fronius 3er-Verbund (18.67 kWp)
     # Formel: WR 1 (Fronius rechts) + WR 2 (100%) + WR 3 (66.7%) = 8/3 ≈ 2.667 * Fronius
@@ -663,13 +736,19 @@ def fetch_auth_data() -> Dict[str, Any]:
         }
 
 
-async def fetch_wallbox_telemetry() -> Dict[str, Any]:
+async def fetch_wallbox_telemetry(force_refresh: bool = False) -> Dict[str, Any]:
     try:
         if str(BOT_DIR) not in sys.path:
             sys.path.insert(0, str(BOT_DIR))
         from bot.wallbox import get_wallbox_instance
         wb = get_wallbox_instance()
-        telemetry = await wb.get_telemetry()
+        if force_refresh:
+            try:
+                telemetry = await wb.get_telemetry(max_cache_age_sec=0)
+            except TypeError:
+                telemetry = await wb.get_telemetry()
+        else:
+            telemetry = await wb.get_telemetry()
         return telemetry
     except Exception as e:
         print(f"Warnung Wallbox-Telemetrie: {e}", file=sys.stderr)
@@ -685,14 +764,19 @@ async def fetch_wallbox_telemetry() -> Dict[str, Any]:
         }
 
 
-async def generate_payload() -> Dict[str, Any]:
+async def generate_payload(
+    force_refresh: bool = False,
+    weather_cache_sec: int = DEFAULT_WEATHER_CACHE_SEC,
+) -> Dict[str, Any]:
     now = datetime.now()
     evcc_state = await fetch_evcc_state() or {}
     influx_stats = fetch_influx_stats()
     charging_data = fetch_charging_db()
     solarlog_data = fetch_solarlog_db()
-    weather_and_charging = await fetch_weather_and_charging_recommendations(evcc_state)
-    wallbox_data = await fetch_wallbox_telemetry()
+    weather_and_charging = await fetch_weather_and_charging_recommendations(
+        evcc_state, weather_cache_sec=weather_cache_sec
+    )
+    wallbox_data = await fetch_wallbox_telemetry(force_refresh=force_refresh)
 
     # EVCC Aufbereitung
     pv_list = evcc_state.get("pv", [])
@@ -852,29 +936,89 @@ async def generate_payload() -> Dict[str, Any]:
     return payload
 
 
-def export_and_push() -> tuple[bool, Dict[str, Any]]:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    payload = loop.run_until_complete(generate_payload())
-    loop.close()
+_LAST_CLOUD_FINGERPRINT: Optional[str] = None
+_LAST_CLOUD_PUSH_MONO: Optional[float] = None
 
-    json_file = BASE_DIR / "data.json"
-    with open(json_file, "w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2, ensure_ascii=False)
 
-    now_str = datetime.now().strftime("%d.%m %H:%M:%S")
-    print(f"[{now_str}] ✅ data.json geschrieben.")
+def _payload_fingerprint(payload: Dict[str, Any]) -> str:
+    """Berechnet einen stabilen Hash der Nutzdaten ohne flüchtige Zeitstempel in meta."""
+    normalized = dict(payload)
+    meta = normalized.get("meta")
+    if isinstance(meta, dict):
+        normalized["meta"] = {
+            k: v for k, v in meta.items() if k not in ("timestamp", "display_time")
+        }
+    canonical = json.dumps(normalized, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
-    pushed = False
-    # Git Commit & Push mit Historien-Schutz (--amend wenn möglich)
+
+@contextlib.contextmanager
+def _exporter_lock(lock_path: Optional[Path] = None):
+    """Schützt parallele Exporter-Läufe über ein exklusives File-Lock."""
+    target = Path(lock_path) if lock_path is not None else LOCK_FILE
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with open(target, "a+", encoding="utf-8") as lock_fp:
+        fcntl.flock(lock_fp.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock_fp.fileno(), fcntl.LOCK_UN)
+
+
+async def push_to_cloudflare_worker(
+    payload_bytes: bytes,
+    worker_url: str,
+    write_token: str,
+    max_attempts: int = 3,
+    timeout_sec: float = 10.0,
+) -> bool:
+    """Überträgt data.json atomar per HTTP PUT an den Cloudflare R2 Worker."""
+    target_url = f"{worker_url.rstrip('/')}/data.json"
+    headers = {
+        "Authorization": f"Bearer {write_token}",
+        "Content-Type": "application/json; charset=utf-8",
+    }
+    timeout = aiohttp.ClientTimeout(total=timeout_sec)
+
+    async with aiohttp.ClientSession(timeout=timeout) as session:
+        for attempt in range(1, max_attempts + 1):
+            try:
+                async with session.put(target_url, data=payload_bytes, headers=headers) as resp:
+                    if resp.status in (200, 201, 204):
+                        return True
+                    body_text = (await resp.text())[:300]
+                    if resp.status in (400, 401, 403, 404, 413):
+                        print(
+                            f"⚠️ Cloudflare Worker lehnte Upload ab (HTTP {resp.status}): {body_text}",
+                            file=sys.stderr,
+                        )
+                        return False
+                    print(
+                        f"⚠️ Cloudflare Worker Fehler HTTP {resp.status} (Versuch {attempt}/{max_attempts}): {body_text}",
+                        file=sys.stderr,
+                    )
+            except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+                print(
+                    f"⚠️ Cloudflare Worker Netzwerkfehler (Versuch {attempt}/{max_attempts}): {e}",
+                    file=sys.stderr,
+                )
+
+            if attempt < max_attempts:
+                await asyncio.sleep(1.0 * attempt)
+
+    return False
+
+
+def _push_to_git(now_str: str) -> bool:
+    """Legacy Git Commit & Push nach GitHub Pages (nur wenn Cloud deaktiviert oder Fallback aktiv)."""
     try:
         status = subprocess.run(["git", "status", "--porcelain", "data.json"], cwd=BASE_DIR, capture_output=True, text=True)
         if status.stdout.strip():
             subprocess.run(["git", "add", "data.json"], cwd=BASE_DIR, check=True)
-            
+
             last_msg = subprocess.run(["git", "log", "-1", "--pretty=%B"], cwd=BASE_DIR, capture_output=True, text=True).stdout.strip()
             commit_msg = f"chore(data): auto-update telemetry {datetime.now().strftime('%d.%m %H:%M')}"
-            
+
             if last_msg.startswith("chore(data):"):
                 subprocess.run(["git", "commit", "--amend", "--date=now", "-m", commit_msg], cwd=BASE_DIR, check=True)
                 subprocess.run(["git", "push", "-f", "origin", "main"], cwd=BASE_DIR, check=True)
@@ -883,37 +1027,143 @@ def export_and_push() -> tuple[bool, Dict[str, Any]]:
                 subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True)
 
             print(f"[{now_str}] 🚀 Telemetrie erfolgreich zu GitHub übertragen.")
-            pushed = True
+            return True
         else:
             print(f"[{now_str}] Keine Änderungen in data.json festgestellt.")
     except Exception as e:
         print(f"[{now_str}] ⚠️ Fehler bei Git Push: {e}", file=sys.stderr)
+    return False
 
-    return pushed, payload
 
+def export_and_push(force_push: bool = False) -> tuple[bool, Dict[str, Any]]:
+    global _LAST_CLOUD_FINGERPRINT, _LAST_CLOUD_PUSH_MONO
 
-def run_daemon(day_interval_sec: int = DAY_INTERVAL_SEC, night_interval_sec: int = NIGHT_INTERVAL_SEC):
-    print(f"⚡ Starte EVCC Dashboard Exporter Daemon v2.1 (Tag: {day_interval_sec}s, Nacht: {night_interval_sec}s / {round(night_interval_sec/60)}m)...")
-    import time
-    while True:
-        sleep_sec = day_interval_sec
+    with _exporter_lock():
+        cloud_cfg = get_cloud_config()
+        cloud_active = bool(cloud_cfg["enabled"] and cloud_cfg["worker_url"] and cloud_cfg["write_token"])
+        if cloud_cfg["enabled"] and not cloud_active:
+            print(
+                "⚠️ [dashboard_cloud] ist aktiviert, aber worker_url oder write_token fehlt -> nutze Git-Fallback.",
+                file=sys.stderr,
+            )
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         try:
-            pushed, payload = export_and_push()
-            sleep_sec = get_dynamic_interval(payload, day_interval_sec, night_interval_sec)
+            payload = loop.run_until_complete(
+                generate_payload(
+                    force_refresh=force_push,
+                    weather_cache_sec=cloud_cfg["weather_cache_sec"],
+                )
+            )
+
+            payload_str = json.dumps(payload, indent=2, ensure_ascii=False)
+            json_file = BASE_DIR / "data.json"
+            json_file.parent.mkdir(parents=True, exist_ok=True)
+            tmp_file = json_file.with_name(f"{json_file.name}.tmp.{os.getpid()}")
+            with open(tmp_file, "w", encoding="utf-8") as f:
+                f.write(payload_str)
+            os.replace(tmp_file, json_file)
+
+            now_str = datetime.now().strftime("%d.%m %H:%M:%S")
+            print(f"[{now_str}] ✅ data.json geschrieben.")
+
+            pushed = False
+            if cloud_active:
+                fp = _payload_fingerprint(payload)
+                now_mono = time.monotonic()
+                needs_push = (
+                    force_push
+                    or _LAST_CLOUD_FINGERPRINT != fp
+                    or _LAST_CLOUD_PUSH_MONO is None
+                    or (now_mono - _LAST_CLOUD_PUSH_MONO) >= cloud_cfg["heartbeat_sec"]
+                )
+                if needs_push:
+                    ok = loop.run_until_complete(
+                        push_to_cloudflare_worker(
+                            payload_str.encode("utf-8"),
+                            cloud_cfg["worker_url"],
+                            cloud_cfg["write_token"],
+                        )
+                    )
+                    if ok:
+                        _LAST_CLOUD_FINGERPRINT = fp
+                        _LAST_CLOUD_PUSH_MONO = time.monotonic()
+                        print(f"[{now_str}] 🚀 Telemetrie erfolgreich an Cloudflare R2 übertragen.")
+                        pushed = True
+                else:
+                    print(f"[{now_str}] Keine Wertänderung (Cloudflare R2 Upload übersprungen).")
+
+            if (not cloud_active) or cloud_cfg["git_fallback_enabled"]:
+                git_pushed = _push_to_git(now_str)
+                pushed = pushed or git_pushed
+
+            return pushed, payload
+        finally:
+            asyncio.set_event_loop(None)
+            loop.close()
+
+
+def _sleep_or_trigger(
+    sleep_sec: int,
+    trigger_file: Optional[Path] = None,
+    poll_interval: float = 1.0,
+) -> bool:
+    """Wartet bis zu `sleep_sec` Sekunden, wacht aber bei vorhandener Trigger-Datei sofort auf."""
+    tf = Path(trigger_file) if trigger_file is not None else TRIGGER_FILE
+    deadline = time.monotonic() + max(0, sleep_sec)
+    while True:
+        if tf.exists():
+            try:
+                tf.unlink(missing_ok=True)
+            except OSError:
+                pass
+            return True
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return False
+        time.sleep(min(poll_interval, remaining))
+
+
+def run_daemon(
+    day_interval_sec: Optional[int] = None,
+    night_interval_sec: Optional[int] = None,
+):
+    init_cfg = get_cloud_config()
+    eff_day = day_interval_sec if day_interval_sec is not None else init_cfg["day_interval_sec"]
+    eff_night = night_interval_sec if night_interval_sec is not None else init_cfg["night_interval_sec"]
+    mode_label = (
+        "Cloudflare R2"
+        if (init_cfg["enabled"] and init_cfg["worker_url"] and init_cfg["write_token"])
+        else "Git"
+    )
+    print(
+        f"⚡ Starte EVCC Dashboard Exporter Daemon v2.2 ({mode_label}, Tag: {eff_day}s, "
+        f"Nacht: {eff_night}s / {round(eff_night / 60)}m)..."
+    )
+
+    triggered = False
+    while True:
+        cloud_cfg = get_cloud_config()
+        eff_day = day_interval_sec if day_interval_sec is not None else cloud_cfg["day_interval_sec"]
+        eff_night = night_interval_sec if night_interval_sec is not None else cloud_cfg["night_interval_sec"]
+        sleep_sec = eff_day
+        try:
+            if triggered:
+                now_str = datetime.now().strftime("%H:%M:%S")
+                print(f"[{now_str}] ⚡ Sofort-Trigger erkannt -> exportiere sofort.")
+            pushed, payload = export_and_push(force_push=triggered)
+            sleep_sec = get_dynamic_interval(payload, eff_day, eff_night)
         except Exception as e:
             print(f"Unerwarteter Exporter-Fehler: {e}", file=sys.stderr)
-            sleep_sec = day_interval_sec
-        time.sleep(sleep_sec)
+            sleep_sec = eff_day
+        triggered = _sleep_or_trigger(sleep_sec)
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] in ("--daemon", "-d", "daemon"):
-        day_iv = DAY_INTERVAL_SEC
-        night_iv = NIGHT_INTERVAL_SEC
-        if len(sys.argv) > 2 and sys.argv[2].isdigit():
-            day_iv = int(sys.argv[2])
-        if len(sys.argv) > 3 and sys.argv[3].isdigit():
-            night_iv = int(sys.argv[3])
+        day_iv = int(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2].isdigit() else None
+        night_iv = int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].isdigit() else None
         run_daemon(day_iv, night_iv)
     else:
-        export_and_push()
+        export_and_push(force_push=True)
